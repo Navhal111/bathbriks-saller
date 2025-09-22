@@ -17,11 +17,7 @@ const menuItems = [
   {
     label: "Password",
     value: "/profile-settings/password",
-  },
-  {
-    label: "Team",
-    value: "/profile-settings/team",
-  },
+  }
 ];
 
 export default function ProfileSettingsNav() {

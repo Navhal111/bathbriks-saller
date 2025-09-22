@@ -106,6 +106,7 @@ export interface UserDetailsResponse extends BaseModel {
   userMobile: string;
   createdDate: string;
   updatedDate: string;
+  userDesignation?: string;
 }
 
 export interface UpdateUserDetailsPayload {

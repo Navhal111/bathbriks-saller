@@ -1,0 +1,102 @@
+import { SubCategoryType } from "@/kit/models/SubCategory";
+
+export const subCategoriesData: SubCategoryType[] = [
+    {
+        id: '0o02051402',
+        name: 'Tasty Metal Shirt',
+        description: 'A stylish metal shirt for modern fashion.',
+        status: 'draft',
+        category: 'Clothing',
+    },
+    {
+        id: '0o17477864',
+        name: 'Modern Gloves',
+        description: 'Comfortable gloves for everyday use.',
+        status: 'draft',
+        category: 'Clothing',
+    },
+    {
+        id: '0o02374305',
+        name: 'Rustic Steel Computer',
+        description: 'A vintage steel computer for retro lovers.',
+        status: 'draft',
+        category: 'Electronics',
+    },
+    {
+        id: '0o02602714',
+        name: 'Licensed Concrete Cheese',
+        description: 'A durable concrete cheese for modern kitchens.',
+        status: 'draft',
+        category: 'Food',
+    },
+    {
+        id: '0o02602714',
+        name: 'Licensed Concrete Cheese',
+        description: 'A durable concrete cheese for modern kitchens.',
+        status: 'draft',
+        category: 'Food',
+    },
+    {
+        id: '0o54011366',
+        name: 'Electronic Rubber Table',
+        description: 'A versatile rubber table for all occasions.',
+        status: 'draft',
+        category: 'Furniture',
+    },
+    {
+        id: '0o24033230',
+        name: 'Gorgeous Bronze Gloves',
+        description: 'Comfortable gloves for everyday use.',
+        status: 'publish',
+        category: 'Clothing',
+    },
+    {
+        id: '0o27342230',
+        name: 'Practical Steel Keyboard',
+        description: 'A stylish metal shirt for modern fashion.',
+        status: 'publish',
+        category: 'Electronics',
+    },
+    {
+        id: '0o64235224',
+        name: 'Sleek Frozen Ball',
+        description: 'A sleek frozen ball for cool drinks.',
+        status: 'publish',
+        category: 'Sports',
+    },
+    {
+        id: '0o63671734',
+        name: 'Ergonomic Frozen Pants',
+        description: 'Comfortable pants for gaming sessions.',
+        status: 'pending',
+        category: 'Clothing',
+    },
+    {
+        id: '0o60206537',
+        name: 'Sleek Fresh Chair',
+        description: 'A sleek fresh chair for modern living.',
+        status: 'draft',
+        category: 'Furniture',
+    },
+    {
+        id: '0o53505174',
+        name: 'Awesome Granite Chicken',
+        description: 'A delicious granite chicken for gourmet meals.',
+        status: 'pending',
+        category: 'Food',
+    },
+    {
+        id: '0o21944000',
+        name: 'Modern Granite Chicken',
+        description: 'A modern granite chicken for gourmet meals.',
+        status: 'pending',
+        category: 'Food',
+    },
+    {
+        id: '0o54011366',
+        name: 'Electronic Rubber Table',
+        description: 'A versatile rubber table for all occasions.',
+        status: 'pending',
+        category: 'Furniture',
+    }
+];

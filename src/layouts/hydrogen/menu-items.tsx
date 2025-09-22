@@ -12,6 +12,7 @@ import {
   PiFolder,
   PiShapesDuotone,
   PiNewspaperClippingDuotone,
+  PiAcorn,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -47,6 +48,36 @@ export const menuItems: MenuItem[] = [
       {
         name: "New Product",
         href: "/products/new",
+      },
+    ],
+  },
+  {
+    name: "Category Management",
+    href: "#",
+    icon: <PiFolder />,
+    dropdownItems: [
+      {
+        name: "Category",
+        href: "/categories",
+      },
+      {
+        name: "Sub Category",
+        href: "/sub-categories",
+      },
+    ],
+  },
+  {
+    name: "Orders modules",
+    href: "#",
+    icon: <PiAcorn />,
+    dropdownItems: [
+      {
+        name: "Orders List",
+        href: "/orders",
+      },
+      {
+        name: "Return Orders",
+        href: "/return-orders",
       },
     ],
   },

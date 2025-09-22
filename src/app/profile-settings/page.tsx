@@ -47,6 +47,7 @@ export default function PersonalInfoView() {
     if (userDetails && formMethods) {
       formMethods.setValue("email", userDetails.userEmail || "");
       formMethods.setValue("mobile", userDetails.userMobile || "");
+      formMethods.setValue("designation", userDetails.userDesignation || "");
       setUserName(userDetails.userName || "");
     }
   }, [userDetails, formMethods]);
@@ -67,6 +68,7 @@ export default function PersonalInfoView() {
         username: userName,
         userEmail: data.email,
         userMobile: data.mobile,
+        userDesignation: data.designation,
         userType: userDetails.userType,
       };
 
@@ -170,6 +172,18 @@ export default function PersonalInfoView() {
                   placeholder="+1 (555) 000-0000"
                   {...register("mobile")}
                   error={errors.mobile?.message}
+                />
+              </FormGroup>
+              <FormGroup
+                title="Designation"
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
+                <Input
+                  type="text"
+                  className="col-span-full"
+                  placeholder="Enter your designation (optional)"
+                  inputClassName="text-sm"
+                  {...register('designation')}
                 />
               </FormGroup>
             </div>

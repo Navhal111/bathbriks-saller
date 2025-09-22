@@ -17,7 +17,7 @@ const pageHeader = {
   breadcrumb: [
     {
       href: "/",
-      name: 'E-Commerce',
+      name: 'Dashboard',
     },
     {
       href: "/products",

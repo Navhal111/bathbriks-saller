@@ -26,18 +26,7 @@ const pageHeader = {
 export default function CreateProductPage() {
   return (
     <>
-      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
-        <Link
-          href={"products/new"}
-          className="mt-4 w-full @lg:mt-0 @lg:w-auto"
-        >
-          <Button as="span" className="w-full @lg:w-auto">
-            <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
-            Add Product
-          </Button>
-        </Link>
-      </PageHeader>
-
+      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
       <CreateEditProduct />
     </>
   );
