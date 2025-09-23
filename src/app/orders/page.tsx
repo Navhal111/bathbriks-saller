@@ -38,6 +38,10 @@ export default function OrdersPage() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
+    const [search, setSearch] = useState({
+        minAmount: '',
+        maxAmount: '',
+    })
     const [selectedOrder, setSelectedOrder] = useState<OrderType>()
     const [orderId, setOrderId] = useState<string>('');
     const [actionType, setActionType] = useState<'delete' | 'update' | null>(null);
@@ -45,7 +49,15 @@ export default function OrdersPage() {
 
     const debouncedSearch = KitDebouncedSearchInput(searchQuery, 500);
 
-    const { OrderList, isOrderListLoading, refreshOrderList } = useGetAllOrderList({ page, size: pageSize, search: debouncedSearch });
+    const queryParams = {
+        page: page,
+        size: pageSize,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(search.minAmount && { startDate: search.minAmount }),
+        ...(search.maxAmount && { endDate: search.maxAmount }),
+    }
+
+    const { OrderList, isOrderListLoading, refreshOrderList } = useGetAllOrderList(queryParams);
     const { deleteRecord, isDeleting } = useDeleteOrder(orderId || '');
     const { update: onUpdateOrder, isUpdatingOrder } = useUpdateOrder(orderId);
 
@@ -123,6 +135,8 @@ export default function OrdersPage() {
                 onDelete={orderDelete}
                 onStatusUpdate={onStatusUpdate}
                 onView={orderView}
+                search={search}
+                setSearch={setSearch}
             />
 
             <KitShow show={isOrderModalOpen}>

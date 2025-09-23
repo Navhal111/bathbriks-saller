@@ -1,6 +1,6 @@
 'use client';
 
-import PriceField from '@/components/controlled-table/price-field';
+import DateFiled from '@/components/controlled-table/date-field';
 import { FilterDrawerView } from '@/components/controlled-table/table-filter';
 import ToggleColumns from '@/components/table-utils/toggle-columns';
 import { type Table as ReactTableType } from '@tanstack/react-table';
@@ -16,8 +16,8 @@ interface TableToolbarProps<T extends Record<string, any>> {
     table: ReactTableType<T>;
     searchQuery?: string;
     setSearchQuery?: (query: string) => void;
-    search?: { minAmount: string; maxAmount: string };
-    setSearch?: (search: { minAmount: string; maxAmount: string }) => void;
+    search?: { startDate: string; endDate: string };
+    setSearch?: (search: { startDate: string; endDate: string }) => void;
 }
 
 export default function Filters<TData extends Record<string, any>>({
@@ -28,7 +28,7 @@ export default function Filters<TData extends Record<string, any>>({
     setSearch
 }: TableToolbarProps<TData>) {
     const [openDrawer, setOpenDrawer] = useState(false);
-    const [tempSearch, setTempSearch] = useState(search || { minAmount: '', maxAmount: '' });
+    const [tempSearch, setTempSearch] = useState(search || { startDate: '', endDate: '' });
 
     const {
         options: { meta },
@@ -38,7 +38,7 @@ export default function Filters<TData extends Record<string, any>>({
         <Flex align="center" justify="between" className="mb-4">
             <Input
                 type="search"
-                placeholder="Search by customer name..."
+                placeholder="Search by transaction..."
                 value={searchQuery}
                 onClear={() => setSearchQuery?.('')}
                 onChange={(e) => setSearchQuery?.(e.target.value)}
@@ -77,41 +77,49 @@ export default function Filters<TData extends Record<string, any>>({
     );
 }
 
-
 function FilterElements({
     initialSearch,
     onTempChange,
 }: {
-    initialSearch?: { minAmount: string; maxAmount: string };
-    onTempChange?: (search: { minAmount: string; maxAmount: string }) => void;
+    initialSearch?: { startDate: string; endDate: string };
+    onTempChange?: (search: { startDate: string; endDate: string }) => void;
 }) {
-    const [minAmount, setMinAmount] = useState(initialSearch?.minAmount || '');
-    const [maxAmount, setMaxAmount] = useState(initialSearch?.maxAmount || '');
+
+    const [startDate, setStartDate] = useState(initialSearch?.startDate || '');
+    const [endDate, setEndDate] = useState(initialSearch?.endDate || '');
 
     useEffect(() => {
-        onTempChange?.({ minAmount, maxAmount });
-    }, [minAmount, maxAmount]);
-    
-    const isFiltered = minAmount !== '' || maxAmount !== '';
+        onTempChange?.({ startDate, endDate });
+    }, [startDate, endDate]);
+
+    const isFiltered = startDate !== '' || endDate !== '';
 
     return (
         <>
-            <PriceField
-                value={[minAmount, maxAmount]}
-                onChange={(value) => {
-                    setMinAmount(value[0]);
-                    setMaxAmount(value[1]);
+            <DateFiled
+                selectsRange
+                dateFormat={'dd-MMM-yyyy'}
+                className="w-full"
+                placeholderText="Select date range"
+                startDate={startDate ? new Date(startDate) : null}
+                endDate={endDate ? new Date(endDate) : null}
+                selected={startDate ? new Date(startDate) : null}
+                onChange={(date) => {
+                    setStartDate(date[0] ? date[0].toLocaleDateString('en-CA') : '');
+                    setEndDate(date[1] ? date[1].toLocaleDateString('en-CA') : '');
                 }}
-                label="Amount"
+                inputProps={{
+                    label: 'Date Range',
+                }}
             />
 
             {isFiltered && (
                 <Button
                     size="sm"
                     onClick={() => {
-                        setMinAmount('');
-                        setMaxAmount('');
-                        onTempChange?.({ minAmount: '', maxAmount: '' });
+                        setStartDate('');
+                        setEndDate('');
+                        onTempChange?.({ startDate: '', endDate: '' });
                     }}
                     variant="flat"
                     className="h-9 bg-gray-200/70"
@@ -122,5 +130,4 @@ function FilterElements({
         </>
     );
 }
-
 

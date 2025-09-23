@@ -1,18 +1,9 @@
 import { routes } from "@/config/routes";
 import {
   PiShoppingCartDuotone,
-  PiHeadsetDuotone,
-  PiPackageDuotone,
-  PiChartBarDuotone,
-  PiCreditCardDuotone,
-  PiFolderLockDuotone,
-  PiCalendarPlusDuotone,
-  PiCurrencyCircleDollarDuotone,
-  PiBriefcaseDuotone,
   PiFolder,
-  PiShapesDuotone,
-  PiNewspaperClippingDuotone,
   PiAcorn,
+  PiWallet,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -78,6 +69,21 @@ export const menuItems: MenuItem[] = [
       {
         name: "Return Orders",
         href: "/return-orders",
+      },
+    ],
+  },
+  {
+    name: "Payments",
+    href: "#",
+    icon: <PiWallet />,
+    dropdownItems: [
+      {
+        name: "Transaction",
+        href: "/transaction",
+      },
+      {
+        name: "wallet",
+        href: "/wallet",
       },
     ],
   },

@@ -5,22 +5,14 @@ import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
 import { exportToCSV } from '@/utils/export-to-csv';
-import { OrderType } from '@/kit/models/Order';
-import { ordersListColumns } from './columns';
-import Filters from './filters';
 import { Meta } from '@/kit/models/_generic';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
+import { TransactionType } from '@/kit/models/Transaction';
+import { transactionListColumns } from './column';
+import Filters from './filter';
 
-declare module '@tanstack/react-table' {
-    interface TableMeta<TData extends unknown> {
-        handleDeleteRow?: (data: TData) => void;
-        handleUpdateRow?: (data: TData) => void;
-        handleView?: (data: TData) => void;
-    }
-}
-
-export default function OrdersTable({
-    OrderList,
+export default function TransactionTable({
+    TransactionList,
     isLoading,
     hideFilters = false,
     hidePagination = false,
@@ -37,13 +29,10 @@ export default function OrdersTable({
     setPage,
     pageSize = 5,
     setPageSize,
-    onStatusUpdate,
-    onDelete,
-    onView,
     search,
     setSearch
 }: {
-    OrderList: OrderType[];
+    TransactionList: TransactionType[];
     isLoading: boolean;
     hideFilters?: boolean;
     hidePagination?: boolean;
@@ -57,39 +46,19 @@ export default function OrdersTable({
     setPage: (page: number) => void;
     pageSize: number;
     setPageSize: (size: number) => void;
-    onStatusUpdate: (data: OrderType) => void;
-    onDelete: (data: OrderType) => void;
-    onView: (data: OrderType) => void;
-    search?: { minAmount: string; maxAmount: string };
-    setSearch?: (search: { minAmount: string; maxAmount: string }) => void;
+    search?: { startDate: string; endDate: string };
+    setSearch?: (search: { startDate: string; endDate: string }) => void;
 }) {
 
-    const handleView = (data: OrderType) => {
-        onView(data)
-    }
-
-    const handleUpdateRow = (data: OrderType) => {
-        onStatusUpdate(data)
-    };
-
-    const handleDeleteRow = (data: OrderType) => {
-        onDelete(data)
-    };
-
-    const { table, setData } = useTanStackTable<OrderType>({
-        tableData: OrderList,
-        columnConfig: ordersListColumns,
+    const { table, setData } = useTanStackTable<TransactionType>({
+        tableData: TransactionList,
+        columnConfig: transactionListColumns,
         options: {
             initialState: {
                 pagination: {
                     pageIndex: 0,
                     pageSize: pageSize,
                 },
-            },
-            meta: {
-                handleDeleteRow,
-                handleUpdateRow,
-                handleView
             },
             enableColumnResizing: false,
         },

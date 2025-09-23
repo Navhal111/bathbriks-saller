@@ -30,6 +30,10 @@ export default function ReturnOrdersPage() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
+    const [search, setSearch] = useState({
+        minAmount: '',
+        maxAmount: '',
+    })
     const [selectedReturnOrder, setSelectedReturnOrder] = useState<ReturnOrderType>()
     const [returnOrderId, setReturnOrderId] = useState<string>('');
     const [actionType, setActionType] = useState<'delete' | 'update' | null>(null);
@@ -37,7 +41,15 @@ export default function ReturnOrdersPage() {
 
     const debouncedSearch = KitDebouncedSearchInput(searchQuery, 500);
 
-    const { ReturnOrderList, isReturnOrderListLoading, refreshReturnOrderList } = useGetAllReturnOrderList({ page, size: pageSize, search: debouncedSearch });
+    const queryParams = {
+        page: page,
+        size: pageSize,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(search.minAmount && { startDate: search.minAmount }),
+        ...(search.maxAmount && { endDate: search.maxAmount }),
+    }
+
+    const { ReturnOrderList, isReturnOrderListLoading, refreshReturnOrderList } = useGetAllReturnOrderList(queryParams);
     const { deleteRecord, isDeleting } = useDeleteReturnOrder(returnOrderId || '');
     const { update: onUpdateReturnOrder, isUpdatingReturnOrder } = useUpdateReturnOrder(returnOrderId);
 
@@ -115,6 +127,8 @@ export default function ReturnOrdersPage() {
                 onStatusUpdate={onStatusUpdate}
                 onDelete={returnOrderDelete}
                 onView={returnOrderView}
+                search={search}
+                setSearch={setSearch}
             />
 
             <KitShow show={isReturnOrderModalOpen}>

@@ -40,6 +40,8 @@ export default function ReturnOrdersTable({
     onStatusUpdate,
     onDelete,
     onView,
+    search,
+    setSearch
 }: {
     ReturnOrderList: ReturnOrderType[];
     isLoading: boolean;
@@ -58,6 +60,8 @@ export default function ReturnOrdersTable({
     onStatusUpdate: (data: ReturnOrderType) => void;
     onDelete: (data: ReturnOrderType) => void;
     onView: (data: ReturnOrderType) => void;
+    search?: { minAmount: string; maxAmount: string };
+    setSearch?: (search: { minAmount: string; maxAmount: string }) => void;
 }) {
 
     const handleView = (data: ReturnOrderType) => {
@@ -105,7 +109,7 @@ export default function ReturnOrdersTable({
 
     return (
         <>
-            {!hideFilters && <Filters table={table} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
+            {!hideFilters && <Filters table={table} searchQuery={searchQuery} setSearchQuery={setSearchQuery} search={search} setSearch={setSearch} />}
             <Table table={table} isLoading={isLoading} variant="modern" classNames={classNames} />
             {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
             {!hidePagination && (
