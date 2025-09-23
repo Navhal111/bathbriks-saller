@@ -1468,3 +1468,7 @@ div[style="z-index: 1000001;"],
 [dir="rtl"] :is(.rizzui-checkbox-icon, .rizzui-switch-on-icon) {
   @apply -scale-x-100;
 }
+
+.custom-pill-select .rizzui-select-button {
+  border-radius: 20px;
+}

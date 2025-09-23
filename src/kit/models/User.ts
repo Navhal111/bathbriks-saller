@@ -102,11 +102,23 @@ export interface UserDetailsResponse extends BaseModel {
   id: number;
   userName: string;
   userType: "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "STAFF";
-  userEmail: string;
   userMobile: string;
+  userEmail: string;
+  userDesignation?: string;
+  userCompanyName?: string
+  userRegisteredAddress?: string
+  userWarehouseAddress?: string
+  userGstNo?: string
+  userPanCard?: string
+  userBankName?: string
+  userAccountName?: string
+  userAccountNo?: string
+  userEmailId?: string
+  userIfscCode?: string
+  userAccountType?: string
+  userDealershipDocuments?: string
   createdDate: string;
   updatedDate: string;
-  userDesignation?: string;
 }
 
 export interface UpdateUserDetailsPayload {

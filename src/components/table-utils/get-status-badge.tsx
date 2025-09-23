@@ -11,7 +11,7 @@ const statusColors = {
   default: ["text-gray-600", "bg-gray-600"],
 };
 
-const allStatus = {
+export const allStatus = {
   online: statusColors.success,
   offline: statusColors.default,
   pending: statusColors.warning,
@@ -29,6 +29,10 @@ const allStatus = {
   delayed: statusColors.default,
   draft: statusColors.default,
   refunded: statusColors.default,
+  order_started: statusColors.default,
+  dispatched: statusColors.success,
+  cancel: statusColors.danger,
+  return: statusColors.warning,
 };
 
 export type StatusTypes = keyof typeof allStatus;

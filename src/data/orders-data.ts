@@ -52,7 +52,7 @@ export const ordersData: OrderType[] = [
         productQty: 4,
         price: 200.00,
         finalPrice: 180.00,
-        status: 'order started',
+        status: 'order_started',
         createdAt: '2023-10-05T16:45:00Z',
         updatedAt: '2023-10-05T16:45:00Z',
     },

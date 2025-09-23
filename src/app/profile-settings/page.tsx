@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import { SubmitHandler } from "react-hook-form";
 import { PiEnvelopeSimple } from "react-icons/pi";
@@ -15,7 +14,7 @@ import {
 } from "@/validators/personal-info.schema";
 import { LocalStorageService } from "@/services/localStorageService";
 import { useUserDetailsRedux } from "@/store/hooks/useUserDetailsRedux";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export default function PersonalInfoView() {
   const [userName, setUserName] = useState<string>("");
@@ -45,9 +44,22 @@ export default function PersonalInfoView() {
   // Update form values when user details are fetched and form methods are available
   useEffect(() => {
     if (userDetails && formMethods) {
-      formMethods.setValue("email", userDetails.userEmail || "");
+      formMethods.setValue("name", userDetails.userName || "");
       formMethods.setValue("mobile", userDetails.userMobile || "");
+      formMethods.setValue("email", userDetails.userEmail || "");
       formMethods.setValue("designation", userDetails.userDesignation || "");
+      formMethods.setValue("companyName", userDetails.userCompanyName || "");
+      formMethods.setValue("registeredAddress", userDetails.userRegisteredAddress || "");
+      formMethods.setValue("warehouseAddress", userDetails.userWarehouseAddress || "");
+      formMethods.setValue("gstNo", userDetails.userGstNo || "");
+      formMethods.setValue("panCard", userDetails.userPanCard || "");
+      formMethods.setValue("bankName", userDetails.userBankName || "");
+      formMethods.setValue("accountName", userDetails.userAccountName || "");
+      formMethods.setValue("accountNo", userDetails.userAccountNo || "");
+      formMethods.setValue("emailId", userDetails.userEmailId || "");
+      formMethods.setValue("ifscCode", userDetails.userIfscCode || "");
+      formMethods.setValue("accountType", userDetails.userAccountType || "");
+      formMethods.setValue("dealershipDocuments", userDetails.userDealershipDocuments || "");
       setUserName(userDetails.userName || "");
     }
   }, [userDetails, formMethods]);
@@ -70,6 +82,18 @@ export default function PersonalInfoView() {
         userMobile: data.mobile,
         userDesignation: data.designation,
         userType: userDetails.userType,
+        userCompanyName: data.companyName,
+        userRegisteredAddress: data.registeredAddress,
+        userWarehouseAddress: data?.warehouseAddress ?? '',
+        userGstNo: data.gstNo,
+        userPanCard: data.panCard,
+        userBankName: data?.bankName ?? '',
+        userAccountName: data?.accountName ?? '',
+        userAccountNo: data?.accountNo ?? '',
+        userEmailId: data?.emailId ?? '',
+        userIfscCode: data?.ifscCode ?? '',
+        userAccountType: data?.accountType ?? 'savings',
+        userDealershipDocuments: data?.dealershipDocuments ?? '',
       };
 
       console.log("Calling updateUser with payload:", payload);

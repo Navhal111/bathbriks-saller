@@ -12,6 +12,12 @@ import { TableClassNameProps } from '@/components/table/table-types';
 import cn from '@/utils/class-names';
 import { exportToCSV } from '@/utils/export-to-csv';
 
+declare module '@tanstack/react-table' {
+  interface TableMeta<TData extends unknown> {
+    handleEditRow?: (data: TData) => void;
+  }
+}
+
 export default function ProductsTable({
   pageSize = 5,
   hideFilters = false,
@@ -30,6 +36,11 @@ export default function ProductsTable({
   classNames?: TableClassNameProps;
   paginationClassName?: string;
 }) {
+
+  const handleEditRow = (data: ProductsDataType) => {
+    alert(`edit ${data.id}`)
+  }
+
   const { table, setData } = useTanStackTable<ProductsDataType>({
     tableData: productsData,
     columnConfig: productsListColumns,
@@ -44,6 +55,7 @@ export default function ProductsTable({
         handleDeleteRow: (row) => {
           setData((prev) => prev.filter((r) => r.id !== row.id));
         },
+        handleEditRow
         // handleMultipleDelete: (rows) => {
         //   setData((prev) => prev.filter((r) => !rows.includes(r)));
         // },

@@ -1,14 +1,14 @@
 'use client';
 
 import DeletePopover from '@/components/delete-popover';
-import { getStatusBadge } from '@/components/table-utils/get-status-badge';
-import PencilIcon from '@/components/icons/pencil';
+import { allStatus, StatusTypes } from '@/components/table-utils/get-status-badge';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
+import { ActionIcon, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
 import { ReturnOrderType } from '@/kit/models/ReturnOrder';
 import EyeIcon from '@/components/icons/eye';
 import { ORDER_STATUS_OPTIONS } from '@/config/orders';
+import cn from '@/utils/class-names';
 
 const columnHelper = createColumnHelper<ReturnOrderType>();
 
@@ -49,13 +49,6 @@ export const returnOrdersListColumns = [
             <Text className="font-medium text-gray-700">${row.original.finalPrice}</Text>
         ),
     }),
-    // columnHelper.accessor('status', {
-    //     id: 'status',
-    //     size: 120,
-    //     header: 'Status',
-    //     enableSorting: false,
-    //     cell: ({ row }) => getStatusBadge(row.original.status),
-    // }),
     columnHelper.accessor('status', {
         id: 'status',
         size: 120,
@@ -70,10 +63,14 @@ export const returnOrdersListColumns = [
                 table.options.meta?.handleUpdateRow?.(updatedRow);
             };
 
+            const key = String(currentValue).toLowerCase() as StatusTypes;
+            const currentBgClass = allStatus[key]?.[1] || "bg-gray-600";
+
             const filteredStatusOptions = ORDER_STATUS_OPTIONS.filter(option => option.value !== 'return');
 
             return (
                 <Select
+                    className={cn("custom-pill-select rounded-full text-white", currentBgClass)}
                     options={filteredStatusOptions}
                     value={filteredStatusOptions.find((opt) => opt.value === String(currentValue)) || null}
                     displayValue={(selected: SelectOption | null) => selected?.label || ''}

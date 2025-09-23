@@ -109,6 +109,7 @@ export const productsListColumns = [
               size="sm"
               variant="outline"
               aria-label={'Edit Product'}
+              onClick={() => meta?.handleEditRow && meta?.handleEditRow?.(row.original)}
             >
               <PencilIcon className="h-4 w-4" />
             </ActionIcon>

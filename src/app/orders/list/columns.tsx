@@ -1,14 +1,14 @@
 'use client';
 
 import DeletePopover from '@/components/delete-popover';
-import { getStatusBadge } from '@/components/table-utils/get-status-badge';
-import PencilIcon from '@/components/icons/pencil';
+import { allStatus, StatusTypes } from '@/components/table-utils/get-status-badge';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
+import { ActionIcon, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
 import { OrderType } from '@/kit/models/Order';
 import EyeIcon from '@/components/icons/eye';
 import { ORDER_STATUS_OPTIONS } from '@/config/orders';
+import cn from '@/utils/class-names';
 
 const columnHelper = createColumnHelper<OrderType>();
 
@@ -63,8 +63,12 @@ export const ordersListColumns = [
                 table.options.meta?.handleUpdateRow?.(updatedRow);
             };
 
+            const key = String(currentValue).toLowerCase() as StatusTypes;
+            const currentBgClass = allStatus[key]?.[1] || "bg-gray-600";
+
             return (
                 <Select
+                    className={cn("custom-pill-select rounded-full text-white", currentBgClass)}
                     options={ORDER_STATUS_OPTIONS}
                     value={ORDER_STATUS_OPTIONS.find((opt) => opt.value === String(currentValue)) || null}
                     displayValue={(selected: SelectOption | null) => selected?.label || ''}

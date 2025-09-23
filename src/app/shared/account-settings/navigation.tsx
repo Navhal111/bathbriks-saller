@@ -15,6 +15,14 @@ const menuItems = [
     value: "/profile-settings",
   },
   {
+    label: "Company Details",
+    value: "/profile-settings/company-details",
+  },
+  {
+    label: "Bank Details",
+    value: "/profile-settings/bank-details",
+  },
+  {
     label: "Password",
     value: "/profile-settings/password",
   }
