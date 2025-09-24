@@ -15,6 +15,7 @@ import {
 import { LocalStorageService } from "@/services/localStorageService";
 import { useUserDetailsRedux } from "@/store/hooks/useUserDetailsRedux";
 import { useEffect, useState } from "react";
+import { AccountType } from "@/config/enums";
 
 export default function PersonalInfoView() {
   const [userName, setUserName] = useState<string>("");
@@ -92,7 +93,7 @@ export default function PersonalInfoView() {
         userAccountNo: data?.accountNo ?? '',
         userEmailId: data?.emailId ?? '',
         userIfscCode: data?.ifscCode ?? '',
-        userAccountType: data?.accountType ?? 'savings',
+        userAccountType: data?.accountType ?? AccountType.SAVINGS,
         userDealershipDocuments: data?.dealershipDocuments ?? '',
       };
 

@@ -1,16 +1,17 @@
 'use client';
 
-import { Input, Select } from 'rizzui';
+import { Input, Select, SelectOption } from 'rizzui';
 import { UseFormReturn } from 'react-hook-form';
 import { BankDetailsSchema } from '@/validators/sign-up.schema';
+import { AccountType } from '@/config/enums';
 
 interface BankDetailsFormProps {
     methods: UseFormReturn<BankDetailsSchema>;
 }
 
 const accountTypeOptions = [
-    { label: 'Savings Account', value: 'savings' },
-    { label: 'Current Account', value: 'current' },
+    { label: 'Savings Account', value: 'SAVINGS' },
+    { label: 'Current Account', value: 'CURRENT' },
 ];
 
 export default function BankDetailsForm({ methods }: BankDetailsFormProps) {
@@ -43,27 +44,17 @@ export default function BankDetailsForm({ methods }: BankDetailsFormProps) {
                 type="text"
                 size="lg"
                 label="Account Number"
-                placeholder="Enter account number (optional)"
+                placeholder="Enter account number min (6 characters)"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
-                {...register('accountNo')}
-                error={errors.accountNo?.message}
-            />
-            <Input
-                type="email"
-                size="lg"
-                label="Email ID"
-                placeholder="Enter email address (optional)"
-                className="[&>label>span]:font-medium"
-                inputClassName="text-sm"
-                {...register('emailId')}
-                error={errors.emailId?.message}
+                {...register('accountNumber')}
+                error={errors.accountNumber?.message}
             />
             <Input
                 type="text"
                 size="lg"
                 label="IFSC Code"
-                placeholder="Enter IFSC code (optional)"
+                placeholder="Enter IFSC code (11 characters)"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
                 {...register('ifscCode')}
@@ -77,8 +68,8 @@ export default function BankDetailsForm({ methods }: BankDetailsFormProps) {
                 className="[&>label>span]:font-medium"
                 selectClassName="text-sm"
                 options={accountTypeOptions}
-                value={accountType}
-                onChange={(value) => setValue('accountType', value as 'savings' | 'current')}
+                value={accountTypeOptions.find(opt => opt.value === accountType) ?? null}
+                onChange={(option) => setValue('accountType', (option as { value: AccountType.SAVINGS | AccountType.CURRENT }).value)}
                 error={errors.accountType?.message}
             />
             <Input

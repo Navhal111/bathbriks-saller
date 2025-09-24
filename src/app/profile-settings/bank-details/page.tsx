@@ -14,10 +14,11 @@ import {
 import { LocalStorageService } from "@/services/localStorageService";
 import { useUserDetailsRedux } from "@/store/hooks/useUserDetailsRedux";
 import { useEffect, useState } from "react";
+import { AccountType } from "@/config/enums";
 
 const accountTypeOptions = [
-    { label: 'Savings Account', value: 'savings' },
-    { label: 'Current Account', value: 'current' },
+    { label: 'Savings Account', value: 'SAVINGS' },
+    { label: 'Current Account', value: 'CURRENT' },
 ];
 
 export default function BankDetailsPage() {
@@ -96,7 +97,7 @@ export default function BankDetailsPage() {
                 userAccountNo: data?.accountNo ?? '',
                 userEmailId: data?.emailId ?? '',
                 userIfscCode: data?.ifscCode ?? '',
-                userAccountType: data?.accountType ?? 'savings',
+                userAccountType: data?.accountType ?? AccountType.SAVINGS,
                 userDealershipDocuments: data?.dealershipDocuments ?? '',
             };
 
@@ -203,7 +204,7 @@ export default function BankDetailsPage() {
                                     selectClassName="text-sm"
                                     options={accountTypeOptions}
                                     value={accountType}
-                                    onChange={(value) => setValue('accountType', value as 'savings' | 'current')}
+                                    onChange={(value) => setValue('accountType', value as AccountType.SAVINGS | AccountType.CURRENT)}
                                     error={errors.accountType?.message}
                                 />
                                 <Input

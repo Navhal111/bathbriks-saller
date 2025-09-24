@@ -23,25 +23,15 @@ export default function CompanyDetailsForm({ methods }: CompanyDetailsFormProps)
                 {...register('companyName')}
                 error={errors.companyName?.message}
             />
-            <Textarea
+            <Input
+                type="email"
                 size="lg"
-                label="Registered Address *"
-                placeholder="Enter registered address"
+                label="Email ID"
+                placeholder="Enter email address (optional)"
                 className="[&>label>span]:font-medium"
-                textareaClassName="text-sm"
-                {...register('registeredAddress')}
-                error={errors.registeredAddress?.message}
-                rows={3}
-            />
-            <Textarea
-                size="lg"
-                label="Warehouse Address"
-                placeholder="Enter warehouse address (optional)"
-                className="[&>label>span]:font-medium"
-                textareaClassName="text-sm"
-                {...register('warehouseAddress')}
-                error={errors.warehouseAddress?.message}
-                rows={3}
+                inputClassName="text-sm"
+                {...register('email')}
+                error={errors.email?.message}
             />
             <Input
                 type="text"
@@ -50,8 +40,8 @@ export default function CompanyDetailsForm({ methods }: CompanyDetailsFormProps)
                 placeholder="Enter GST number (15 characters)"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
-                {...register('gstNo')}
-                error={errors.gstNo?.message}
+                {...register('gstNumber')}
+                error={errors.gstNumber?.message}
                 maxLength={15}
             />
             <Input
@@ -61,8 +51,8 @@ export default function CompanyDetailsForm({ methods }: CompanyDetailsFormProps)
                 placeholder="Enter PAN card number (10 characters)"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
-                {...register('panCard')}
-                error={errors.panCard?.message}
+                {...register('panNumber')}
+                error={errors.panNumber?.message}
                 maxLength={10}
             />
         </div>

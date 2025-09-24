@@ -2,39 +2,55 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { SubmitHandler } from 'react-hook-form';
 import { PiArrowRightBold } from 'react-icons/pi';
 import { Checkbox, Password, Button, Input, Text } from 'rizzui';
 import { Form } from "@/app/shared/form";
-import { routes } from '@/config/routes';
 import { loginSchema, LoginSchema } from '@/validators/login.schema';
-import { LocalStorageService, UserData } from '@/services/localStorageService';
+import toast from 'react-hot-toast';
+import { CustomErrorType } from '@/kit/models/CustomError';
+import { useSWRLogin } from '@/kit/hooks/data/auth';
+import { Login } from '@/kit/models/Auth';
+import storage from '@/kit/services/storage';
+import authConfig from '@/config/auth'
+import { useRouter } from 'next/navigation';
 
 const initialValues: LoginSchema = {
-  email: 'saller@gmail.com',
-  password: '12345678',
+  email: '',
+  password: '',
   rememberMe: true,
 };
 
 export default function SignInForm() {
-  //TODO: why we need to reset it here
+  const router = useRouter()
   const [reset, setReset] = useState({});
 
-  const onSubmit: SubmitHandler<LoginSchema> = (data) => {
-    console.log(data);
-    // signIn('credentials', {
-    //   ...data,
-    // });
-    setReset({ email: "", password: "", isRememberMe: false });
-    const userData: UserData = {
-      token: "asdasdasdasdjhalsdjkahdjkahdkjasdhjkasd",
-      username: "seller",
-      role: "SELLER",
+  const { create: onLoginAccount, isMutating, error: loginError } = useSWRLogin()
+
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
+    const payload = {
+      Username: data.email,
+      password: data.password
+    }
+    const basicAuthHeader = 'Basic ' + btoa(`${data.email}:${data.password}`);
+    const headers: { [key: string]: string } = {
+      Authorization: basicAuthHeader,
     };
-    LocalStorageService.setUserData(userData);
-    window.location.href = "http://localhost:3000";
-    return;
+
+    try {
+      const loginDetail = await onLoginAccount(payload as Partial<Login>, undefined, headers);
+
+      storage.setItem(authConfig.storageTokenKeyName, loginDetail.data.accessToken)
+      storage.setItem(authConfig.storageRefreshKeyName, loginDetail.data.refreshToken)
+      storage.setItem(authConfig.storageUserDetailName, loginDetail.data.seller)
+      storage.setItem('userId', loginDetail.data.seller.id)
+
+      setReset({ email: "", password: "", isRememberMe: false });
+      toast.success(loginDetail?.message ?? 'Login Successfully!')
+      router.push('/')
+    } catch (error) {
+      toast.error((error as CustomErrorType)?.message)
+    }
   };
 
   return (
@@ -83,7 +99,7 @@ export default function SignInForm() {
                 Forget Password?
               </Link>
             </div>
-            <Button className="w-full" type="submit" size="lg">
+            <Button className="w-full" type="submit" size="lg" isLoading={isMutating}>
               <span>Sign in</span>{' '}
               <PiArrowRightBold className="ms-2 mt-0.5 h-6 w-6" />
             </Button>

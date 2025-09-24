@@ -14,6 +14,7 @@ import {
 import { LocalStorageService } from "@/services/localStorageService";
 import { useUserDetailsRedux } from "@/store/hooks/useUserDetailsRedux";
 import { useEffect, useState } from "react";
+import { AccountType } from "@/config/enums";
 
 export default function CompanyDetailsPage() {
     const [userName, setUserName] = useState<string>("");
@@ -91,7 +92,7 @@ export default function CompanyDetailsPage() {
                 userAccountNo: data?.accountNo ?? '',
                 userEmailId: data?.emailId ?? '',
                 userIfscCode: data?.ifscCode ?? '',
-                userAccountType: data?.accountType ?? 'savings',
+                userAccountType: data?.accountType ?? AccountType.SAVINGS,
                 userDealershipDocuments: data?.dealershipDocuments ?? '',
             };
 

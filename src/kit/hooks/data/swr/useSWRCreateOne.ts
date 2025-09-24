@@ -49,10 +49,11 @@ const useSWRCreateOne = <T extends BaseModel>({ path, key, apiVersion }: UseSWRC
     error,
     isMutating,
     reset,
-    create: (record: Partial<T>, options?: SWRMutationConfiguration) => {
+    create: (record: Partial<T>, options?: SWRMutationConfiguration, headers?: { [key: string]: string }) => {
       return trigger(
         {
-          body: record
+          body: record,
+          headers,
         },
         {
           optimisticData: (currentRecords: GetAllResponse<T> | undefined): GetAllResponse<T> => {

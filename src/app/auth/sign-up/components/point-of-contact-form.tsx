@@ -30,8 +30,8 @@ export default function PointOfContactForm({ methods }: PointOfContactFormProps)
                 placeholder="Enter your phone number"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
-                {...register('phoneNumber')}
-                error={errors.phoneNumber?.message}
+                {...register('phone')}
+                error={errors.phone?.message}
             />
             <Input
                 type="email"
@@ -62,7 +62,7 @@ export default function PointOfContactForm({ methods }: PointOfContactFormProps)
                 {...register('password')}
                 error={errors.password?.message}
             />
-            <Password
+            {/* <Password
                 label="Confirm Password *"
                 placeholder="Confirm your password"
                 size="lg"
@@ -70,7 +70,7 @@ export default function PointOfContactForm({ methods }: PointOfContactFormProps)
                 inputClassName="text-sm"
                 {...register('confirmPassword')}
                 error={errors.confirmPassword?.message}
-            />
+            /> */}
         </div>
     );
 }

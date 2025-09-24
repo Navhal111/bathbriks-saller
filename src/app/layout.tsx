@@ -8,6 +8,7 @@ import GlobalDrawer from "@/app/shared/drawer-views/container";
 import GlobalModal from "@/app/shared/modal-views/container";
 import "./globals.css";
 import LayoutVisibility from "@/layouts/layoutVisibility";
+import { AuthProvider } from "@/@core/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "App Name",
@@ -33,7 +34,11 @@ export default function RootLayout({
           <ReduxProvider>
             <NextProgress />
             <JotaiProvider>
-              <LayoutVisibility>{children}</LayoutVisibility>
+              <LayoutVisibility>
+                <AuthProvider>
+                  {children}
+                </AuthProvider>
+              </LayoutVisibility>
               <GlobalDrawer />
               <GlobalModal />
             </JotaiProvider>

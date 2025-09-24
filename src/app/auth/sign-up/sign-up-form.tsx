@@ -14,55 +14,75 @@ import {
     pointOfContactSchema,
     companyDetailsSchema,
     bankDetailsSchema,
-    PointOfContactSchema,
-    CompanyDetailsSchema,
-    BankDetailsSchema,
+    addressDetailsSchema,
 } from '@/validators/sign-up.schema';
+import AddressDetailsForm from './components/address-details-form';
+import { useSWRSignUp } from '@/kit/hooks/data/auth';
+import { SignUp } from '@/kit/models/Auth';
+import { AccountType } from '@/config/enums';
+import toast from 'react-hot-toast';
+import { CustomErrorType } from '@/kit/models/CustomError';
+import { useRouter } from 'next/navigation';
 
 const steps = [
     { title: 'Contact Details', description: 'Personal information' },
+    { title: 'Address Details', description: 'Address information' },
     { title: 'Company Details', description: 'Business information' },
     { title: 'Bank Details', description: 'Banking information' },
 ];
 
 const initialValues = {
+    companyName: "",
+    email: "",
+    password: "",
+    gstNumber: "",
+    panNumber: "",
+    registeredAddress: {
+        addressLine1: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: ""
+    },
+    warehouseAddress: {
+        addressLine1: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: ""
+    },
     pointOfContact: {
-        name: '',
-        phoneNumber: '',
-        email: '',
-        designation: '',
-        password: '',
-        confirmPassword: '',
+        name: "",
+        phone: "",
+        email: "",
+        designation: ""
     },
-    companyDetails: {
-        companyName: '',
-        registeredAddress: '',
-        warehouseAddress: '',
-        gstNo: '',
-        panCard: '',
+    bankAccount: {
+        bankName: "",
+        accountName: "",
+        accountNumber: "",
+        ifscCode: "",
+        accountType: AccountType.SAVINGS as const,
     },
-    bankDetails: {
-        bankName: '',
-        accountName: '',
-        accountNo: '',
-        emailId: '',
-        ifscCode: '',
-        accountType: 'savings' as const,
-        dealershipDocuments: '',
-    },
+    documents: []
 };
 
 export default function SignUpForm() {
+    const router = useRouter()
     const [currentStep, setCurrentStep] = useState(0);
     const [formData, setFormData] = useState(initialValues);
+
+    const { create: onSignUpAccount, isMutating: isLoading } = useSWRSignUp()
 
     const getCurrentSchema = () => {
         switch (currentStep) {
             case 0:
                 return pointOfContactSchema;
             case 1:
-                return companyDetailsSchema;
+                return addressDetailsSchema;
             case 2:
+                return companyDetailsSchema;
+            case 3:
                 return bankDetailsSchema;
             default:
                 return pointOfContactSchema;
@@ -74,29 +94,64 @@ export default function SignUpForm() {
             case 0:
                 return formData.pointOfContact;
             case 1:
-                return formData.companyDetails;
+                return {
+                    registeredAddress: formData.registeredAddress,
+                    warehouseAddress: formData.warehouseAddress,
+                };
             case 2:
-                return formData.bankDetails;
+                return {
+                    companyName: formData.companyName,
+                    email: formData.email,
+                    gstNumber: formData.gstNumber,
+                    panNumber: formData.panNumber,
+                };
+            case 3:
+                return formData.bankAccount;
             default:
                 return formData.pointOfContact;
         }
     };
 
-    const onSubmit: SubmitHandler<any> = (data) => {
+    const onSubmit: SubmitHandler<any> = async (data) => {
         if (currentStep === 0) {
-            setFormData(prev => ({ ...prev, pointOfContact: data }));
+            const { password, ...pointOfContact } = data;
+            setFormData(prev => ({
+                ...prev,
+                password,
+                pointOfContact,
+            }));
             setCurrentStep(1);
+
         } else if (currentStep === 1) {
-            setFormData(prev => ({ ...prev, companyDetails: data }));
+            setFormData(prev => ({
+                ...prev,
+                registeredAddress: data.registeredAddress,
+                warehouseAddress: data.warehouseAddress,
+            }));
             setCurrentStep(2);
+        } else if (currentStep === 2) {
+            setFormData(prev => ({
+                ...prev,
+                companyName: data.companyName,
+                email: data.email,
+                gstNumber: data.gstNumber,
+                panNumber: data.panNumber,
+            }));
+            setCurrentStep(3);
         } else {
+            const { dealershipDocuments, ...bankAccount } = data;
             const finalData = {
                 ...formData,
-                bankDetails: data,
+                bankAccount: bankAccount,
             };
-            console.log('Final form data:', finalData);
-            // Handle final submission here
-            // You can call your API or perform sign-up logic
+
+            try {
+                const signUpDetail = await onSignUpAccount(finalData as Partial<SignUp>)
+                toast.success(signUpDetail?.message ?? 'Register Successfully!')
+                router.push('/auth/sign-in')
+            } catch (error) {
+                toast.error((error as CustomErrorType)?.message)
+            }
         }
     };
 
@@ -111,8 +166,10 @@ export default function SignUpForm() {
             case 0:
                 return <PointOfContactForm methods={methods} />;
             case 1:
-                return <CompanyDetailsForm methods={methods} />;
+                return <AddressDetailsForm methods={methods} />;
             case 2:
+                return <CompanyDetailsForm methods={methods} />;
+            case 3:
                 return <BankDetailsForm methods={methods} />;
             default:
                 return <PointOfContactForm methods={methods} />;
@@ -152,7 +209,7 @@ export default function SignUpForm() {
                                 <div></div>
                             )}
 
-                            <Button type="submit" size="lg">
+                            <Button type="submit" size="lg" isLoading={isLoading}>
                                 <span>{currentStep === 2 ? 'Complete Registration' : 'Next'}</span>
                                 <PiArrowRightBold className="ms-2 mt-0.5 h-6 w-6" />
                             </Button>
