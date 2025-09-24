@@ -1,23 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-import { PiPlusBold } from 'react-icons/pi';
-import { Button } from 'rizzui/button';
 import PageHeader from '@/app/shared/page-header';
-import { metaObject } from '@/config/site.config';
 import ExportButton from '@/app/shared/export-button';
-import { categoriesData } from '@/data/categories-data';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
-import AddUpdateCategoryModal from '@/views/category/AddUpdateCategoryModal';
-import { CategoryType } from '@/kit/models/Category';
-import { useGetAllCategoryList } from '@/kit/hooks/data/category';
 import { useDeleteOrder, useGetAllOrderList, useUpdateOrder } from '@/kit/hooks/data/order';
 import { ordersData } from '@/data/orders-data';
 import OrdersTable from './list/table';
 import { OrderType } from '@/kit/models/Order';
 import toast from 'react-hot-toast';
-import { CustomErrorType } from '@/kit/models/CustomError';
 import OrderViewModal from '@/views/order/OrderViewModal';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
 

@@ -33,20 +33,20 @@ export const returnOrdersListColumns = [
             <Text className="font-medium text-gray-700">{row.original.productQty}</Text>
         ),
     }),
-    columnHelper.accessor('price', {
-        id: 'price',
+    columnHelper.accessor('totalMrp', {
+        id: 'totalMrp',
         size: 150,
         header: 'Price',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">${row.original.price}</Text>
+            <Text className="font-medium text-gray-700">${row.original.totalMrp}</Text>
         ),
     }),
-    columnHelper.accessor('finalPrice', {
-        id: 'finalPrice',
+    columnHelper.accessor('totalPrice', {
+        id: 'totalPrice',
         size: 150,
         header: 'Final Price',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">${row.original.finalPrice}</Text>
+            <Text className="font-medium text-gray-700">${row.original.totalPrice}</Text>
         ),
     }),
     columnHelper.accessor('status', {

@@ -68,18 +68,17 @@ export default function KitMetricCard({
             {chart ? (
               <div className={cn('h-12 w-20', chartClassName)}>{chart}</div>
             ) : null}
+            <Text className={cn('mb-0.5 text-gray-500', titleClassName)}>
+              {title}
+            </Text>
             <Text
               className={cn(
-                'font-lexend text-3xl font-semibold text-gray-900 2xl:xl:text-xl dark:text-gray-700',
+                'font-lexend text-3xl text-start font-semibold text-gray-900 2xl:xl:text-xl dark:text-gray-700',
                 metricClassName
               )}
             >
               {metric}
             </Text>
-            <Text className={cn('mb-0.5 text-gray-500', titleClassName)}>
-              {title}
-            </Text>
-
             {info ? info : null}
           </div>
         </div>

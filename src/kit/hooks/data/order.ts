@@ -1,9 +1,9 @@
-import { API_VERSION, fetchAll } from '@/kit/hooks/data/fetchers'
+import { API_VERSION, fetchAll, fetchOne } from '@/kit/hooks/data/fetchers'
 import useSWR from 'swr'
 import type { CustomError } from '@/kit/models/CustomError'
 import type { Params } from '@/kit/services/axiosService'
 import useSWRCreateOne from './swr/useSWRCreateOne';
-import { CreateOneResponse, GetAllResponse } from '@/kit/models/_generic';
+import { CreateOneResponse, GetAllResponse, GetOneResponse } from '@/kit/models/_generic';
 import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
 import { OrderType } from '@/kit/models/Order';
@@ -29,6 +29,27 @@ const useGetAllOrderList = (params?: Params, shouldFetch = true) => {
         isOrderListLoading: isLoading,
         isValidatingOrderList: isValidating,
         refreshOrderList: mutate
+    }
+}
+
+const useGetOneOrder = (id = '', params?: Params) => {
+    const { data, error, isLoading, isValidating, mutate } = useSWR<GetOneResponse<OrderType>, CustomError[]>(
+        id ? [`${ORDER_LIST_PATH}/${id}`, params] : null,
+        (): Promise<GetOneResponse<OrderType>> => fetchOne(ORDER_LIST_PATH, id, params),
+        {
+            revalidateOnMount: true,
+            revalidateIfStale: true,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false
+        }
+    )
+
+    return {
+        data,
+        error,
+        isLoading,
+        isValidating,
+        mutate
     }
 }
 
@@ -78,4 +99,4 @@ const useDeleteOrder = (id = '', params?: Params) => {
     }
 }
 
-export { useGetAllOrderList, useCreateOrder, useUpdateOrder, useDeleteOrder }
+export { useGetAllOrderList, useGetOneOrder, useCreateOrder, useUpdateOrder, useDeleteOrder }
