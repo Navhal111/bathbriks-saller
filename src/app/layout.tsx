@@ -30,20 +30,18 @@ export default function RootLayout({
         suppressHydrationWarning
         className={cn(inter.variable, lexendDeca.variable, "font-inter")}
       >
-        <ThemeProvider>
-          <ReduxProvider>
-            <NextProgress />
-            <JotaiProvider>
-              <LayoutVisibility>
-                <AuthProvider>
-                  {children}
-                </AuthProvider>
-              </LayoutVisibility>
-              <GlobalDrawer />
-              <GlobalModal />
-            </JotaiProvider>
-          </ReduxProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <ReduxProvider>
+              <NextProgress />
+              <JotaiProvider>
+                <LayoutVisibility>{children}</LayoutVisibility>
+                <GlobalDrawer />
+                <GlobalModal />
+              </JotaiProvider>
+            </ReduxProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

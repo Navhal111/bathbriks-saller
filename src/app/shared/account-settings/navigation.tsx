@@ -15,6 +15,10 @@ const menuItems = [
     value: "/profile-settings",
   },
   {
+    label: "Address Details",
+    value: "/profile-settings/address-details",
+  },
+  {
     label: "Company Details",
     value: "/profile-settings/company-details",
   },

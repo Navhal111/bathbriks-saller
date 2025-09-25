@@ -111,7 +111,7 @@ const AuthProvider = ({ children }: Props) => {
     const handleLogout = async () => {
         // await onLogoutUser({ ...user })
         clearLoginData()
-        router.push('/login')
+        router.push('/auth/sign-in')
     }
 
     const getTokens = () => {

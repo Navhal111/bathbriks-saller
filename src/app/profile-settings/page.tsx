@@ -1,226 +1,216 @@
 "use client";
 
 import toast from "react-hot-toast";
-import { SubmitHandler } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { PiEnvelopeSimple } from "react-icons/pi";
-import { Form } from "@/app/shared/form";
-import { Loader, Text, Input } from "rizzui";
+import { Text, Input } from "rizzui";
 import FormGroup from "@/app/shared/form-group";
 import FormFooter from "@/components/form-footer";
-import {
-  defaultValues,
-  personalInfoFormSchema,
-  PersonalInfoFormTypes,
-} from "@/validators/personal-info.schema";
-import { LocalStorageService } from "@/services/localStorageService";
-import { useUserDetailsRedux } from "@/store/hooks/useUserDetailsRedux";
-import { useEffect, useState } from "react";
-import { AccountType } from "@/config/enums";
+import { useEffect } from "react";
+import { useAuth } from "@/kit/hooks/useAuth";
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import KitShow from "@/kit/components/KitShow/KitShow";
+import KitLoader from "@/kit/components/KitLoader/KitLoader";
+
+interface FormData {
+  name: string,
+  mobile: string,
+  email: string,
+  designation: string,
+}
+
+const formSchema = yup.object().shape({
+  name: yup.string().required('Name is a required'),
+  email: yup.string().required('Email is a required'),
+  designation: yup.string().optional(),
+  mobile: yup
+    .string()
+    .required('Mobile number is required')
+    .matches(/^\d{10,}$/, 'Mobile number must be at least 10 digits'),
+})
 
 export default function PersonalInfoView() {
-  const [userName, setUserName] = useState<string>("");
-  const [formMethods, setFormMethods] = useState<any>(null);
+  const { user, loading } = useAuth()
 
-  // Redux hook for user details
-  const { userDetails, isLoading, error, fetchUserDetails, updateUser } =
-    useUserDetailsRedux();
+  const defaultValues: FormData = {
+    name: user?.contacts[0]?.name || '',
+    mobile: user?.contacts[0]?.phone || '',
+    email: user?.contacts[0]?.email || '',
+    designation: user?.contacts[0]?.designation || '',
+  }
 
-  useEffect(() => {
-    // Get username from localStorage on component mount
-    const storedUsername = LocalStorageService.getUsername();
-    if (storedUsername) {
-      setUserName(storedUsername);
-    }
-    // Fetch user details
-    fetchUserDetails();
-  }, []);
+  const {
+    reset,
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(formSchema)
+  })
 
-  // Handle successful update
-  useEffect(() => {
-    if (userDetails && !isLoading && !error) {
-      // Success handling can be added here if needed
-    }
-  }, [userDetails, isLoading, error]);
+  // const isBtnLoading = isCreatingCategory || isUpdatingCategory
 
-  // Update form values when user details are fetched and form methods are available
-  useEffect(() => {
-    if (userDetails && formMethods) {
-      formMethods.setValue("name", userDetails.userName || "");
-      formMethods.setValue("mobile", userDetails.userMobile || "");
-      formMethods.setValue("email", userDetails.userEmail || "");
-      formMethods.setValue("designation", userDetails.userDesignation || "");
-      formMethods.setValue("companyName", userDetails.userCompanyName || "");
-      formMethods.setValue("registeredAddress", userDetails.userRegisteredAddress || "");
-      formMethods.setValue("warehouseAddress", userDetails.userWarehouseAddress || "");
-      formMethods.setValue("gstNo", userDetails.userGstNo || "");
-      formMethods.setValue("panCard", userDetails.userPanCard || "");
-      formMethods.setValue("bankName", userDetails.userBankName || "");
-      formMethods.setValue("accountName", userDetails.userAccountName || "");
-      formMethods.setValue("accountNo", userDetails.userAccountNo || "");
-      formMethods.setValue("emailId", userDetails.userEmailId || "");
-      formMethods.setValue("ifscCode", userDetails.userIfscCode || "");
-      formMethods.setValue("accountType", userDetails.userAccountType || "");
-      formMethods.setValue("dealershipDocuments", userDetails.userDealershipDocuments || "");
-      setUserName(userDetails.userName || "");
-    }
-  }, [userDetails, formMethods]);
-
-  const onSubmit: SubmitHandler<PersonalInfoFormTypes> = async (data) => {
-    console.log("Form submitted with data:", data);
-    console.log("Current user details:", userDetails);
-    console.log("Current username:", userName);
-
+  const onSubmit = async (data: any) => {
     try {
-      if (!userDetails) {
-        console.error("User details not loaded");
-        toast.error(<Text as="b">User details not loaded</Text>);
-        return;
-      }
-
       const payload = {
-        username: userName,
-        userEmail: data.email,
-        userMobile: data.mobile,
-        userDesignation: data.designation,
-        userType: userDetails.userType,
-        userCompanyName: data.companyName,
-        userRegisteredAddress: data.registeredAddress,
-        userWarehouseAddress: data?.warehouseAddress ?? '',
-        userGstNo: data.gstNo,
-        userPanCard: data.panCard,
-        userBankName: data?.bankName ?? '',
-        userAccountName: data?.accountName ?? '',
-        userAccountNo: data?.accountNo ?? '',
-        userEmailId: data?.emailId ?? '',
-        userIfscCode: data?.ifscCode ?? '',
-        userAccountType: data?.accountType ?? AccountType.SAVINGS,
-        userDealershipDocuments: data?.dealershipDocuments ?? '',
+        companyName: user?.companyName,
+        email: user?.email,
+        gstNumber: user?.gstNumber,
+        panNumber: user?.panNumber,
+        registeredAddress: {
+          addressLine1: user?.addresses[0]?.addressLine1,
+          city: user?.addresses[0]?.city,
+          state: user?.addresses[0]?.state,
+          postalCode: user?.addresses[0]?.postalCode,
+          country: user?.addresses[0]?.country,
+        },
+        warehouseAddress: {
+          addressLine1: user?.addresses[1]?.addressLine1,
+          city: user?.addresses[1]?.city,
+          state: user?.addresses[1]?.state,
+          postalCode: user?.addresses[1]?.postalCode,
+          country: user?.addresses[1]?.country,
+        },
+        pointOfContact: {
+          name: data.name,
+          phone: data.mobile,
+          email: data.email,
+          designation: data.designation ?? "",
+        },
+        bankAccount: {
+          bankName: user?.bankAccounts[0]?.bankName,
+          accountName: user?.bankAccounts[0]?.accountName,
+          accountNumber: user?.bankAccounts[0]?.accountNumber,
+          ifscCode: user?.bankAccounts[0]?.ifscCode,
+          accountType: user?.bankAccounts[0]?.accountType || '',
+        },
+        documents: []
       };
 
       console.log("Calling updateUser with payload:", payload);
 
-      const result = await updateUser(payload);
-      console.log("Update result:", result);
-      toast.success(<Text as="b">Profile updated successfully!</Text>);
+      // const result = await updateUser(payload);
+      // toast.success(<Text as="b">Profile updated successfully!</Text>);
     } catch (error) {
-      console.error("Update error:", error);
       toast.error(<Text as="b">Failed to update profile</Text>);
     }
   };
 
+  useEffect(() => {
+    if (!user) return;
+    reset(defaultValues)
+  }, [user]);
+
   return (
-    <Form<PersonalInfoFormTypes>
-      validationSchema={personalInfoFormSchema}
-      // resetValues={reset}
-      onSubmit={onSubmit}
-      className="@container"
-      useFormProps={{
-        mode: "onChange",
-        defaultValues,
-      }}
-    >
-      {({
-        register,
-        control,
-        setValue,
-        getValues,
-        formState: { errors, isSubmitting },
-      }) => {
-        // Capture form methods for use in useEffect
-        if (!formMethods || formMethods.setValue !== setValue) {
-          setFormMethods({ setValue, register, control, getValues });
-        }
-
-        console.log("Form errors:", errors);
-        console.log("Form is submitting:", isSubmitting);
-
-        return (
-          <>
-            <FormGroup
-              title="Personal Info"
-              description="Update your photo and personal details here"
-              className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
-            />
-
-            {isLoading && (
-              <div className="flex justify-center items-center py-8">
-                <Loader size="lg" />
-                <Text className="ml-3">Loading user details...</Text>
-              </div>
-            )}
-
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-                <Text className="text-red-600">
-                  Error loading user details. Please try again.
-                </Text>
-              </div>
-            )}
-
+    <>
+      <div className="@container">
+        <KitShow show={loading}>
+          <div className='h-screen flex justify-center'>
+            <KitLoader isLoading={true} />
+          </div>
+        </KitShow>
+        <KitShow show={!loading}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
               <FormGroup
                 title="Username"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
-                <Input
-                  placeholder="Username"
-                  value={userName}
-                  readOnly
-                  disabled
-                  className="col-span-full bg-gray-50 cursor-not-allowed"
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field: { value, onChange, ref } }) => (
+                    <Input
+                      ref={ref}
+                      required
+                      value={value}
+                      onChange={onChange}
+                      disabled
+                      error={errors.name && errors.name.message}
+                      placeholder="Username"
+                      className="col-span-full bg-gray-50 cursor-not-allowed"
+                    />
+                  )}
                 />
               </FormGroup>
-
               <FormGroup
                 title="Email Address"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
-                <Input
-                  className="col-span-full"
-                  prefix={
-                    <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
-                  }
-                  type="email"
-                  placeholder="georgia.young@example.com"
-                  {...register("email")}
-                  error={errors.email?.message}
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field: { value, onChange, ref } }) => (
+                    <Input
+                      prefix={
+                        <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
+                      }
+                      ref={ref}
+                      type="email"
+                      required
+                      value={value}
+                      onChange={onChange}
+                      className="col-span-full"
+                      placeholder="georgia.young@example.com"
+                      error={errors.email && errors.email.message}
+                    />
+                  )}
                 />
               </FormGroup>
-
               <FormGroup
                 title="Mobile Number"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
-                <Input
-                  className="col-span-full"
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  {...register("mobile")}
-                  error={errors.mobile?.message}
+                <Controller
+                  name="mobile"
+                  control={control}
+                  render={({ field: { value, onChange, ref } }) => (
+                    <Input
+                      ref={ref}
+                      required
+                      value={value}
+                      onChange={onChange}
+                      error={errors.mobile && errors.mobile.message}
+                      placeholder="+1 (555) 000-0000"
+                      className="col-span-full"
+                      type="number"
+                      onKeyDown={(e) => {
+                        if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
+                      }}
+                    />
+                  )}
                 />
               </FormGroup>
               <FormGroup
                 title="Designation"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
-                <Input
-                  type="text"
-                  className="col-span-full"
-                  placeholder="Enter your designation (optional)"
-                  inputClassName="text-sm"
-                  {...register('designation')}
+                <Controller
+                  name="designation"
+                  control={control}
+                  render={({ field: { value, onChange, ref } }) => (
+                    <Input
+                      ref={ref}
+                      value={value}
+                      onChange={onChange}
+                      placeholder="Enter your designation (optional)"
+                      className="col-span-full"
+                    />
+                  )}
                 />
               </FormGroup>
             </div>
-
             <FormFooter
-              isLoading={isLoading}
+              // isLoading={isLoading}
               altBtnText="Cancel"
               submitBtnText="Save"
             />
-          </>
-        );
-      }}
-    </Form>
+          </form>
+        </KitShow>
+      </div>
+    </>
   );
 }

@@ -31,6 +31,11 @@ export default function PointOfContactForm({ methods }: PointOfContactFormProps)
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
                 {...register('phone')}
+                onKeyDown={(e) => {
+                    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace') {
+                        e.preventDefault();
+                    }
+                }}
                 error={errors.phone?.message}
             />
             <Input
@@ -62,7 +67,7 @@ export default function PointOfContactForm({ methods }: PointOfContactFormProps)
                 {...register('password')}
                 error={errors.password?.message}
             />
-            {/* <Password
+            <Password
                 label="Confirm Password *"
                 placeholder="Confirm your password"
                 size="lg"
@@ -70,7 +75,7 @@ export default function PointOfContactForm({ methods }: PointOfContactFormProps)
                 inputClassName="text-sm"
                 {...register('confirmPassword')}
                 error={errors.confirmPassword?.message}
-            /> */}
+            />
         </div>
     );
 }

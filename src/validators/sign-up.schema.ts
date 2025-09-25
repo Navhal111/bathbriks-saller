@@ -8,10 +8,10 @@ export const pointOfContactSchema = z.object({
     email: z.string().email('Invalid email address'),
     designation: z.string().optional(), // Optional field
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    //     confirmPassword: z.string().min(1, 'Please confirm your password'),
-    // }).refine((data) => data.password === data.confirmPassword, {
-    //     message: "Passwords don't match",
-    //     path: ["confirmPassword"],
+        confirmPassword: z.string().min(1, 'Please confirm your password'),
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
 });
 
 // Step 2: Address Details

@@ -55,7 +55,8 @@ const initialValues = {
         name: "",
         phone: "",
         email: "",
-        designation: ""
+        designation: "",
+        confirmPassword: "",
     },
     bankAccount: {
         bankName: "",
@@ -114,7 +115,7 @@ export default function SignUpForm() {
 
     const onSubmit: SubmitHandler<any> = async (data) => {
         if (currentStep === 0) {
-            const { password, ...pointOfContact } = data;
+            const { password, confirmPassword, ...pointOfContact } = data;
             setFormData(prev => ({
                 ...prev,
                 password,

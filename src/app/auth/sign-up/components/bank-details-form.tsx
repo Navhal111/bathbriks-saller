@@ -24,7 +24,7 @@ export default function BankDetailsForm({ methods }: BankDetailsFormProps) {
                 type="text"
                 size="lg"
                 label="Bank Name"
-                placeholder="Enter bank name (optional)"
+                placeholder="Enter bank name"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
                 {...register('bankName')}
@@ -34,20 +34,23 @@ export default function BankDetailsForm({ methods }: BankDetailsFormProps) {
                 type="text"
                 size="lg"
                 label="Account Name"
-                placeholder="Enter account holder name (optional)"
+                placeholder="Enter account holder name"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
                 {...register('accountName')}
                 error={errors.accountName?.message}
             />
             <Input
-                type="text"
                 size="lg"
                 label="Account Number"
                 placeholder="Enter account number min (6 characters)"
                 className="[&>label>span]:font-medium"
                 inputClassName="text-sm"
                 {...register('accountNumber')}
+                type="number"
+                onKeyDown={(e) => {
+                    if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
+                }}
                 error={errors.accountNumber?.message}
             />
             <Input

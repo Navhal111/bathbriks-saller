@@ -3,25 +3,12 @@
 import { Input, Select, Textarea } from 'rizzui';
 import { UseFormReturn } from 'react-hook-form';
 import { AddressDetailsSchema } from '@/validators/sign-up.schema';
+import { useMemo } from 'react';
+import { Country, locationData, State } from '@/app/profile-settings/address-details/page';
 
 interface AddressDetailsFormProps {
     methods: UseFormReturn<AddressDetailsSchema>;
 }
-
-const countryTypeOptions = [
-    { label: 'India', value: 'India' },
-    { label: 'USA', value: 'USA' },
-];
-
-const stateTypeOptions = [
-    { label: 'Gujarat', value: 'Gujarat' },
-    { label: 'Maharashtra', value: 'Maharashtra' },
-];
-
-const cityTypeOptions = [
-    { label: 'Ahmedabad', value: 'Ahmedabad' },
-    { label: 'Mumbai', value: 'Mumbai' },
-];
 
 export default function AddressDetailsForm({ methods }: AddressDetailsFormProps) {
     const {
@@ -32,14 +19,61 @@ export default function AddressDetailsForm({ methods }: AddressDetailsFormProps)
     } = methods;
 
     // Watch registered address fields
-    const registeredCountry = watch('registeredAddress.country') ?? "";
-    const registeredState = watch('registeredAddress.state') ?? "";
-    const registeredCity = watch('registeredAddress.city') ?? "";
+    const registeredCountry = watch('registeredAddress.country') as Country;
+    const registeredState = watch('registeredAddress.state') as State;
+    const registeredCity = watch('registeredAddress.city');
 
     // Watch warehouse address fields
-    const warehouseCountry = watch('warehouseAddress.country') ?? "";
-    const warehouseState = watch('warehouseAddress.state') ?? "";
-    const warehouseCity = watch('warehouseAddress.city') ?? "";
+    const warehouseCountry = watch('warehouseAddress.country') as Country;
+    const warehouseState = watch('warehouseAddress.state') as State;
+    const warehouseCity = watch('warehouseAddress.city');
+
+    const countryTypeOptions = Object.keys(locationData).map(country => ({
+        label: country,
+        value: country,
+    }));
+
+    const stateOptions = useMemo(() => {
+        if (!registeredCountry) return [];
+        return Object.keys(locationData[registeredCountry]).map(state => ({
+            label: state,
+            value: state,
+        }));
+    }, [registeredCountry]);
+
+    const cityOptions = useMemo(() => {
+        if (!registeredCountry || !registeredState) return [];
+        const cities = locationData[registeredCountry][registeredState] as string[];
+
+        return cities.map((city: string) => ({
+            label: city,
+            value: city,
+        }));
+    }, [registeredCountry, registeredState]);
+
+    const warehouseStateOptions = useMemo(() => {
+        if (!warehouseCountry || !locationData[warehouseCountry]) return [];
+        return Object.keys(locationData[warehouseCountry]).map(state => ({
+            label: state,
+            value: state,
+        }));
+    }, [warehouseCountry]);
+
+    const warehouseCityOptions = useMemo(() => {
+        if (!warehouseCountry || !warehouseState) return [];
+        const cities = locationData[warehouseCountry][warehouseState] as string[];
+
+        return cities.map((city: string) => ({
+            label: city,
+            value: city,
+        }));
+    }, [warehouseCountry, warehouseState]);
+
+    const isStateDisabled = !registeredCountry;
+    const isCityDisabled = !registeredState;
+    const isWarehouseStateDisabled = !warehouseCountry;
+    const isWarehouseCityDisabled = !warehouseState;
+
 
     return (
         <div className="space-y-10">
@@ -57,25 +91,36 @@ export default function AddressDetailsForm({ methods }: AddressDetailsFormProps)
                     label="Country *"
                     options={countryTypeOptions}
                     value={countryTypeOptions.find(opt => opt.value === registeredCountry) ?? null}
-                    // value={registeredCountry || ""}
-                    onChange={(option) => setValue('registeredAddress.country', (option as { value: string })?.value ?? '', { shouldValidate: true })}
+                    onChange={(option) => {
+                        const value = (option as { value: string }).value;
+                        setValue('registeredAddress.country', value, { shouldValidate: true });
+                        setValue('registeredAddress.state', '');
+                        setValue('registeredAddress.city', '');
+                    }}
                     error={errors.registeredAddress?.country?.message}
                 />
                 <Select
                     label="State *"
-                    options={stateTypeOptions}
-                    value={stateTypeOptions.find(opt => opt.value === registeredState) ?? null}
-                    // value={registeredState || ""}
-                    onChange={(option) => setValue('registeredAddress.state', (option as { value: string }).value ?? '', { shouldValidate: true })}
+                    options={stateOptions}
+                    value={stateOptions.find(opt => opt.value === registeredState) ?? null}
+                    onChange={(option) => {
+                        const value = (option as { value: string }).value;
+                        setValue('registeredAddress.state', value, { shouldValidate: true });
+                        setValue('registeredAddress.city', '');
+                    }}
                     error={errors.registeredAddress?.state?.message}
+                    disabled={isStateDisabled}
                 />
                 <Select
                     label="City *"
-                    options={cityTypeOptions}
-                    value={cityTypeOptions.find(opt => opt.value === registeredCity) ?? null}
-                    // value={registeredCity || ""}
-                    onChange={(option) => setValue('registeredAddress.city', (option as { value: string }).value ?? '', { shouldValidate: true })}
+                    options={cityOptions}
+                    value={cityOptions.find(opt => opt.value === registeredCity) ?? null}
+                    onChange={(option) => {
+                        const value = (option as { value: string }).value;
+                        setValue('registeredAddress.city', value, { shouldValidate: true });
+                    }}
                     error={errors.registeredAddress?.city?.message}
+                    disabled={isCityDisabled}
                 />
                 <Input
                     type="text"
@@ -100,22 +145,36 @@ export default function AddressDetailsForm({ methods }: AddressDetailsFormProps)
                     label="Country *"
                     options={countryTypeOptions}
                     value={countryTypeOptions.find(opt => opt.value === warehouseCountry) ?? null}
-                    onChange={(option) => setValue('warehouseAddress.country', (option as { value: string }).value ?? '', { shouldValidate: true })}
+                    onChange={(option) => {
+                        const value = (option as { value: string }).value;
+                        setValue('warehouseAddress.country', value, { shouldValidate: true });
+                        setValue('warehouseAddress.state', '');
+                        setValue('warehouseAddress.city', '');
+                    }}
                     error={errors.warehouseAddress?.country?.message}
                 />
                 <Select
                     label="State *"
-                    options={stateTypeOptions}
-                    value={stateTypeOptions.find(opt => opt.value === warehouseState) ?? null}
-                    onChange={(option) => setValue('warehouseAddress.state', (option as { value: string }).value ?? '', { shouldValidate: true })}
+                    options={warehouseStateOptions}
+                    value={warehouseStateOptions.find(opt => opt.value === warehouseState) ?? null}
+                    onChange={(option) => {
+                        const value = (option as { value: string }).value;
+                        setValue('warehouseAddress.state', value, { shouldValidate: true });
+                        setValue('warehouseAddress.city', '');
+                    }}
                     error={errors.warehouseAddress?.state?.message}
+                    disabled={isWarehouseStateDisabled}
                 />
                 <Select
                     label="City *"
-                    options={cityTypeOptions}
-                    value={cityTypeOptions.find(opt => opt.value === warehouseCity) ?? null}
-                    onChange={(option) => setValue('warehouseAddress.city', (option as { value: string }).value ?? '', { shouldValidate: true })}
+                    options={warehouseCityOptions}
+                    value={warehouseCityOptions.find(opt => opt.value === warehouseCity) ?? null}
+                    onChange={(option) => {
+                        const value = (option as { value: string }).value;
+                        setValue('warehouseAddress.city', value, { shouldValidate: true });
+                    }}
                     error={errors.warehouseAddress?.city?.message}
+                    disabled={isWarehouseCityDisabled}
                 />
                 <Input
                     type="text"

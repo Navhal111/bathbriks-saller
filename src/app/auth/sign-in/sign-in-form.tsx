@@ -14,6 +14,7 @@ import { Login } from '@/kit/models/Auth';
 import storage from '@/kit/services/storage';
 import authConfig from '@/config/auth'
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/kit/hooks/useAuth';
 
 const initialValues: LoginSchema = {
   email: '',
@@ -22,6 +23,7 @@ const initialValues: LoginSchema = {
 };
 
 export default function SignInForm() {
+  const auth = useAuth()
   const router = useRouter()
   const [reset, setReset] = useState({});
 
@@ -39,6 +41,7 @@ export default function SignInForm() {
 
     try {
       const loginDetail = await onLoginAccount(payload as Partial<Login>, undefined, headers);
+      auth.setLoading(false)
 
       storage.setItem(authConfig.storageTokenKeyName, loginDetail.data.accessToken)
       storage.setItem(authConfig.storageRefreshKeyName, loginDetail.data.refreshToken)
@@ -47,7 +50,7 @@ export default function SignInForm() {
 
       setReset({ email: "", password: "", isRememberMe: false });
       toast.success(loginDetail?.message ?? 'Login Successfully!')
-      router.push('/')
+      router.replace('/')
     } catch (error) {
       toast.error((error as CustomErrorType)?.message)
     }
