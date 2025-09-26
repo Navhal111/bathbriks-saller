@@ -25,7 +25,7 @@ export default function Filters<TData extends Record<string, any>>({
         <Flex align="center" justify="between" className="mb-4">
             <Input
                 type="search"
-                placeholder="Search by category name..."
+                placeholder="Search by brand name..."
                 value={searchQuery ?? ''}
                 onClear={() => setSearchQuery?.('')}
                 onChange={(e) => setSearchQuery?.(e.target.value)}

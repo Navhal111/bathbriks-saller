@@ -31,11 +31,11 @@ import { swrMutationConfig } from '@/config/swrConfigs'
  * getOne cases, where the record is already available. It will update the
  * record and reflect the changes in the UI without triggering a GET request.
  */
-export const useSWRUpdateOne = <T extends BaseModel>({ path, id, apiVersion }: UseSWRUpdateOne) => {
+export const useSWRUpdateOne = <T extends BaseModel>({ path, id, apiVersion, isCategoryAPI }: UseSWRUpdateOne) => {
   const { data, error, trigger, reset, isMutating } = useSWRMutation(
     [`${path}/${id}`],
     ([], { arg }: { arg: FetcherUpdate<T> }) =>
-      updateOne<T>(path, id, arg.body, arg.params, arg.headers, apiVersion)
+      updateOne<T>(path, id, arg.body, arg.params, arg.headers, apiVersion, isCategoryAPI)
   )
 
   const defaultOptimisticData = (currentRecord: Partial<T> | undefined, record: Partial<T>) => {

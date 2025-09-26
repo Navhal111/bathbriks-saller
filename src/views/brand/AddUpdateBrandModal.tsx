@@ -11,14 +11,14 @@ import KitButton from "@/kit/components/KitButton/KitButton";
 import { CustomErrorType } from "@/kit/models/CustomError";
 import toast from "react-hot-toast";
 import { STATUS_OPTIONS } from "@/config/categories";
-import { useCreateCategory, useUpdateCategory } from "@/kit/hooks/data/category";
-import { CategoryType } from "@/kit/models/Category";
+import { useCreateBrand, useUpdateBrand } from "@/kit/hooks/data/brand";
+import { BrandType } from "@/kit/models/Brand";
 
 interface Props {
     isOpen: boolean
     onClose: () => void
     onRefresh?: () => void
-    updateCategory?: CategoryType
+    updateBrand?: BrandType
 }
 
 interface FormData {
@@ -33,15 +33,15 @@ const formSchema = yup.object().shape({
     // status: yup.string().required('Status is a required'),
 })
 
-export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, updateCategory }: Props) {
+export default function AddUpdateBrandModal({ isOpen, onClose, onRefresh, updateBrand }: Props) {
 
-    const { createCategory: onCreateCategory, isCreatingCategory } = useCreateCategory()
-    const { update: onUpdateCategory, isUpdatingCategory } = useUpdateCategory(String(updateCategory?.id))
+    const { createBrand: onCreateBrand, isCreatingBrand } = useCreateBrand()
+    const { update: onUpdateBrand, isUpdatingBrand } = useUpdateBrand(String(updateBrand?.id))
 
     const defaultValues: FormData = {
-        name: updateCategory?.name || '',
-        slug: updateCategory?.slug || '',
-        // status: updateCategory?.status || '',
+        name: updateBrand?.name || '',
+        slug: updateBrand?.slug || '',
+        // status: updateBrand?.status || '',
     }
 
     const {
@@ -55,22 +55,23 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
         resolver: yupResolver(formSchema)
     })
 
-    const isBtnLoading = isCreatingCategory || isUpdatingCategory
+    const isBtnLoading = isCreatingBrand || isUpdatingBrand
 
     const onSubmit = async (data: FormData) => {
         const payload = {
             name: data.name,
             slug: data.slug,
+            image: null
             // status: data.status,
         };
 
         try {
-            if (updateCategory) {
-                await onUpdateCategory(payload as Partial<CategoryType>)
-                toast.success('Category updated successfully.')
+            if (updateBrand) {
+                await onUpdateBrand(payload as Partial<BrandType>)
+                toast.success('Brand updated successfully.')
             } else {
-                await onCreateCategory(payload as Partial<CategoryType>)
-                toast.success('Category created successfully.')
+                await onCreateBrand(payload as Partial<BrandType>)
+                toast.success('Brand created successfully.')
             }
             onClose()
             onRefresh?.()
@@ -80,9 +81,9 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
     }
 
     useEffect(() => {
-        if (!updateCategory) return;
+        if (!updateBrand) return;
         reset(defaultValues)
-    }, [updateCategory]);
+    }, [updateBrand]);
 
     return (
         <div>
@@ -96,7 +97,7 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
                 <div className="m-auto px-7 pt-6 pb-8">
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="mb-2 flex items-center justify-between">
-                            <Title as="h5">{updateCategory ? 'Update Category' : 'Add Category'}</Title>
+                            <Title as="h5">{updateBrand ? 'Update Brand' : 'Add Brand'}</Title>
                         </div>
                         <Grid >
                             <Grid.Col >
@@ -175,7 +176,7 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
                                 type="submit"
                                 isLoading={isBtnLoading}
                             >
-                                {updateCategory ? 'Update' : 'Save'}
+                                {updateBrand ? 'Update' : 'Save'}
                             </KitButton>
                         </Grid>
                     </form>

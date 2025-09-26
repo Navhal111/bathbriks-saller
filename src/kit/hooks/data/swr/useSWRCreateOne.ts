@@ -37,11 +37,11 @@ import { swrMutationConfig } from '@/config/swrConfigs'
  * updating the local cache.
  *
  */
-const useSWRCreateOne = <T extends BaseModel>({ path, key, apiVersion }: UseSWRCreateOne) => {
+const useSWRCreateOne = <T extends BaseModel>({ path, key, apiVersion, isCategoryAPI }: UseSWRCreateOne) => {
   const { data, error, trigger, reset, isMutating } = useSWRMutation(
     key ? [path, key] : [path],
     ([name]: string[], { arg }: { arg: FetcherCreate<T> }) =>
-      createOne<T>(name, arg.body, arg.params, arg.headers, apiVersion)
+      createOne<T>(name, arg.body, arg.params, arg.headers, apiVersion, isCategoryAPI)
   )
 
   return {

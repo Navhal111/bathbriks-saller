@@ -1,17 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { PiPlusBold } from 'react-icons/pi';
 import { Button } from 'rizzui/button';
 import PageHeader from '@/app/(dashboard)/shared/page-header';
-import { metaObject } from '@/config/site.config';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
-import { subCategoriesData } from '@/data/sub-categories-data';
 import SubCategoriesTable from './list/table';
 import { useDeleteSubCategory, useGetAllSubCategoryList } from '@/kit/hooks/data/subCategory';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
-import { SubCategoryType } from '@/kit/models/SubCategory';
+import { SubCategoryData } from '@/kit/models/SubCategory';
 import AddUpdateSubCategoryModal from '@/views/subCategory/AddUpdateSubCategoryModal';
 import toast from 'react-hot-toast';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
@@ -33,14 +30,14 @@ export default function SubCategoriesPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategoryType>()
+  const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategoryData>()
   const [subCategoryId, setSubCategoryId] = useState<string>('');
   const [isAddUpdateSubCategoryModalOpen, setIsAddUpdateSubCategoryModalOpen] = useState<boolean>(false)
 
   const debouncedSearch = KitDebouncedSearchInput(searchQuery, 500);
 
   const { SubCategoryList, isSubCategoryListLoading, refreshSubCategoryList } = useGetAllSubCategoryList({ page, size: pageSize, search: debouncedSearch });
-  const { deleteRecord, isDeleting } = useDeleteSubCategory(subCategoryId || '');
+  const { deleteRecord, isDeleting } = useDeleteSubCategory(subCategoryId);
 
   const toggleAddUpdateSubCategoryModal = () => setIsAddUpdateSubCategoryModalOpen(!isAddUpdateSubCategoryModalOpen)
 
@@ -49,12 +46,12 @@ export default function SubCategoriesPage() {
     toggleAddUpdateSubCategoryModal()
   }
 
-  const subCategoryDelete = (data: SubCategoryType) => {
+  const subCategoryDelete = (data: SubCategoryData) => {
     setSubCategoryId(String(data.id));
     setSelectedSubCategory(data)
   };
 
-  const subCategoryEdit = (data: SubCategoryType) => {
+  const subCategoryEdit = (data: SubCategoryData) => {
     setSelectedSubCategory(data)
     toggleAddUpdateSubCategoryModal()
   };
@@ -82,11 +79,18 @@ export default function SubCategoriesPage() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <div className="mt-4 flex items-center gap-3 @lg:mt-0">
-          <ExportButton
-            data={subCategoriesData}
-            fileName="category_data"
-            header="ID,Name,Description,Category,Status"
-          />
+          {SubCategoryList?.data?.items &&
+            <ExportButton
+              data={SubCategoryList?.data?.items.map(item => ({
+                ID: item.id,
+                Name: item.name,
+                Slug: item.slug,
+                Category: item.category?.name ?? '',
+              }))}
+              fileName="sub_category_data"
+              header="ID,Name,Slug,Category"
+            />
+          }
           <Button as="span" className="w-full @lg:w-auto" onClick={handleAddSubCategory}>
             <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
             Add Sub Category
@@ -95,8 +99,8 @@ export default function SubCategoriesPage() {
       </PageHeader>
 
       <SubCategoriesTable
-        SubCategoryList={subCategoriesData}
-        isLoading={false}
+        SubCategoryList={SubCategoryList?.data?.items ?? []}
+        isLoading={isSubCategoryListLoading || isDeleting}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         meta={SubCategoryList?.meta}

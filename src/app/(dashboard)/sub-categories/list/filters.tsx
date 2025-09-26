@@ -2,11 +2,8 @@
 
 import ToggleColumns from '@/components/table-utils/toggle-columns';
 import { type Table as ReactTableType } from '@tanstack/react-table';
-import {
-    PiMagnifyingGlassBold,
-    PiTrash,
-} from 'react-icons/pi';
-import { Button, Flex, Input } from 'rizzui';
+import { PiMagnifyingGlassBold } from 'react-icons/pi';
+import { Flex, Input } from 'rizzui';
 
 interface TableToolbarProps<T extends Record<string, any>> {
     table: ReactTableType<T>;
@@ -19,7 +16,6 @@ export default function Filters<TData extends Record<string, any>>({
     searchQuery,
     setSearchQuery,
 }: TableToolbarProps<TData>) {
-    const isMultipleSelected = table.getSelectedRowModel().rows.length > 1;
 
     const {
         options: { meta },
@@ -39,20 +35,6 @@ export default function Filters<TData extends Record<string, any>>({
             />
 
             <Flex align="center" gap="3" className="w-auto">
-                {isMultipleSelected ? (
-                    <Button
-                        color="danger"
-                        variant="outline"
-                        className="h-[34px] gap-2 text-sm"
-                        onClick={() => {
-
-                        }}
-                    >
-                        <PiTrash size={18} />
-                        Delete
-                    </Button>
-                ) : null}
-
                 <ToggleColumns table={table} />
             </Flex>
         </Flex>

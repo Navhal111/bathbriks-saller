@@ -95,8 +95,6 @@ export default function PersonalInfoView() {
         documents: []
       };
 
-      console.log("Calling updateUser with payload:", payload);
-
       const updateUser = await onUpdateUser(payload)
       await Promise.all([storage.setItem(authConfig.storageUserDetailName, updateUser.data)])
       toast.success(updateUser?.message ?? 'Profile updated successfully!')

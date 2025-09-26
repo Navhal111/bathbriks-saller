@@ -112,9 +112,6 @@ export default function BankDetailsPage() {
                 documents: []
             };
 
-
-            console.log("bankpayload", payload);
-
             const updateUser = await onUpdateUser(payload)
             await Promise.all([storage.setItem(authConfig.storageUserDetailName, updateUser.data)])
             toast.success(updateUser?.message ?? 'Profile updated successfully!')

@@ -3,12 +3,12 @@
 import Table from '@/components/table';
 import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import { TableClassNameProps } from '@/components/table/table-types';
-import { categoriesListColumns } from './columns';
+import { brandListColumns } from './columns';
 import Filters from './filters';
-import { CategoryType } from '@/kit/models/Category';
 import { Meta } from '@/kit/models/_generic';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
 import { useEffect } from 'react';
+import { BrandType } from '@/kit/models/Brand';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends unknown> {
@@ -17,8 +17,8 @@ declare module '@tanstack/react-table' {
   }
 }
 
-export default function CategoriesTable({
-  CategoryList,
+export default function BrandTable({
+  BrandList,
   isLoading,
   hideFilters = false,
   hidePagination = false,
@@ -36,7 +36,7 @@ export default function CategoriesTable({
   onEdit,
   onDelete,
 }: {
-  CategoryList: CategoryType[];
+  BrandList: BrandType[];
   isLoading: boolean;
   hideFilters?: boolean;
   hidePagination?: boolean;
@@ -48,21 +48,21 @@ export default function CategoriesTable({
   setPage: (page: number) => void;
   pageSize: number;
   setPageSize: (size: number) => void;
-  onEdit: (data: CategoryType) => void;
-  onDelete: (data: CategoryType) => void;
+  onEdit: (data: BrandType) => void;
+  onDelete: (data: BrandType) => void;
 }) {
 
-  const handleEditRow = (data: CategoryType) => {
+  const handleEditRow = (data: BrandType) => {
     onEdit(data)
   }
 
-  const handleDeleteRow = (data: CategoryType) => {
+  const handleDeleteRow = (data: BrandType) => {
     onDelete(data)
   }
 
-  const { table, setData } = useTanStackTable<CategoryType>({
-    tableData: CategoryList,
-    columnConfig: categoriesListColumns,
+  const { table, setData } = useTanStackTable<BrandType>({
+    tableData: BrandList,
+    columnConfig: brandListColumns,
     options: {
       initialState: {
         pagination: {
@@ -79,10 +79,10 @@ export default function CategoriesTable({
   });
 
   useEffect(() => {
-    if (Array.isArray(CategoryList)) {
-      setData(CategoryList);
+    if (Array.isArray(BrandList)) {
+      setData(BrandList);
     }
-  }, [CategoryList, setData]);
+  }, [BrandList, setData]);
 
   return (
     <>

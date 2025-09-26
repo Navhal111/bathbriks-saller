@@ -5,7 +5,6 @@ import { Button } from 'rizzui/button';
 import PageHeader from '@/app/(dashboard)/shared/page-header';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
 import CategoriesTable from './list/table';
-import { categoriesData } from '@/data/categories-data';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
 import AddUpdateCategoryModal from '@/views/category/AddUpdateCategoryModal';
@@ -80,11 +79,13 @@ export default function CategoriesPage() {
         <>
             <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
                 <div className="mt-4 flex items-center gap-3 @lg:mt-0">
-                    <ExportButton
-                        data={categoriesData}
-                        fileName="category_data"
-                        header="ID,Name,Description,Status"
-                    />
+                    {CategoryList?.data &&
+                        <ExportButton
+                            data={CategoryList?.data}
+                            fileName="category_data"
+                            header="ID,Name,Slug,Status,createdAt,updatedAt"
+                        />
+                    }
                     <Button as="span" className="w-full @lg:w-auto" onClick={handleAddCategory}>
                         <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
                         Add Category
@@ -93,8 +94,8 @@ export default function CategoriesPage() {
             </PageHeader>
 
             <CategoriesTable
-                CategoryList={categoriesData}
-                isLoading={false}
+                CategoryList={CategoryList?.data ?? []}
+                isLoading={isCategoryListLoading || isDeleting}
                 onEdit={categoryEdit}
                 onDelete={categoryDelete}
                 searchQuery={searchQuery}

@@ -2,14 +2,13 @@
 
 import Table from '@/components/table';
 import { useTanStackTable } from '@/components/table/use-TanStack-Table';
-import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
-import { exportToCSV } from '@/utils/export-to-csv';
 import { subCategoriesListColumns } from './column';
 import Filters from './filters';
-import { SubCategoryType } from '@/kit/models/SubCategory';
 import { Meta } from '@/kit/models/_generic';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
+import { SubCategoryData } from '@/kit/models/SubCategory';
+import { useEffect } from 'react';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends unknown> {
@@ -23,12 +22,10 @@ export default function SubCategoriesTable({
   isLoading,
   hideFilters = false,
   hidePagination = false,
-  hideFooter = false,
   classNames = {
     container: 'border border-muted rounded-md',
     rowClassName: 'last:border-0',
   },
-  paginationClassName,
   searchQuery,
   setSearchQuery,
   meta,
@@ -41,9 +38,7 @@ export default function SubCategoriesTable({
 }: {
   hideFilters?: boolean;
   hidePagination?: boolean;
-  hideFooter?: boolean;
   classNames?: TableClassNameProps;
-  paginationClassName?: string;
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
   meta?: Meta
@@ -51,21 +46,21 @@ export default function SubCategoriesTable({
   setPage: (page: number) => void;
   pageSize: number;
   setPageSize: (size: number) => void;
-  SubCategoryList: SubCategoryType[];
+  SubCategoryList: SubCategoryData[];
   isLoading: boolean;
-  onEdit: (data: SubCategoryType) => void;
-  onDelete: (data: SubCategoryType) => void;
+  onEdit: (data: SubCategoryData) => void;
+  onDelete: (data: SubCategoryData) => void;
 }) {
 
-  const handleEditRow = (data: SubCategoryType) => {
+  const handleEditRow = (data: SubCategoryData) => {
     onEdit(data)
   }
 
-  const handleDeleteRow = (data: SubCategoryType) => {
+  const handleDeleteRow = (data: SubCategoryData) => {
     onDelete(data)
   }
 
-  const { table, setData } = useTanStackTable<SubCategoryType>({
+  const { table, setData } = useTanStackTable<SubCategoryData>({
     tableData: SubCategoryList,
     columnConfig: subCategoriesListColumns,
     options: {
@@ -83,23 +78,16 @@ export default function SubCategoriesTable({
     },
   });
 
-  const selectedData = table
-    .getSelectedRowModel()
-    .rows.map((row) => row.original);
-
-  function handleExportData() {
-    exportToCSV(
-      selectedData,
-      'ID,Name,Category,Status,Description',
-      `sub_category_data_${selectedData.length}`
-    );
-  }
+  useEffect(() => {
+    if (Array.isArray(SubCategoryList)) {
+      setData(SubCategoryList);
+    }
+  }, [SubCategoryList, setData]);
 
   return (
     <>
       {!hideFilters && <Filters table={table} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
       <Table table={table} isLoading={isLoading} variant="modern" classNames={classNames} />
-      {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
       {!hidePagination && (
         <ServerPagination
           pageIndex={meta?.currentPage ?? 1}

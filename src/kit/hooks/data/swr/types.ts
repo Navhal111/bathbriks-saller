@@ -15,14 +15,14 @@ export interface UseSWRUpdateOne {
   path: string
   id: string
   apiVersion?: string
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
 }
 
 export interface useSWRUpdateOneAndRefresh {
   path: string
   id: string
   key?: Params
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
 }
 
 export interface useSWRDeleteOneAndRefresh {
@@ -30,13 +30,13 @@ export interface useSWRDeleteOneAndRefresh {
   id?: string
   key?: Params
   apiVersion?: string
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
 }
 
 export interface useCustomSWRDeleteOneAndRefreshAll {
   path: string
   key?: Params
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
   options: {
     path: string
     payload?: object
@@ -49,5 +49,5 @@ export interface UseSWRCreateOne {
   path: string
   key?: Params
   apiVersion?: string
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
 }

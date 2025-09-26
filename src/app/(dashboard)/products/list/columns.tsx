@@ -2,9 +2,8 @@
 
 import DeletePopover from '@/components/delete-popover';
 import { getRatings } from '@/components/table-utils/get-ratings';
-import { getStatusBadge } from '@/components/table-utils/get-status-badge';
+import { getBadge } from '@/components/table-utils/get-badge';
 import { getStockStatus } from '@/components/table-utils/get-stock-status';
-import { routes } from '@/config/routes';
 import { ProductType } from '@/data/products-data';
 import EyeIcon from '@/components/icons/eye';
 import PencilIcon from '@/components/icons/pencil';
@@ -85,7 +84,7 @@ export const productsListColumns = [
     size: 120,
     header: 'Status',
     enableSorting: false,
-    cell: ({ row }) => getStatusBadge(row.original.status),
+    cell: ({ row }) => getBadge(row.original.status),
   }),
   columnHelper.display({
     id: 'action',

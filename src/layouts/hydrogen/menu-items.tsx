@@ -4,6 +4,7 @@ import {
   PiFolder,
   PiAcorn,
   PiWallet,
+  PiGlobe,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -56,6 +57,11 @@ export const menuItems: MenuItem[] = [
         href: "/sub-categories",
       },
     ],
+  },
+  {
+    name: "Brand",
+    href: "/brand",
+    icon: <PiGlobe />,
   },
   {
     name: "Orders modules",
