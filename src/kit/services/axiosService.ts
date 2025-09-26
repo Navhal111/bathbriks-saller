@@ -262,7 +262,7 @@ function handleLogout() {
   storage.removeItem(authConfig.storageTokenKeyName);
   storage.removeItem(authConfig.storageRefreshKeyName);
 
-  window.location.href = "/login"; // Example: Redirect to login page
+  window.location.href = "/sign-in"; // Example: Redirect to login page
 }
 
 export default { get, post, patch, remove, request };

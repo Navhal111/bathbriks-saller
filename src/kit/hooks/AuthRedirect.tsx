@@ -12,9 +12,9 @@ const AuthRedirect = () => {
         ? (storage.getItem(authConfig.storageUserDetailName) as unknown as User)
         : null
 
-    const redirectUrl = `/login?redirectTo=${pathname}`
-    const login = `/login`
-    const homePage = '/'
+    const redirectUrl = `/sign-in?redirectTo=${pathname}`
+    const login = `/sign-in`
+    const homePage = '/dashboard'
 
     // Redirect logic
     if (!userData) {

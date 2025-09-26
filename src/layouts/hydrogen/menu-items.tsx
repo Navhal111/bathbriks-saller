@@ -24,7 +24,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     name: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     icon: <PiFolder />,
   },
   {

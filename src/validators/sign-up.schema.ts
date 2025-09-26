@@ -46,7 +46,12 @@ export const bankDetailsSchema = z.object({
     accountName: z.string().min(1, 'Account name is required'),
     accountNumber: z.string().min(6, 'Account number must be 6 characters'),
     ifscCode: z.string().min(11, 'IFSC code must be 11 characters').max(11, 'IFSC code must be 11 characters'),
-    accountType: z.enum([AccountType.SAVINGS, AccountType.CURRENT]).optional(),
+    // accountType: z.enum([AccountType.SAVINGS, AccountType.CURRENT]).optional(),
+    accountType: z.union([
+        z.enum([AccountType.SAVINGS, AccountType.CURRENT]),
+        z.literal(''),
+    ]).optional(),
+
     dealershipDocuments: z.string().optional(),
 });
 

@@ -8,7 +8,7 @@ const statusColors = {
     success: ["text-green-dark", "bg-green-200"],
     warning: ["text-orange-dark", "bg-orange-200"],
     danger: ["text-red-dark", "bg-red-200"],
-    default: ["text-gray-dark", "bg-gray-200"],
+    default: ["text-gray-900", "bg-gray-200"],
 };
 
 export const allStatus = {

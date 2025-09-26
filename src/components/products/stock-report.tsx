@@ -1,7 +1,7 @@
 'use client';
 
 import { productsData } from '@/data/products-data';
-import { productsListColumns } from '@/app/products/list/columns';
+import { productsListColumns } from '@/app/(dashboard)/products/list/columns';
 import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import Table from '@/components/table';
 import WidgetCard from '@/components/cards/widget-card';
