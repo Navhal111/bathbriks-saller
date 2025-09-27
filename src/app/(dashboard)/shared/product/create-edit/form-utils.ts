@@ -22,23 +22,24 @@ export const productVariants = [
 
 export function defaultValues(product?: CreateProductInput) {
   return {
-    title: product?.title ?? '',
+    name: product?.name ?? '',
     sku: product?.sku ?? '',
     type: product?.type ?? '',
-    categories: product?.categories ?? '',
+    category_id: product?.category_id ?? '',
+    subcategory_id: product?.subcategory_id ?? '',
+    brand_id: product?.brand_id ?? '',
     description: product?.description ?? '',
     price: product?.price ?? undefined,
     costPrice: product?.costPrice ?? undefined,
-    retailPrice: product?.retailPrice ?? undefined,
+    mrp: product?.mrp ?? undefined,
     salePrice: product?.salePrice ?? undefined,
     inventoryTracking: product?.inventoryTracking ?? '',
-    currentStock: product?.currentStock ?? '',
+    quantity: product?.quantity ?? '',
     lowStock: product?.lowStock ?? '',
     productAvailability: product?.productAvailability ?? '',
     productImages: product?.productImages ?? undefined,
     tradeNumber: product?.tradeNumber ?? '',
     manufacturerNumber: product?.manufacturerNumber ?? '',
-    brand: product?.brand ?? '',
     upcEan: product?.upcEan ?? '',
     customFields: isEmpty(product?.customFields)
       ? customFields

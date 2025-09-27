@@ -3,29 +3,30 @@ import { messages } from '@/config/messages';
 import { fileSchema } from './common-rules';
 
 export const productFormSchema = z.object({
-  title: z.string().min(1, { message: messages.productNameIsRequired }),
+  name: z.string().min(1, { message: messages.productNameIsRequired }),
   sku: z.string().optional(),
   type: z
     .string({ required_error: messages.productTypeIsRequired })
     .min(1, { message: messages.productTypeIsRequired }),
-  categories: z.string().optional(),
+  category_id: z.string().optional(),
+  subcategory_id: z.string().optional(),
+  brand_id: z.string().optional(),
   description: z.string().optional(),
   productImages: z.array(fileSchema).optional(),
   price: z.coerce.number().min(1, { message: messages.priceIsRequired }),
   costPrice: z.coerce.number().optional(),
-  retailPrice: z.coerce
+  mrp: z.coerce
     .number()
     .min(1, { message: messages.retailPriceIsRequired }),
   salePrice: z.coerce
     .number()
     .min(1, { message: messages.salePriceIsRequired }),
   inventoryTracking: z.string().optional(),
-  currentStock: z.number().or(z.string()).optional(),
+  quantity: z.number().or(z.string()).optional(),
   lowStock: z.number().or(z.string()).optional(),
   productAvailability: z.string().optional(),
   tradeNumber: z.number().or(z.string()).optional(),
   manufacturerNumber: z.number().or(z.string()).optional(),
-  brand: z.string().optional(),
   upcEan: z.number().or(z.string()).optional(),
   customFields: z
     .array(

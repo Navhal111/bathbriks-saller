@@ -47,7 +47,7 @@ export default function ProductVariants({ className }: { className?: string }) {
             render={({ field: { onChange, value } }) => (
               <Select
                 options={variantOption}
-                value={value}
+                value={value ?? null}
                 onChange={onChange}
                 label="Variant Name"
                 className="w-full @2xl:w-auto @2xl:flex-grow"

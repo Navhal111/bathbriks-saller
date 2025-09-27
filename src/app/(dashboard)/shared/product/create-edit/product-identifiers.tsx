@@ -37,12 +37,6 @@ export default function ProductIdentifiers({
         error={errors.manufacturerNumber?.message as string}
       />
       <Input
-        label="Brand Name"
-        placeholder="brand name"
-        {...register('brand')}
-        error={errors.brand?.message as string}
-      />
-      <Input
         label="Product UPC/EAN "
         placeholder="145782"
         {...register('upcEan')}

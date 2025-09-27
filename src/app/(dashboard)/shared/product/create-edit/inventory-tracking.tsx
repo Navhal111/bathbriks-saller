@@ -52,8 +52,8 @@ export default function InventoryTracing() {
         type="number"
         label="Current Stock Level"
         placeholder="150"
-        {...register('currentStock')}
-        error={errors.currentStock?.message as string}
+        {...register('quantity')}
+        error={errors.quantity?.message as string}
       />
       <Input
         type="number"

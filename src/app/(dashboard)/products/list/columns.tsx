@@ -11,8 +11,9 @@ import AvatarCard from '@/components/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
+import { ProductData } from '@/kit/models/Product';
 
-const columnHelper = createColumnHelper<ProductType>();
+const columnHelper = createColumnHelper<ProductData>();
 
 export const productsListColumns = [
   columnHelper.display({
@@ -42,9 +43,10 @@ export const productsListColumns = [
     enableSorting: false,
     cell: ({ row }) => (
       <AvatarCard
-        src={row.original.image}
+        // src={row.original.image}
+        src={''}
         name={row.original.name}
-        description={row.original.category}
+        description={row.original.description}
         avatarProps={{
           name: row.original.name,
           size: 'lg',
@@ -53,18 +55,18 @@ export const productsListColumns = [
       />
     ),
   }),
-  columnHelper.display({
-    id: 'sku',
-    size: 150,
-    header: 'SKU',
-    cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
-  }),
-  columnHelper.accessor('stock', {
-    id: 'stock',
-    size: 200,
-    header: 'Stock',
-    cell: ({ row }) => getStockStatus(row.original.stock),
-  }),
+  // columnHelper.display({
+  //   id: 'sku',
+  //   size: 150,
+  //   header: 'SKU',
+  //   cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
+  // }),
+  // columnHelper.accessor('stock', {
+  //   id: 'stock',
+  //   size: 200,
+  //   header: 'Stock',
+  //   cell: ({ row }) => getStockStatus(row.original.stock),
+  // }),
   columnHelper.accessor('price', {
     id: 'price',
     size: 150,
@@ -73,19 +75,19 @@ export const productsListColumns = [
       <Text className="font-medium text-gray-700">${row.original.price}</Text>
     ),
   }),
-  columnHelper.display({
-    id: 'rating',
-    size: 200,
-    header: 'Rating',
-    cell: ({ row }) => getRatings(row.original.rating),
-  }),
-  columnHelper.accessor('status', {
-    id: 'status',
-    size: 120,
-    header: 'Status',
-    enableSorting: false,
-    cell: ({ row }) => getBadge(row.original.status),
-  }),
+  // columnHelper.display({
+  //   id: 'rating',
+  //   size: 200,
+  //   header: 'Rating',
+  //   cell: ({ row }) => getRatings(row.original.rating),
+  // }),
+  // columnHelper.accessor('status', {
+  //   id: 'status',
+  //   size: 120,
+  //   header: 'Status',
+  //   enableSorting: false,
+  //   cell: ({ row }) => getBadge(row.original.status),
+  // }),
   columnHelper.display({
     id: 'action',
     size: 120,

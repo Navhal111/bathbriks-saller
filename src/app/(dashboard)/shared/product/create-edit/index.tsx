@@ -27,6 +27,13 @@ import {
 } from '@/validators/create-product.schema';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
+import { useGetAllCategoryList } from '@/kit/hooks/data/category';
+import { CustomErrorType } from '@/kit/models/CustomError';
+import { useCreateProduct, useUpdateProduct } from '@/kit/hooks/data/product';
+import { CreateProductType } from '@/kit/models/Product';
+import { useAuth } from '@/kit/hooks/useAuth';
+import { useGetAllBrandList } from '@/kit/hooks/data/brand';
+import { useGetAllSubCategoryList } from '@/kit/hooks/data/subCategory';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -43,7 +50,7 @@ const MAP_STEP_TO_COMPONENT = {
 interface IndexProps {
   slug?: string;
   className?: string;
-  product?: CreateProductInput;
+  product?: CreateProductType;
 }
 
 export default function CreateEditProduct({
@@ -51,23 +58,47 @@ export default function CreateEditProduct({
   product,
   className,
 }: IndexProps) {
+  const { user } = useAuth()
   const { layout } = useLayout();
   const [isLoading, setLoading] = useState(false);
+
+  const { CategoryList, isCategoryListLoading } = useGetAllCategoryList({ page: 1, size: 10000 });
+  const { SubCategoryList, isSubCategoryListLoading } = useGetAllSubCategoryList({ page: 1, size: 10000 });
+  const { BrandList, isBrandListLoading } = useGetAllBrandList({ page: 1, size: 10000 });
+  const { createProduct: onCreateProduct, isCreatingProduct } = useCreateProduct()
+  const { update: onUpdateProduct, isUpdatingProduct } = useUpdateProduct(String(product?.id))
+
   const methods = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
     defaultValues: defaultValues(product),
   });
 
-  const onSubmit: SubmitHandler<CreateProductInput> = (data) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('product_data', data);
-      toast.success(
-        <Text as="b">Product successfully {slug ? 'updated' : 'created'}</Text>
-      );
-      methods.reset();
-    }, 600);
+  const onSubmit: SubmitHandler<CreateProductInput> = async (data) => {
+    console.log("productdata", data)
+
+    const payload: Partial<CreateProductType> = {
+      ...data,
+      is_fragile: true,
+      user_id: user?.id,
+      seller_id: user?.id,
+
+      // availableDate: data.availableDate?.toISOString() as unknown as Date,
+      // endDate: data.endDate?.toISOString() as unknown as Date,
+    };
+    console.log("payload", payload)
+
+    // setLoading(true);
+    // try {
+    //   if (product) {
+    //     await onUpdateProduct(payload)
+    //     toast.success('Product updated successfully.')
+    //   } else {
+    //     await onCreateProduct(payload)
+    //     toast.success('Product created successfully.')
+    //   }
+    // } catch (error) {
+    //   toast.error((error as CustomErrorType)?.message)
+    // }
   };
 
   return (
@@ -91,7 +122,12 @@ export default function CreateEditProduct({
                 key={key}
                 name={formParts[key as keyof typeof formParts]}
               >
-                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" />}
+                {<Component
+                  className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                  categoryList={CategoryList?.data ?? []}
+                  SubCategoryList={SubCategoryList?.data?.items ?? []}
+                  BrandList={BrandList?.data ?? []}
+                />}
               </Element>
             ))}
           </div>

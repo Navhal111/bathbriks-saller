@@ -1,16 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import { PiPlusBold } from 'react-icons/pi';
-import { routes } from '@/config/routes';
 import { Button } from 'rizzui/button';
 import PageHeader from '@/app/(dashboard)/shared/page-header';
 import ProductsTable from '@/app/(dashboard)/products/list/table';
 import { productsData } from '@/data/products-data';
-import { metaObject } from '@/config/site.config';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
-
-export const metadata = {
-  ...metaObject('Products'),
-};
+import { useEffect, useState } from 'react';
+import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
+import { useDeleteProduct, useGetAllProductList } from '@/kit/hooks/data/product';
+import { ProductData } from '@/kit/models/Product';
+import toast from 'react-hot-toast';
 
 const pageHeader = {
   title: 'Products',
@@ -30,6 +31,41 @@ const pageHeader = {
 };
 
 export default function ProductsPage() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<ProductData>()
+  const [productId, setProductId] = useState<string>('');
+
+  const debouncedSearch = KitDebouncedSearchInput(searchQuery, 500);
+
+  const { ProductList, isProductListLoading, refreshProductList } = useGetAllProductList({ page, size: pageSize, search: debouncedSearch });
+  const { deleteRecord, isDeleting } = useDeleteProduct(productId);
+
+  const productDelete = (data: ProductData) => {
+    setProductId(String(data.id));
+    setSelectedProduct(data)
+  };
+
+  useEffect(() => {
+    const deleteProduct = async () => {
+      if (productId && selectedProduct) {
+        try {
+          await deleteRecord(selectedProduct);
+          toast.success("Product Deleted successfully!");
+          refreshProductList();
+        } catch (error) {
+          toast.error("Failed to delete");
+        } finally {
+          setProductId('');
+          setSelectedProduct(undefined);
+        }
+      }
+    };
+
+    deleteProduct();
+  }, [productId]);
+
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
@@ -51,7 +87,18 @@ export default function ProductsPage() {
         </div>
       </PageHeader>
 
-      <ProductsTable pageSize={10} />
+      <ProductsTable
+        ProductList={ProductList?.data?.items ?? []}
+        isLoading={isProductListLoading || isDeleting}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        meta={ProductList?.meta}
+        page={page}
+        setPage={setPage}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        onDelete={productDelete}
+      />
     </>
   );
 }

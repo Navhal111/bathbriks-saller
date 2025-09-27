@@ -11,15 +11,21 @@ import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
 import cn from '@/utils/class-names';
 import { exportToCSV } from '@/utils/export-to-csv';
+import { Meta } from '@/kit/models/_generic';
+import { ProductData, ProductType } from '@/kit/models/Product';
+import ServerPagination from '@/kit/components/Table/ServerPagination';
+import { useEffect } from 'react';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends unknown> {
     handleEditRow?: (data: TData) => void;
+    handleDeleteRow?: (data: TData) => void;
   }
 }
 
 export default function ProductsTable({
-  pageSize = 5,
+  ProductList,
+  isLoading,
   hideFilters = false,
   hidePagination = false,
   hideFooter = false,
@@ -27,22 +33,41 @@ export default function ProductsTable({
     container: 'border border-muted rounded-md',
     rowClassName: 'last:border-0',
   },
-  paginationClassName,
+  searchQuery,
+  setSearchQuery,
+  meta,
+  page,
+  pageSize = 5,
+  setPage,
+  setPageSize,
+  onDelete,
 }: {
-  pageSize?: number;
+  ProductList: ProductData[];
+  isLoading: boolean;
   hideFilters?: boolean;
   hidePagination?: boolean;
   hideFooter?: boolean;
   classNames?: TableClassNameProps;
-  paginationClassName?: string;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+  meta?: Meta
+  page: number;
+  setPage: (page: number) => void;
+  pageSize: number;
+  setPageSize: (size: number) => void;
+  onDelete: (data: ProductData) => void;
 }) {
 
-  const handleEditRow = (data: ProductsDataType) => {
+  const handleEditRow = (data: ProductData) => {
     alert(`edit ${data.id}`)
   }
 
-  const { table, setData } = useTanStackTable<ProductsDataType>({
-    tableData: productsData,
+  const handleDeleteRow = (data: ProductData) => {
+    onDelete(data)
+  }
+
+  const { table, setData } = useTanStackTable<ProductData>({
+    tableData: ProductList,
     columnConfig: productsListColumns,
     options: {
       initialState: {
@@ -52,13 +77,8 @@ export default function ProductsTable({
         },
       },
       meta: {
-        handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
-        },
+        handleDeleteRow,
         handleEditRow
-        // handleMultipleDelete: (rows) => {
-        //   setData((prev) => prev.filter((r) => !rows.includes(r)));
-        // },
       },
       enableColumnResizing: false,
     },
@@ -76,15 +96,28 @@ export default function ProductsTable({
     );
   }
 
+  useEffect(() => {
+    if (Array.isArray(ProductList)) {
+      setData(ProductList);
+    }
+  }, [ProductList, setData]);
+
   return (
     <>
       {!hideFilters && <Filters table={table} />}
-      <Table table={table} variant="modern" classNames={classNames} />
+      <Table table={table} isLoading={isLoading} variant="modern" classNames={classNames} />
       {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
       {!hidePagination && (
-        <TablePagination
-          table={table}
-          className={cn('py-4', paginationClassName)}
+        <ServerPagination
+          pageIndex={meta?.currentPage ?? 1}
+          pageSize={pageSize}
+          totalPages={meta?.totalPages ?? 1}
+          onPageChange={(page) => setPage(page)}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+          className="py-4"
         />
       )}
     </>

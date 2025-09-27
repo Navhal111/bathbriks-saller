@@ -30,8 +30,8 @@ export default function ProductPricing() {
       <Input
         label="Retail Price"
         placeholder="10"
-        {...register('retailPrice')}
-        error={errors.retailPrice?.message as string}
+        {...register('mrp')}
+        error={errors.mrp?.message as string}
         prefix={'$'}
         type="number"
       />
