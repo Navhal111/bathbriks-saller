@@ -1,15 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
-import { Text } from 'rizzui';
 import cn from '@/utils/class-names';
-import FormNav, {
-  formParts,
-} from '@/app/(dashboard)/shared/product/create-edit/form-nav';
+import FormNav, { formParts } from '@/app/(dashboard)/shared/product/create-edit/form-nav';
 import ProductSummary from '@/app/(dashboard)/shared/product/create-edit/product-summary';
 import { defaultValues } from '@/app/(dashboard)/shared/product/create-edit/form-utils';
 import ProductMedia from '@/app/(dashboard)/shared/product/create-edit/product-media';
@@ -21,10 +17,7 @@ import DeliveryEvent from '@/app/(dashboard)/shared/product/create-edit/delivery
 import ProductVariants from '@/app/(dashboard)/shared/product/create-edit/product-variants';
 import ProductTaxonomies from '@/app/(dashboard)/shared/product/create-edit/product-tags';
 import FormFooter from '@/components/form-footer';
-import {
-  CreateProductInput,
-  productFormSchema,
-} from '@/validators/create-product.schema';
+import { CreateProductInput, productFormSchema } from '@/validators/create-product.schema';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 import { useGetAllCategoryList } from '@/kit/hooks/data/category';
@@ -34,6 +27,8 @@ import { CreateProductType } from '@/kit/models/Product';
 import { useAuth } from '@/kit/hooks/useAuth';
 import { useGetAllBrandList } from '@/kit/hooks/data/brand';
 import { useGetAllSubCategoryList } from '@/kit/hooks/data/subCategory';
+import KitShow from '@/kit/components/KitShow/KitShow';
+import KitLoader from '@/kit/components/KitLoader/KitLoader';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -60,7 +55,6 @@ export default function CreateEditProduct({
 }: IndexProps) {
   const { user } = useAuth()
   const { layout } = useLayout();
-  const [isLoading, setLoading] = useState(false);
 
   const { CategoryList, isCategoryListLoading } = useGetAllCategoryList({ page: 1, size: 10000 });
   const { SubCategoryList, isSubCategoryListLoading } = useGetAllSubCategoryList({ page: 1, size: 10000 });
@@ -69,36 +63,34 @@ export default function CreateEditProduct({
   const { update: onUpdateProduct, isUpdatingProduct } = useUpdateProduct(String(product?.id))
 
   const methods = useForm<CreateProductInput>({
+    mode: 'onChange',
     resolver: zodResolver(productFormSchema),
     defaultValues: defaultValues(product),
   });
 
-  const onSubmit: SubmitHandler<CreateProductInput> = async (data) => {
-    console.log("productdata", data)
+  const isBtnLoading = isCreatingProduct || isUpdatingProduct
 
+  const onSubmit: SubmitHandler<CreateProductInput> = async (data) => {
     const payload: Partial<CreateProductType> = {
       ...data,
       is_fragile: true,
       user_id: user?.id,
       seller_id: user?.id,
-
       // availableDate: data.availableDate?.toISOString() as unknown as Date,
       // endDate: data.endDate?.toISOString() as unknown as Date,
     };
-    console.log("payload", payload)
 
-    // setLoading(true);
-    // try {
-    //   if (product) {
-    //     await onUpdateProduct(payload)
-    //     toast.success('Product updated successfully.')
-    //   } else {
-    //     await onCreateProduct(payload)
-    //     toast.success('Product created successfully.')
-    //   }
-    // } catch (error) {
-    //   toast.error((error as CustomErrorType)?.message)
-    // }
+    try {
+      if (product) {
+        await onUpdateProduct(payload)
+        toast.success('Product updated successfully.')
+      } else {
+        await onCreateProduct(payload)
+        toast.success('Product created successfully.')
+      }
+    } catch (error) {
+      toast.error((error as CustomErrorType)?.message)
+    }
   };
 
   return (
@@ -109,34 +101,41 @@ export default function CreateEditProduct({
         )}
       />
       <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(onSubmit)}
-          className={cn(
-            'relative z-[19] [&_label.block>span]:font-medium',
-            className
-          )}
-        >
-          <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
-            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => (
-              <Element
-                key={key}
-                name={formParts[key as keyof typeof formParts]}
-              >
-                {<Component
-                  className="pt-7 @2xl:pt-9 @3xl:pt-11"
-                  categoryList={CategoryList?.data ?? []}
-                  SubCategoryList={SubCategoryList?.data?.items ?? []}
-                  BrandList={BrandList?.data ?? []}
-                />}
-              </Element>
-            ))}
+        <KitShow show={isCategoryListLoading || isBrandListLoading}>
+          <div className='h-screen flex justify-center'>
+            <KitLoader isLoading={true} />
           </div>
+        </KitShow>
+        <KitShow show={!isCategoryListLoading || !isBrandListLoading}>
+          <form
+            onSubmit={methods.handleSubmit(onSubmit)}
+            className={cn(
+              'relative z-[19] [&_label.block>span]:font-medium',
+              className
+            )}
+          >
+            <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
+              {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => (
+                <Element
+                  key={key}
+                  name={formParts[key as keyof typeof formParts]}
+                >
+                  {<Component
+                    className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                    categoryList={CategoryList?.data ?? []}
+                    SubCategoryList={SubCategoryList?.data?.items ?? []}
+                    BrandList={BrandList?.data ?? []}
+                  />}
+                </Element>
+              ))}
+            </div>
 
-          <FormFooter
-            isLoading={isLoading}
-            submitBtnText={slug ? 'Update Product' : 'Create Product'}
-          />
-        </form>
+            <FormFooter
+              isLoading={isBtnLoading}
+              submitBtnText={slug ? 'Update Product' : 'Create Product'}
+            />
+          </form>
+        </KitShow>
       </FormProvider>
     </div>
   );

@@ -31,8 +31,6 @@ export default function ProductVariants({ className }: { className?: string }) {
 
   const addVariant = useCallback(() => append([...productVariants]), [append]);
 
-  console.log('fields', fields);
-
   return (
     <FormGroup
       title="Variant Options"

@@ -34,8 +34,10 @@ export function defaultValues(product?: CreateProductInput) {
     mrp: product?.mrp ?? undefined,
     salePrice: product?.salePrice ?? undefined,
     inventoryTracking: product?.inventoryTracking ?? '',
-    quantity: product?.quantity ?? '',
-    lowStock: product?.lowStock ?? '',
+    // quantity: product?.quantity ?? '',
+    // lowStock: product?.lowStock ?? '',
+    quantity: product?.quantity !== undefined ? Number(product.quantity) : undefined,
+    lowStock: product?.lowStock !== undefined ? Number(product.lowStock) : undefined,
     productAvailability: product?.productAvailability ?? '',
     productImages: product?.productImages ?? undefined,
     tradeNumber: product?.tradeNumber ?? '',
@@ -58,6 +60,8 @@ export function defaultValues(product?: CreateProductInput) {
     isPurchaseSpecifyDate: product?.isPurchaseSpecifyDate ?? false,
     isLimitDate: product?.isLimitDate ?? false,
     dateFieldName: product?.dateFieldName ?? '',
+    availableDate: product?.availableDate ?? undefined,
+    endDate: product?.endDate ?? undefined,
     productVariants: isEmpty(product?.productVariants)
       ? productVariants
       : product?.productVariants,

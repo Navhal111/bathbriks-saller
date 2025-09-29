@@ -24,12 +24,14 @@ interface Props {
 interface FormData {
     name: string
     slug: string
+    image?: string
     // status: string
 }
 
 const formSchema = yup.object().shape({
     name: yup.string().required('Name is a required'),
     slug: yup.string().required('Slug is a required'),
+    image: yup.string().optional()
     // status: yup.string().required('Status is a required'),
 })
 
@@ -41,6 +43,7 @@ export default function AddUpdateBrandModal({ isOpen, onClose, onRefresh, update
     const defaultValues: FormData = {
         name: updateBrand?.name || '',
         slug: updateBrand?.slug || '',
+        image: ''
         // status: updateBrand?.status || '',
     }
 
@@ -61,7 +64,7 @@ export default function AddUpdateBrandModal({ isOpen, onClose, onRefresh, update
         const payload = {
             name: data.name,
             slug: data.slug,
-            image: null
+            image: 'https://picsum.photos/200/300'
             // status: data.status,
         };
 

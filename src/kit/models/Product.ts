@@ -84,15 +84,15 @@ export interface CreateProductType extends BaseModel {
   mrp: number;
   salePrice: number;
   inventoryTracking: string;
-  quantity?: string | number;
-  lowStock?: string | number
+  quantity: number;
+  lowStock: number
   productAvailability: string;
   tradeNumber: string | number
   manufacturerNumber: string | number
   upcEan: string | number
   customFields: ProductCustomField[];
   freeShipping: boolean;
-  shippingPrice: number;
+  shippingPrice?: number;
   locationBasedShipping: boolean;
   locationShipping: ProductLocationShipping[];
   pageTitle: string;

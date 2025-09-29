@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import { Input, Switch, Button, ActionIcon } from 'rizzui';
 import cn from '@/utils/class-names';
@@ -8,11 +8,14 @@ import FormGroup from '@/app/(dashboard)/shared/form-group';
 import { locationShipping } from '@/app/(dashboard)/shared/product/create-edit/form-utils';
 import TrashIcon from '@/components/icons/trash';
 import { PiPlusBold } from 'react-icons/pi';
+import KitShow from '@/kit/components/KitShow/KitShow';
 
 export default function ShippingInfo({ className }: { className?: string }) {
   const {
     control,
     register,
+    setValue,
+    watch,
     formState: { errors },
   } = useFormContext();
 
@@ -25,6 +28,23 @@ export default function ShippingInfo({ className }: { className?: string }) {
     () => append([...locationShipping]),
     [append]
   );
+
+  const freeShippingSwitch = watch('freeShipping')
+  const locationBasedSwitch = watch('locationBasedShipping')
+
+  useEffect(() => {
+    if (freeShippingSwitch) {
+      setValue('shippingPrice', 0);
+    } else {
+      setValue('shippingPrice', undefined);
+    }
+  }, [freeShippingSwitch, setValue]);
+
+  useEffect(() => {
+    if (!locationBasedSwitch) {
+      setValue('locationShipping', locationShipping);
+    }
+  }, [locationBasedSwitch, setValue]);
 
   return (
     <FormGroup
@@ -46,14 +66,17 @@ export default function ShippingInfo({ className }: { className?: string }) {
         )}
       />
 
-      <Input
-        label="Shipping Price"
-        placeholder="150.00"
-        {...register('shippingPrice')}
-        error={errors.shippingPrice?.message as string}
-        prefix={'$'}
-        type="number"
-      />
+      <KitShow show={!freeShippingSwitch}>
+        <Input
+          label="Shipping Price"
+          placeholder="150.00"
+          {...register('shippingPrice')}
+          error={errors.shippingPrice?.message as string}
+          prefix={'$'}
+          type="number"
+        />
+      </KitShow>
+
       <Controller
         name="locationBasedShipping"
         control={control}
@@ -68,38 +91,42 @@ export default function ShippingInfo({ className }: { className?: string }) {
         )}
       />
 
-      {fields.map((item, index) => (
-        <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
-          <Input
-            label="Location Name"
-            placeholder="location name"
-            className="flex-grow"
-            {...register(`locationShipping.${index}.name`)}
-          />
-          <Input
-            label="Shipping Charge"
-            placeholder="150.00"
-            className="flex-grow"
-            {...register(`locationShipping.${index}.value`)}
-          />
-          {fields.length > 1 && (
-            <ActionIcon
-              onClick={() => remove(index)}
-              variant="flat"
-              className="mt-7 shrink-0"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </ActionIcon>
-          )}
-        </div>
-      ))}
-      <Button
-        onClick={addCustomField}
-        variant="outline"
-        className="col-span-full ml-auto w-auto"
-      >
-        <PiPlusBold className="me-2 h-4 w-4" strokeWidth={2} /> Add Item
-      </Button>
+      <KitShow show={locationBasedSwitch}>
+        {fields.map((item, index) => (
+          <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
+            <Input
+              label="Location Name"
+              placeholder="location name"
+              className="flex-grow"
+              error={(errors.locationShipping as any)?.[index]?.name?.message}
+              {...register(`locationShipping.${index}.name`)}
+            />
+            <Input
+              label="Shipping Charge"
+              placeholder="150.00"
+              className="flex-grow"
+              error={(errors.locationShipping as any)?.[index]?.shippingCharge?.message}
+              {...register(`locationShipping.${index}.shippingCharge`)}
+            />
+            {fields.length > 1 && (
+              <ActionIcon
+                onClick={() => remove(index)}
+                variant="flat"
+                className="mt-7 shrink-0"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </ActionIcon>
+            )}
+          </div>
+        ))}
+        <Button
+          onClick={addCustomField}
+          variant="outline"
+          className="col-span-full ml-auto w-auto"
+        >
+          <PiPlusBold className="me-2 h-4 w-4" strokeWidth={2} /> Add Item
+        </Button>
+      </KitShow>
     </FormGroup>
   );
 }

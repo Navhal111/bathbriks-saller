@@ -6,12 +6,12 @@ import PageHeader from '@/app/(dashboard)/shared/page-header';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
-import { CategoryType } from '@/kit/models/Category';
 import toast from 'react-hot-toast';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
 import BrandTable from './list/table';
 import AddUpdateBrandModal from '@/views/brand/AddUpdateBrandModal';
 import { useDeleteBrand, useGetAllBrandList } from '@/kit/hooks/data/brand';
+import { BrandType } from '@/kit/models/Brand';
 
 const pageHeader = {
     title: 'Brand',
@@ -30,7 +30,7 @@ export default function BrandPage() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedBrand, setSelectedBrand] = useState<CategoryType>()
+    const [selectedBrand, setSelectedBrand] = useState<BrandType>()
     const [brandId, setBrandId] = useState<string>('');
     const [isAddUpdateBrandModalOpen, setIsAddUpdateBrandModalOpen] = useState<boolean>(false)
 
@@ -46,12 +46,12 @@ export default function BrandPage() {
         toggleAddUpdateBrandModal()
     }
 
-    const brandEdit = (data: CategoryType) => {
+    const brandEdit = (data: BrandType) => {
         setSelectedBrand(data)
         toggleAddUpdateBrandModal()
     };
 
-    const brandDelete = (data: CategoryType) => {
+    const brandDelete = (data: BrandType) => {
         setBrandId(String(data.id));
         setSelectedBrand(data)
     };

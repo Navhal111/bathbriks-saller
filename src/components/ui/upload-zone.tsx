@@ -12,6 +12,9 @@ import cn from "../../utils/class-names";
 import { endsWith } from "lodash";
 import { FileWithPath } from "react-dropzone";
 import { ClientUploadedFileData } from "uploadthing/types";
+import UploadIcon from "../shape/upload";
+import { generateClientDropzoneAccept } from "uploadthing/client";
+import { useUploadThing } from "@/utils/uploadthing";
 
 interface UploadZoneProps {
   label?: string;
@@ -70,40 +73,40 @@ export default function UploadZone({
     (file) => !uploadedItems?.some((uploadedFile: FileType) => uploadedFile.name === file.name)
   );
 
-  // const { startUpload, routeConfig, isUploading } = useUploadThing("generalMedia", {
-  //   onClientUploadComplete: (res: ClientUploadedFileData<any>[] | undefined) => {
-  //     console.log("res", res);
-  //     if (setValue) {
-  //       // const respondedUrls = res?.map((r) => r.url);
-  //       setFiles([]);
-  //       const respondedUrls = res?.map((r) => ({
-  //         name: r.name,
-  //         size: r.size,
-  //         url: r.url,
-  //       }));
-  //       setValue(name, respondedUrls);
-  //     }
-  //     toast.success(
-  //       <Text
-  //         as="b"
-  //         className="font-semibold"
-  //       >
-  //         portfolio Images updated
-  //       </Text>
-  //     );
-  //   },
-  //   onUploadError: (error: Error) => {
-  //     console.error(error);
-  //     toast.error(error.message);
-  //   },
-  // });
+  const { startUpload, routeConfig, isUploading } = useUploadThing("generalMedia", {
+    onClientUploadComplete: (res: ClientUploadedFileData<any>[] | undefined) => {
+      console.log("res", res);
+      if (setValue) {
+        // const respondedUrls = res?.map((r) => r.url);
+        setFiles([]);
+        const respondedUrls = res?.map((r) => ({
+          name: r.name,
+          size: r.size,
+          url: r.url,
+        }));
+        setValue(name, respondedUrls);
+      }
+      toast.success(
+        <Text
+          as="b"
+          className="font-semibold"
+        >
+          portfolio Images updated
+        </Text>
+      );
+    },
+    onUploadError: (error: Error) => {
+      console.error(error);
+      toast.error(error.message);
+    },
+  });
 
-  // const fileTypes = routeConfig ? Object.keys(routeConfig) : [];
+  const fileTypes = routeConfig ? Object.keys(routeConfig) : [];
 
-  // const { getRootProps, getInputProps } = useDropzone({
-  //   onDrop,
-  //   accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
-  // });
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+  });
 
   return (
     <div className={cn("grid @container", className)}>
@@ -114,6 +117,44 @@ export default function UploadZone({
           !isEmpty(files) && "flex flex-wrap items-center justify-between @xl:flex-nowrap @xl:pr-6"
         )}
       >
+        <div
+          {...getRootProps()}
+          className={cn(
+            "flex cursor-pointer items-center gap-4 px-6 py-5 transition-all duration-300",
+            isEmpty(files) ? "justify-center" : "flex-grow justify-center @xl:justify-start"
+          )}
+        >
+          <input {...getInputProps()} />
+          <UploadIcon className="h-12 w-12" />
+          <Text className="text-base font-medium">Drop or select file</Text>
+        </div>
+
+        {!isEmpty(files) && !isEmpty(notUploadedItems) && (
+          <UploadButtons
+            files={notUploadedItems}
+            isLoading={isUploading}
+            onClear={() => setFiles([])}
+            onUpload={() => startUpload(notUploadedItems)}
+          />
+        )}
+
+        {isEmpty(files) && !isEmpty(notUploadedItems) && (
+          <UploadButtons
+            files={notUploadedItems}
+            isLoading={isUploading}
+            onClear={() => setFiles([])}
+            onUpload={() => startUpload(notUploadedItems)}
+          />
+        )}
+
+        {!isEmpty(files) && isEmpty(notUploadedItems) && (
+          <UploadButtons
+            files={files}
+            isLoading={isUploading}
+            onClear={() => setFiles([])}
+            onUpload={() => startUpload(files)}
+          />
+        )}
       </div>
 
       {(!isEmpty(uploadedItems) || !isEmpty(notUploadedItems)) && (
@@ -151,6 +192,19 @@ export default function UploadZone({
                   name={file.name}
                   url={file.preview}
                 />
+                {isUploading ? (
+                  <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFile(index)}
+                    className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
+                  >
+                    <PiTrashBold className="text-white" />
+                  </button>
+                )}
               </figure>
               <MediaCaption
                 name={file.path}
