@@ -58,7 +58,7 @@ export default function ProductVariants({ className }: { className?: string }) {
             label="Variant Value"
             placeholder="150.00"
             className="flex-grow"
-            prefix={'$'}
+            prefix={'₹'}
             {...register(`productVariants.${index}.value`)}
           />
           {fields.length > 1 && (

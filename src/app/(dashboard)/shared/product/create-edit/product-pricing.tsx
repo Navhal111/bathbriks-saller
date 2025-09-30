@@ -16,7 +16,7 @@ export default function ProductPricing() {
         placeholder="10"
         {...register('price')}
         error={errors.price?.message as string}
-        prefix={'$'}
+        prefix={'₹'}
         type="number"
       />
       <Input
@@ -24,7 +24,7 @@ export default function ProductPricing() {
         placeholder="15"
         {...register('costPrice')}
         error={errors.costPrice?.message as string}
-        prefix={'$'}
+        prefix={'₹'}
         type="number"
       />
       <Input
@@ -32,7 +32,7 @@ export default function ProductPricing() {
         placeholder="10"
         {...register('mrp')}
         error={errors.mrp?.message as string}
-        prefix={'$'}
+        prefix={'₹'}
         type="number"
       />
       <Input
@@ -40,7 +40,7 @@ export default function ProductPricing() {
         placeholder="20"
         {...register('salePrice')}
         error={errors.salePrice?.message as string}
-        prefix={'$'}
+        prefix={'₹'}
         type="number"
       />
     </>

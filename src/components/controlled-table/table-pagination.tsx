@@ -1,7 +1,7 @@
 "use client";
 
 import { PiCaretDownBold } from "react-icons/pi";
-import Pagination, { type PaginationProps } from "@core/ui/pagination";
+import Pagination, { PaginationProps } from "../ui/pagination";
 import { Select } from "rizzui";
 import cn from "@/utils/class-names";
 

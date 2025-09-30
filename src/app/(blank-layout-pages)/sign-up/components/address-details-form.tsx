@@ -4,7 +4,7 @@ import { Input, Select, Textarea } from 'rizzui';
 import { UseFormReturn } from 'react-hook-form';
 import { AddressDetailsSchema } from '@/validators/sign-up.schema';
 import { useMemo } from 'react';
-import { Country, locationData, State } from '@/app/(dashboard)/profile-settings/address-details/page';
+import { Country, locationData, State } from '@/dummyData/country';
 
 interface AddressDetailsFormProps {
     methods: UseFormReturn<AddressDetailsSchema>;

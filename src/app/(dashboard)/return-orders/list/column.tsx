@@ -38,7 +38,7 @@ export const returnOrdersListColumns = [
         size: 150,
         header: 'Price',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">${row.original.totalMrp}</Text>
+            <Text className="font-medium text-gray-700">₹{row.original.totalMrp}</Text>
         ),
     }),
     columnHelper.accessor('totalPrice', {
@@ -46,7 +46,7 @@ export const returnOrdersListColumns = [
         size: 150,
         header: 'Final Price',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">${row.original.totalPrice}</Text>
+            <Text className="font-medium text-gray-700">₹{row.original.totalPrice}</Text>
         ),
     }),
     columnHelper.accessor('status', {

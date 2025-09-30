@@ -76,9 +76,11 @@ export default function WalletPage() {
                     <KitMetricCard
                         key={stat.title + stat.id}
                         title={stat.title}
-                        metric={`$${stat.metric}`}
+                        metric={`₹${stat.metric}`}
                         icon={stat.icon}
                         iconClassName="bg-transparent w-11 h-11"
+                        className='!py-4'
+                        titleClassName='!mb-2'
                     />
                 ))}
             </div>

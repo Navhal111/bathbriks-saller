@@ -33,7 +33,8 @@ export default function TableFooter<TData extends Record<string, any>>({
           variant="text"
           className="underline"
           color="danger"
-          onClick={() => meta?.handleMultipleDelete?.(checkedItems)}
+          // onClick={() => meta?.handleMultipleDelete?.(checkedItems)}
+          onClick={() => {}}
         >
           Delete Them
         </Button>

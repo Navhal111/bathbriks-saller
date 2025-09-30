@@ -14,7 +14,7 @@ export const transactionListColumns = [
         size: 150,
         header: 'Amount',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">${row.original.amount}</Text>
+            <Text className="font-medium text-gray-700">₹{row.original.amount}</Text>
         ),
     }),
     columnHelper.accessor('transactionType', {

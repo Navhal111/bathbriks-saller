@@ -4,7 +4,6 @@ import { productsData } from '@/data/products-data';
 import Table from '@/components/table';
 import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import TablePagination from '@/components/table/pagination';
-import { ProductsDataType } from '@/components/products/stock-report';
 import { productsListColumns } from './columns';
 import Filters from './filters';
 import TableFooter from '@/components/table/footer';
