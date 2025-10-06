@@ -5,10 +5,10 @@ import { Badge, Flex, Text } from "rizzui";
 import { replaceUnderscoreDash } from "@/utils/replace-underscore-dash";
 
 const statusColors = {
-    success: ["text-green-dark", "bg-green-200"],
-    warning: ["text-orange-dark", "bg-orange-200"],
-    danger: ["text-red-dark", "bg-red-200"],
-    default: ["text-gray-900", "bg-gray-200"],
+    success: ["text-green-dark", "bg-green-200", "border-green-dark"],
+    warning: ["text-orange-dark", "bg-orange-200", "border-orange-dark"],
+    danger: ["text-red-dark", "bg-red-200", "border-red-dark"],
+    default: ["text-gray-900", "bg-gray-200", "border-gray-900"],
 };
 
 export const allStatus = {
@@ -33,6 +33,8 @@ export const allStatus = {
     dispatched: statusColors.success,
     cancel: statusColors.danger,
     return: statusColors.warning,
+    started: statusColors.default,
+    resolved: statusColors.success,
 };
 
 export type StatusTypes = keyof typeof allStatus;

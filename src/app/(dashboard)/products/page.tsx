@@ -12,6 +12,7 @@ import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
 import { useDeleteProduct, useGetAllProductList } from '@/kit/hooks/data/product';
 import { ProductData } from '@/kit/models/Product';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const pageHeader = {
   title: 'Products',
@@ -31,6 +32,7 @@ const pageHeader = {
 };
 
 export default function ProductsPage() {
+  const router = useRouter()
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +43,12 @@ export default function ProductsPage() {
 
   const { ProductList, isProductListLoading, refreshProductList } = useGetAllProductList({ page, size: pageSize, search: debouncedSearch });
   const { deleteRecord, isDeleting } = useDeleteProduct(productId);
+
+  const productEdit = (data: ProductData) => {
+    setTimeout(() => {
+      router.push(`/products/edit/${data.id}`);
+    }, 0);
+  };
 
   const productDelete = (data: ProductData) => {
     setProductId(String(data.id));
@@ -93,6 +101,7 @@ export default function ProductsPage() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         meta={ProductList?.meta}
+        onEdit={productEdit}
         page={page}
         setPage={setPage}
         pageSize={pageSize}

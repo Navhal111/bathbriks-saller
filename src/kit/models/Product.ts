@@ -57,13 +57,13 @@ export interface ProductType extends BaseModel {
 
 // create product types
 export interface ProductCustomField {
-  label?: string;
-  value?: string;
+  label: string;
+  value: string;
 }
 
 export interface ProductLocationShipping {
-  name?: string;
-  shippingCharge?: string | number;
+  name: string;
+  shippingCharge: string;
 }
 
 export interface ProductVariant {
@@ -74,25 +74,25 @@ export interface ProductVariant {
 export interface CreateProductType extends BaseModel {
   name: string;
   sku: string;
-  type: string;
   category_id: string;
   subcategory_id: string
   brand_id: string
   description: string;
-  price: number;
-  costPrice: number;
-  mrp: number;
-  salePrice: number;
+  productImages?: string[] | undefined
+  price: number | undefined;
+  costPrice: number | undefined;
+  mrp: number | undefined;
+  salePrice: number | undefined;
   inventoryTracking: string;
-  quantity: number;
-  lowStock: number
+  quantity: number | undefined;
+  lowStock: number | undefined
   productAvailability: string;
-  tradeNumber: string | number
-  manufacturerNumber: string | number
-  upcEan: string | number
+  tradeNumber: string
+  manufacturerNumber: string
+  upcEan: string
   customFields: ProductCustomField[];
   freeShipping: boolean;
-  shippingPrice?: number;
+  shippingPrice?: number | undefined;
   locationBasedShipping: boolean;
   locationShipping: ProductLocationShipping[];
   pageTitle: string;
@@ -102,8 +102,8 @@ export interface CreateProductType extends BaseModel {
   isPurchaseSpecifyDate: boolean;
   isLimitDate: boolean;
   dateFieldName: string;
-  availableDate: Date; // ISO date string
-  endDate: Date; // ISO date string
+  availableDate: string;
+  endDate: string;
   productVariants: ProductVariant[];
   tags: string[];
   is_fragile?: boolean

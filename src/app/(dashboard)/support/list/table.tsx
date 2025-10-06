@@ -1,33 +1,27 @@
 'use client';
 
-import { productsData } from '@/data/products-data';
 import Table from '@/components/table';
 import { useTanStackTable } from '@/components/table/use-TanStack-Table';
-import TablePagination from '@/components/table/pagination';
-import { productsListColumns } from './columns';
-import Filters from './filters';
-import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
-import cn from '@/utils/class-names';
-import { exportToCSV } from '@/utils/export-to-csv';
+import { supportListColumns } from './columns';
+import Filters from './filters';
 import { Meta } from '@/kit/models/_generic';
-import { ProductData, ProductType } from '@/kit/models/Product';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
 import { useEffect } from 'react';
+import { SupoortType } from '@/kit/models/Supoort';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends unknown> {
-    handleEditRow?: (data: TData) => void;
+    handlChatRow?: (data: TData) => void;
     handleDeleteRow?: (data: TData) => void;
   }
 }
 
-export default function ProductsTable({
-  ProductList,
+export default function SupportTable({
+  SupportList,
   isLoading,
   hideFilters = false,
   hidePagination = false,
-  hideFooter = false,
   classNames = {
     container: 'border border-muted rounded-md',
     rowClassName: 'last:border-0',
@@ -39,14 +33,13 @@ export default function ProductsTable({
   pageSize = 5,
   setPage,
   setPageSize,
-  onEdit,
-  onDelete,
+  onChat,
+  onDelete
 }: {
-  ProductList: ProductData[];
+  SupportList: SupoortType[];
   isLoading: boolean;
   hideFilters?: boolean;
   hidePagination?: boolean;
-  hideFooter?: boolean;
   classNames?: TableClassNameProps;
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
@@ -55,21 +48,21 @@ export default function ProductsTable({
   setPage: (page: number) => void;
   pageSize: number;
   setPageSize: (size: number) => void;
-  onEdit: (data: ProductData) => void;
-  onDelete: (data: ProductData) => void;
+  onChat: (data: SupoortType) => void;
+  onDelete: (data: SupoortType) => void;
 }) {
 
-  const handleEditRow = (data: ProductData) => {
-    onEdit(data)
+  const handlChatRow = (data: SupoortType) => {
+    onChat(data)
   }
 
-  const handleDeleteRow = (data: ProductData) => {
+  const handleDeleteRow = (data: SupoortType) => {
     onDelete(data)
   }
 
-  const { table, setData } = useTanStackTable<ProductData>({
-    tableData: ProductList,
-    columnConfig: productsListColumns,
+  const { table, setData } = useTanStackTable<SupoortType>({
+    tableData: SupportList,
+    columnConfig: supportListColumns,
     options: {
       initialState: {
         pagination: {
@@ -78,36 +71,23 @@ export default function ProductsTable({
         },
       },
       meta: {
-        handleDeleteRow,
-        handleEditRow
+        handlChatRow,
+        handleDeleteRow
       },
       enableColumnResizing: false,
     },
   });
 
-  const selectedData = table
-    .getSelectedRowModel()
-    .rows.map((row) => row.original);
-
-  function handleExportData() {
-    exportToCSV(
-      selectedData,
-      'ID,Name,Category,Sku,Price,Stock,Status,Rating',
-      `product_data_${selectedData.length}`
-    );
-  }
-
   useEffect(() => {
-    if (Array.isArray(ProductList)) {
-      setData(ProductList);
+    if (Array.isArray(SupportList)) {
+      setData(SupportList);
     }
-  }, [ProductList, setData]);
+  }, [SupportList, setData]);
 
   return (
     <>
-      {!hideFilters && <Filters table={table} />}
+      {!hideFilters && <Filters table={table} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
       <Table table={table} isLoading={isLoading} variant="modern" classNames={classNames} />
-      {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
       {!hidePagination && (
         <ServerPagination
           pageIndex={meta?.currentPage ?? 1}

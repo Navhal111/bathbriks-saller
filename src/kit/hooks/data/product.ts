@@ -3,13 +3,18 @@ import useSWR from 'swr'
 import type { CustomError } from '@/kit/models/CustomError'
 import type { Params } from '@/kit/services/axiosService'
 import useSWRCreateOne from './swr/useSWRCreateOne';
-import { CreateOneResponse, GetAllObjectResponse, GetAllResponse } from '@/kit/models/_generic';
+import { CreateOneResponse, GetAllObjectResponse, GetAllResponse, GetOneResponse } from '@/kit/models/_generic';
 import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
-import { API_VERSION, fetchAll } from './fetchers';
+import { API_VERSION, customRequest, fetchAll, fetchOne } from './fetchers';
 import { CreateProductType, ProductType } from '@/kit/models/Product';
+import authConfig from '@/config/auth'
+import storage from '@/kit/services/storage'
+import useSWRMutation from 'swr/mutation';
+import { FetcherCreate } from './fetchers/type';
 
 const PRODUCT_LIST_PATH = 'products/fetch-products';
+const PRODUCT_PATH = 'products/fetch-product-detail';
 const ADD_PRODUCT_PATH = 'products/add-product';
 const EDIT_PRODUCT_PATH = 'products/edit-product';
 const DELETE_PRODUCT_PATH = 'products/delete-product';
@@ -36,19 +41,54 @@ const useGetAllProductList = (params?: Params, shouldFetch = true) => {
     }
 }
 
-const useCreateProduct = (params?: Params) => {
-    const { data, error, isMutating, reset, create } = useSWRCreateOne<CreateOneResponse<CreateProductType>>({
-        path: ADD_PRODUCT_PATH,
-        key: params,
-        isCategoryAPI: true,
-    })
+const useGetOneProduct = (id = '', params?: Params) => {
+    const { data, error, isLoading, isValidating, mutate } = useSWR<GetOneResponse<CreateProductType>, CustomError[]>(
+        id ? [`${PRODUCT_PATH}/${id}`, params] : null,
+        (): Promise<GetOneResponse<CreateProductType>> => fetchOne(PRODUCT_PATH, id, params, undefined, undefined, true),
+        {
+            revalidateOnMount: true,
+            revalidateIfStale: true,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false
+        }
+    )
+
+    return {
+        data,
+        error,
+        isLoading,
+        isValidating,
+        mutate
+    }
+}
+
+const useCreateProduct = (shouldFetch = true, params?: Params) => {
+    const sellerId = storage.getItem(authConfig.storageUserIDName)
+
+    const { data, error, isMutating, reset, trigger } = useSWRMutation(
+        shouldFetch ? [`${ADD_PRODUCT_PATH}`] : null,
+        ([name]: string[], { arg }: { arg: FetcherCreate<any> }) =>
+            customRequest<any, any>({
+                name: name,
+                method: 'POST',
+                payload: arg.body,
+                isCategoryAPI: true,
+                headers: {
+                    'x-seller-id': sellerId,
+                },
+            })
+    )
 
     return {
         onCreateProduct: data,
         createProductError: error,
         isCreatingProduct: isMutating,
         createProductReset: reset,
-        createProduct: create
+        createProduct: (record: Partial<any>) => {
+            return trigger({
+                body: record
+            })
+        }
     }
 }
 
@@ -85,4 +125,4 @@ const useDeleteProduct = (id = '', params?: Params) => {
     }
 }
 
-export { useGetAllProductList, useCreateProduct, useUpdateProduct, useDeleteProduct }
+export { useGetAllProductList, useGetOneProduct, useCreateProduct, useUpdateProduct, useDeleteProduct }

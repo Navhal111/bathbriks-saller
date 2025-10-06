@@ -78,4 +78,7 @@ export const messages = {
   roleNameLengthMin: "Role name must be at least 3 letters",
   errorSendingEmail: "Error sending email",
   emailSentSuccessfully: "Your email has been sent successfully.",
+  skuIsRequired: "SKU is required",
+  subCategoryIsRequired: "Sub category is required",
 };
+

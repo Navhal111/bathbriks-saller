@@ -4,14 +4,13 @@ import { fileSchema } from './common-rules';
 
 export const productFormSchema = z.object({
   name: z.string().min(1, { message: messages.productNameIsRequired }),
-  sku: z.string().optional(),
-  type: z
-    .string({ required_error: messages.productTypeIsRequired })
-    .min(1, { message: messages.productTypeIsRequired }),
+  sku: z.string().min(1, { message: messages.skuIsRequired }),
   category_id: z
     .string({ required_error: messages.categoryIsRequired })
     .min(1, { message: messages.categoryIsRequired }),
-  subcategory_id: z.string().optional(),
+  subcategory_id: z
+    .string({ required_error: messages.subCategoryIsRequired })
+    .min(1, { message: messages.subCategoryIsRequired }),
   brand_id: z
     .string({ required_error: messages.brandIsRequired })
     .min(1, { message: messages.brandIsRequired }),

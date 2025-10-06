@@ -4,11 +4,19 @@ export const shippingStatuses = {
   Pending: "pending",
   Delivered: "Delivered",
   DeliveryFailed: "Delivery Failed",
+  Started: "started",
+  Resolved: "resolved"
 };
 
 export function getStatusColors(status: string) {
   if (shippingStatuses.Draft === status) {
     return "success";
+  }
+  if (shippingStatuses.Resolved === status) {
+    return "success";
+  }
+  if (shippingStatuses.Started === status) {
+    return "secondary";
   }
   if (shippingStatuses.Published === status) {
     return "secondary";

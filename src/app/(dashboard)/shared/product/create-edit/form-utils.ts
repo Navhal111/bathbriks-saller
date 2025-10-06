@@ -15,7 +15,7 @@ export const locationShipping = [
 ];
 export const productVariants = [
   {
-    label: '',
+    name: '',
     value: '',
   },
 ];
@@ -24,7 +24,6 @@ export function defaultValues(product?: CreateProductInput) {
   return {
     name: product?.name ?? '',
     sku: product?.sku ?? '',
-    type: product?.type ?? '',
     category_id: product?.category_id ?? '',
     subcategory_id: product?.subcategory_id ?? '',
     brand_id: product?.brand_id ?? '',
@@ -167,18 +166,6 @@ export const categoryOption = [
   {
     value: 'cat food',
     label: 'Cat Food',
-  },
-];
-
-// Type option
-export const typeOption = [
-  {
-    value: 'digital product',
-    label: 'Digital Product',
-  },
-  {
-    value: 'physical product',
-    label: 'Physical Product',
   },
 ];
 

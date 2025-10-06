@@ -28,7 +28,7 @@ export default function ShippingInfo({ className }: { className?: string }) {
     () => append([...locationShipping]),
     [append]
   );
-
+  console.log("errors", errors)
   const freeShippingSwitch = watch('freeShipping')
   const locationBasedSwitch = watch('locationBasedShipping')
 

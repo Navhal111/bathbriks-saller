@@ -28,16 +28,22 @@ const fetchAll = async <T = any>(
   }
 };
 
-const fetchOne = async <T>(
+const fetchOne = async <T extends BaseModel>(
   name: string,
   id: string,
   params?: Params,
   headers?: Headers,
-  apiVersion: string = API_VERSION
-): Promise<T> => {
-  const path = `/${apiVersion}/${name}/${id}`;
-  return API.get(path, params, headers);
-};
+  apiVersion: string = API_VERSION,
+  isCategoryAPI: boolean = false
+): Promise<GetOneResponse<T>> => {
+  const path = `/${apiVersion}/${name}/${id}`
+
+  if (isCategoryAPI) {
+    return CategoryAPI.get(path, params, headers)
+  } else {
+    return API.get(path, params, headers)
+  }
+}
 
 const createOne = async <T extends BaseModel>(
   name: string,
@@ -100,24 +106,64 @@ const customRequest = async <T, R>({
   params,
   headers,
   apiVersion = API_VERSION,
+  isCategoryAPI = false
 }: {
-  name: string;
-  method: "POST" | "PATCH" | "GET" | "DELETE";
-  id?: string;
-  payload?: Partial<T>;
-  params?: Params;
-  headers?: Headers;
-  apiVersion?: string;
+  name: string
+  method: 'POST' | 'PATCH' | 'GET' | 'DELETE'
+  id?: string
+  payload?: Partial<T>
+  params?: Params
+  headers?: Headers
+  apiVersion?: string
+  isCategoryAPI?: boolean
 }): Promise<R> => {
-  const path = id ? `/${apiVersion}/${name}/${id}` : `/${apiVersion}/${name}`;
-  return API.request({
-    path,
-    method,
-    payload,
-    params,
-    headers,
-  });
-};
+  const path = id ? `/${apiVersion}/${name}/${id}` : `/${apiVersion}/${name}`
+
+  if (isCategoryAPI) {
+    return CategoryAPI.request({
+      path,
+      method,
+      payload,
+      params,
+      headers
+    })
+  } else {
+    return API.request({
+      path,
+      method,
+      payload,
+      params,
+      headers
+    })
+  }
+}
+
+// const customRequest = async <T, R>({
+//   name,
+//   method,
+//   id,
+//   payload,
+//   params,
+//   headers,
+//   apiVersion = API_VERSION,
+// }: {
+//   name: string;
+//   method: "POST" | "PATCH" | "GET" | "DELETE";
+//   id?: string;
+//   payload?: Partial<T>;
+//   params?: Params;
+//   headers?: Headers;
+//   apiVersion?: string;
+// }): Promise<R> => {
+//   const path = id ? `/${apiVersion}/${name}/${id}` : `/${apiVersion}/${name}`;
+//   return API.request({
+//     path,
+//     method,
+//     payload,
+//     params,
+//     headers,
+//   });
+// };
 
 const fetcher = async <T>(url: string, params?: string): Promise<T> => {
   const response = await fetch(`${url}?${params}`);

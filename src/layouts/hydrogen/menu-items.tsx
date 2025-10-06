@@ -5,6 +5,7 @@ import {
   PiAcorn,
   PiWallet,
   PiGlobe,
+  PiSupersetOf,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -92,6 +93,11 @@ export const menuItems: MenuItem[] = [
         href: "/wallet",
       },
     ],
+  },
+  {
+    name: "Support",
+    href: "/support",
+    icon: <PiSupersetOf />,
   },
   // {
   //   name: "Reports",

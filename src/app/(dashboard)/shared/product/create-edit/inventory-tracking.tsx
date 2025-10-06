@@ -11,11 +11,7 @@ const options = [
   {
     value: 'no',
     label: 'Do not track inventory for this product',
-  },
-  {
-    value: 'by-options',
-    label: 'Track inventory by options',
-  },
+  }
 ];
 
 export default function InventoryTracing() {

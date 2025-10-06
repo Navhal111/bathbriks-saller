@@ -6,12 +6,11 @@ import cn from '@/utils/class-names';
 import FormGroup from '@/app/(dashboard)/shared/form-group';
 import {
   categoryOption,
-  typeOption,
 } from '@/app/(dashboard)/shared/product/create-edit/form-utils';
 import dynamic from 'next/dynamic';
 import QuillLoader from '@/components/loader/quill-loader';
 import { useGetAllCategoryList } from '@/kit/hooks/data/category';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CategoryType } from '@/kit/models/Category';
 import { BrandType } from '@/kit/models/Brand';
 import { SubCategoryData } from '@/kit/models/SubCategory';
@@ -37,6 +36,7 @@ export default function ProductSummary({ className, categoryList, BrandList, Sub
     register,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
@@ -72,6 +72,13 @@ export default function ProductSummary({ className, categoryList, BrandList, Sub
     [BrandList]
   );
 
+  useEffect(() => {
+  const initialCategoryId = getValues('category_id');
+  if (initialCategoryId) {
+    setSelectedMainCategoryId(String(initialCategoryId));
+  }
+}, []);
+
   return (
     <FormGroup
       title="Summary"
@@ -89,22 +96,6 @@ export default function ProductSummary({ className, categoryList, BrandList, Sub
         placeholder="Product sku"
         {...register('sku')}
         error={errors.sku?.message as string}
-      />
-
-      <Controller
-        name="type"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            dropdownClassName="h-auto"
-            options={typeOption}
-            value={value}
-            onChange={onChange}
-            label="Product Type"
-            error={errors?.type?.message as string}
-            getOptionValue={(option) => option.value}
-          />
-        )}
       />
 
       <Controller

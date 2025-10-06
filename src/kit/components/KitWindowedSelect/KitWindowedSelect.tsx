@@ -4,21 +4,21 @@ import React from 'react';
 import { SelectOption } from "rizzui/select";
 import WindowedSelect from 'react-windowed-select';
 
-const customStyles = {
+const customStyles = (error?: string) => ({
     control: (provided: any, state: any) => ({
         ...provided,
-        borderColor: '#ced4da',
-        border: '2px solid #ced4da',
+        borderColor: error ? '#ef4444' : '#ced4da',
+        border: `2px solid ${error ? '#ef4444' : '#ced4da'}`,
         borderRadius: '6px',
         '&:hover': {
-            border: '2px solid #1976d2',
+            border: `2px solid ${error ? '#ef4444' : '#1976d2'}`,
         },
         boxShadow: 'none',
     }),
     indicatorSeparator: () => ({
         display: 'none',
     }),
-};
+});
 
 interface KitWindowedSelectProps {
     options: SelectOption[];
@@ -67,7 +67,7 @@ const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
                 getOptionLabel={(option: any) => option.label}
                 getOptionValue={(option: any) => option.value}
                 windowThreshold={windowThreshold}
-                styles={customStyles}
+                styles={customStyles(error)}
                 isDisabled={disabled}
                 noOptionsMessage={noOptionsMessage}
             />
