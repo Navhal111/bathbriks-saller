@@ -2,8 +2,7 @@
 
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import cn from '@/utils/class-names';
 import FormNav, { formParts } from '@/app/(dashboard)/shared/product/create-edit/form-nav';
 import ProductSummary from '@/app/(dashboard)/shared/product/create-edit/product-summary';
@@ -23,7 +22,7 @@ import { LAYOUT_OPTIONS } from '@/config/enums';
 import { useGetAllCategoryList } from '@/kit/hooks/data/category';
 import { CustomErrorType } from '@/kit/models/CustomError';
 import { useCreateProduct, useUpdateProduct } from '@/kit/hooks/data/product';
-import { CreateProductType, ProductCustomField, ProductData, ProductLocationShipping, ProductVariant } from '@/kit/models/Product';
+import { CreateProductType, ProductCustomField, ProductLocationShipping, ProductVariant } from '@/kit/models/Product';
 import { useAuth } from '@/kit/hooks/useAuth';
 import { useGetAllBrandList } from '@/kit/hooks/data/brand';
 import { useGetAllSubCategoryList } from '@/kit/hooks/data/subCategory';
@@ -34,8 +33,6 @@ import { useEffect } from 'react';
 import * as yup from 'yup';
 import { messages } from '@/config/messages';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { isEmpty } from 'lodash';
-import { InferType } from 'yup';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -52,50 +49,50 @@ const MAP_STEP_TO_COMPONENT = {
 interface IndexProps {
   className?: string;
   productDetails?: CreateProductType;
-  isLoading?: boolean
+  productLoading?: boolean
 }
 
-// interface FormData {
-//   name: string;
-//   sku: string;
-//   category_id: string;
-//   subcategory_id: string
-//   brand_id: string
-//   description: string;
-//   productImages?: string[] | undefined
-//   price: number;
-//   costPrice: number;
-//   mrp: number;
-//   salePrice: number;
-//   inventoryTracking: string;
-//   quantity: number;
-//   lowStock: number
-//   productAvailability: string;
-//   tradeNumber: string
-//   manufacturerNumber: string
-//   upcEan: string
-//   customFields: ProductCustomField[];
-//   freeShipping: boolean;
-//   shippingPrice?: number | undefined;
-//   locationBasedShipping: boolean;
-//   locationShipping: ProductLocationShipping[];
-//   pageTitle: string;
-//   metaDescription: string;
-//   metaKeywords: string;
-//   productUrl: string;
-//   isPurchaseSpecifyDate: boolean;
-//   isLimitDate: boolean;
-//   dateFieldName: string;
-//   availableDate: string;
-//   endDate: string;
-//   productVariants: ProductVariant[];
-//   tags: string[];
-//   is_fragile?: boolean
-//   user_id?: number
-//   seller_id?: number
-// }
+interface FormData {
+  name: string;
+  sku: string;
+  category_id: string;
+  subcategory_id: string
+  brand_id: string
+  description?: string;
+  productImages?: any[];
+  price: number;
+  costPrice: number;
+  mrp: number;
+  salePrice: number;
+  inventoryTracking?: string;
+  quantity: number;
+  lowStock: number
+  productAvailability: string;
+  tradeNumber?: string;
+  manufacturerNumber?: string;
+  upcEan?: string
+  customFields?: ProductCustomField[];
+  freeShipping?: boolean;
+  shippingPrice?: number;
+  locationBasedShipping?: boolean;
+  locationShipping?: ProductLocationShipping[];
+  pageTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  productUrl?: string;
+  isPurchaseSpecifyDate?: boolean;
+  isLimitDate?: boolean;
+  dateFieldName?: string;
+  availableDate?: string;
+  endDate?: string;
+  productVariants?: ProductVariant[];
+  tags?: string[];
+  is_fragile?: boolean
+  user_id?: number
+  seller_id?: number
+}
 
-type FormData = InferType<typeof productFormSchema>;
+// type FormData = InferType<typeof productFormSchema>;
 
 const productFormSchema = yup.object({
   name: yup.string().required(messages.productNameIsRequired),
@@ -103,8 +100,8 @@ const productFormSchema = yup.object({
   category_id: yup.string().required(messages.categoryIsRequired),
   subcategory_id: yup.string().required(messages.subCategoryIsRequired),
   brand_id: yup.string().required(messages.brandIsRequired),
-  description: yup.string().nullable(),
-  productImages: yup.array().nullable(),
+  description: yup.string().optional(),
+  productImages: yup.array().optional(),
 
   price: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
@@ -169,19 +166,13 @@ const productFormSchema = yup.object({
       }
     ),
 
-  // price: yup.number().typeError(messages.priceIsRequired).min(1, messages.priceIsRequired).required(),
-  // costPrice: yup.number().typeError(messages.costPriceIsRequired).min(1, messages.costPriceIsRequired).required(),
-  // mrp: yup.number().typeError(messages.retailPriceIsRequired).min(1, messages.retailPriceIsRequired).required(),
-  // salePrice: yup.number().typeError(messages.salePriceIsRequired).min(1, messages.salePriceIsRequired).required(),
-
-  inventoryTracking: yup.string().nullable(),
+  inventoryTracking: yup.string().optional(),
 
   quantity: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
     .typeError(messages.currentStockIsRequired)
     .required(messages.currentStockIsRequired)
     .min(1, messages.currentStockIsRequired),
-
   lowStock: yup
     .number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
@@ -199,28 +190,25 @@ const productFormSchema = yup.object({
       }
     ),
 
-  // quantity: yup.number().typeError(messages.currentStockIsRequired).min(1, messages.currentStockIsRequired).required(),
-  // lowStock: yup.number().typeError(messages.lowStockIsRequired).min(1, messages.lowStockIsRequired).required(),
-
   productAvailability: yup.string().required(messages.productAvailabilityIsRequired),
 
-  tradeNumber: yup.mixed().nullable(),
-  manufacturerNumber: yup.mixed().nullable(),
-  upcEan: yup.mixed().nullable(),
+  tradeNumber: yup.mixed().optional(),
+  manufacturerNumber: yup.mixed().optional(),
+  upcEan: yup.mixed().optional(),
 
   customFields: yup.array(
     yup.object({
-      label: yup.string().nullable(),
-      value: yup.string().nullable(),
+      label: yup.string().optional(),
+      value: yup.string().optional(),
     })
-  ).nullable(),
+  ).optional(),
 
-  freeShipping: yup.boolean().nullable(),
+  freeShipping: yup.boolean().optional(),
   shippingPrice: yup.number()
     .transform((value, originalValue) => {
       return originalValue === '' ? undefined : value;
     })
-    .nullable()
+    .optional()
     .when('freeShipping', {
       is: (val: boolean | null | undefined) => val === false,
       then: schema =>
@@ -229,13 +217,7 @@ const productFormSchema = yup.object({
       otherwise: schema => schema.notRequired(),
     }),
 
-  locationBasedShipping: yup.boolean().nullable(),
-  // locationShipping: yup.array(
-  //   yup.object({
-  //     label: yup.string().nullable(),
-  //     shippingCharge: yup.string().nullable(),
-  //   })
-  // ).nullable(),
+  locationBasedShipping: yup.boolean().optional(),
   locationShipping: yup.array()
     .of(
       yup.object({
@@ -255,35 +237,35 @@ const productFormSchema = yup.object({
       is: true,
       then: schema =>
         schema.min(1, 'At least one location must be added').required('Location shipping is required'),
-      otherwise: schema => schema.notRequired().nullable(),
+      otherwise: schema => schema.notRequired().optional(),
     }),
 
-  pageTitle: yup.string().nullable(),
-  metaDescription: yup.string().nullable(),
-  metaKeywords: yup.string().nullable(),
-  productUrl: yup.string().nullable(),
+  pageTitle: yup.string().optional(),
+  metaDescription: yup.string().optional(),
+  metaKeywords: yup.string().optional(),
+  productUrl: yup.string().optional(),
 
-  isPurchaseSpecifyDate: yup.boolean().nullable(),
-  isLimitDate: yup.boolean().nullable(),
-  dateFieldName: yup.string().nullable(),
+  isPurchaseSpecifyDate: yup.boolean().optional(),
+  isLimitDate: yup.boolean().optional(),
+  dateFieldName: yup.string().optional(),
 
   availableDate: yup.string().optional(),
   endDate: yup.string().optional(),
 
   productVariants: yup.array(
     yup.object({
-      name: yup.string().nullable(),
-      value: yup.string().nullable(),
+      name: yup.string().optional(),
+      value: yup.string().optional(),
     })
-  ).nullable(),
+  ).optional(),
 
-  tags: yup.array(yup.string()).nullable(),
-  is_fragile: yup.boolean().nullable(),
-  user_id: yup.number().nullable(),
-  seller_id: yup.number().nullable(),
+  tags: yup.array(yup.string()).optional(),
+  is_fragile: yup.boolean().optional(),
+  user_id: yup.number().optional(),
+  seller_id: yup.number().optional(),
 })
 
-export default function CreateEditProduct({ className, productDetails, isLoading }: IndexProps) {
+export default function CreateEditProduct({ className, productDetails, productLoading }: IndexProps) {
   console.log("productDetails", productDetails)
   const { user } = useAuth()
   const { layout } = useLayout();
@@ -293,7 +275,7 @@ export default function CreateEditProduct({ className, productDetails, isLoading
   const { SubCategoryList, isSubCategoryListLoading } = useGetAllSubCategoryList({ page: 1, size: 10000 });
   const { BrandList, isBrandListLoading } = useGetAllBrandList({ page: 1, size: 10000 });
   const { createProduct: onCreateProduct, isCreatingProduct } = useCreateProduct()
-  const { update: onUpdateProduct, isUpdatingProduct } = useUpdateProduct(String(productDetails?.id))
+  const { update: onUpdateProduct, isUpdatingProduct } = useUpdateProduct()
 
   const defaultValues: FormData = {
     name: productDetails?.name || '',
@@ -314,15 +296,11 @@ export default function CreateEditProduct({ className, productDetails, isLoading
     tradeNumber: productDetails?.tradeNumber || '',
     manufacturerNumber: productDetails?.manufacturerNumber || '',
     upcEan: productDetails?.upcEan || '',
-    customFields: isEmpty(productDetails?.customFields)
-      ? customFields
-      : productDetails?.customFields ?? customFields,
+    customFields: productDetails?.customFields ? productDetails?.customFields : customFields,
     freeShipping: productDetails?.freeShipping || false,
     shippingPrice: productDetails?.shippingPrice ?? undefined,
     locationBasedShipping: productDetails?.locationBasedShipping || false,
-    locationShipping: isEmpty(productDetails?.locationShipping)
-      ? locationShipping
-      : productDetails?.locationShipping ?? locationShipping,
+    locationShipping: productDetails?.locationShipping ? productDetails?.locationShipping : locationShipping,
     pageTitle: productDetails?.pageTitle || '',
     metaDescription: productDetails?.metaDescription || '',
     metaKeywords: productDetails?.metaKeywords || '',
@@ -332,14 +310,18 @@ export default function CreateEditProduct({ className, productDetails, isLoading
     dateFieldName: productDetails?.dateFieldName || '',
     availableDate: productDetails?.availableDate ? productDetails.availableDate : '',
     endDate: productDetails?.endDate ? productDetails.endDate : '',
-    productVariants: isEmpty(productDetails?.productVariants)
-      ? productVariants
-      : productDetails?.productVariants ?? productVariants,
+    productVariants: Array.isArray(productDetails?.productVariants)
+      ? productDetails.productVariants
+        .filter(item => typeof item?.sku === 'string' && item.sku.includes('-'))
+        .map(item => ({
+          name: item.sku.split('-')[1],
+          value: item.stock ?? '',
+        }))
+      : productVariants,
     tags: productDetails?.tags || [],
-  } as unknown as FormData;
+  } as unknown as FormData;;
 
-
-  const methods = useForm<FormData>({
+  const methods = useForm({
     mode: 'onChange',
     resolver: yupResolver(productFormSchema),
     defaultValues,
@@ -354,13 +336,8 @@ export default function CreateEditProduct({ className, productDetails, isLoading
       is_fragile: true,
       user_id: user?.id,
       seller_id: user?.id,
-      productUrl: data.productUrl ? [data.productUrl] : [],
-      
-      //   productUrl: data.productUrl
-      // ? [{ url: data.productUrl }]
-      // : [],
-      // availableDate: data.availableDate?.toISOString() as unknown as Date,
-      // endDate: data.endDate?.toISOString() as unknown as Date,
+      productUrl: [],
+      ...(productDetails && { id: productDetails.id })
     };
 
     try {
@@ -370,8 +347,8 @@ export default function CreateEditProduct({ className, productDetails, isLoading
       } else {
         await onCreateProduct(payload)
         toast.success('Product created successfully.')
-        router.push('/products')
       }
+      router.push('/products')
     } catch (error) {
       toast.error((error as CustomErrorType)?.message)
     }
@@ -390,12 +367,12 @@ export default function CreateEditProduct({ className, productDetails, isLoading
         )}
       />
       <FormProvider {...methods}>
-        <KitShow show={isCategoryListLoading || isBrandListLoading}>
+        <KitShow show={isCategoryListLoading || isBrandListLoading || !!productLoading}>
           <div className='h-screen flex justify-center'>
             <KitLoader isLoading={true} />
           </div>
         </KitShow>
-        <KitShow show={!isCategoryListLoading || !isBrandListLoading}>
+        <KitShow show={!isCategoryListLoading || !isBrandListLoading || !productLoading}>
           <form
             onSubmit={methods.handleSubmit(onSubmit)}
             className={cn(

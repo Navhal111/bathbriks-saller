@@ -13,7 +13,7 @@ export type SWRUpdateAndRefreshAllOptimisticDataFunction<T extends BaseModel> = 
 
 export interface UseSWRUpdateOne {
   path: string
-  id: string
+  id?: string
   apiVersion?: string
   isCategoryAPI?: boolean
 }

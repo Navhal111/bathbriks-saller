@@ -64,14 +64,14 @@ const createOne = async <T extends BaseModel>(
 
 const updateOne = async <T extends BaseModel>(
   name: string,
-  id: string,
   body: Partial<T>,
+  id?: string,
   params?: Params,
   headers?: Headers,
   apiVersion: string = API_VERSION,
   isCategoryAPI: boolean = false
 ): Promise<UpdateOneResponse<T>> => {
-  const path = `/${apiVersion}/${name}/${id}`
+  const path = id ? `/${apiVersion}/${name}/${id}` : `/${apiVersion}/${name}`
 
   if (isCategoryAPI) {
     return CategoryAPI.post(path, body, params, headers)

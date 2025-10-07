@@ -37,6 +37,7 @@ export default function ProductSummary({ className, categoryList, BrandList, Sub
     control,
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useFormContext();
 
@@ -72,12 +73,13 @@ export default function ProductSummary({ className, categoryList, BrandList, Sub
     [BrandList]
   );
 
+  const categoryId = watch('category_id');
+
   useEffect(() => {
-  const initialCategoryId = getValues('category_id');
-  if (initialCategoryId) {
-    setSelectedMainCategoryId(String(initialCategoryId));
-  }
-}, []);
+    if (categoryId) {
+      setSelectedMainCategoryId(String(categoryId));
+    }
+  }, [categoryId]);
 
   return (
     <FormGroup

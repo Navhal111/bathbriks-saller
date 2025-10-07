@@ -92,10 +92,9 @@ const useCreateProduct = (shouldFetch = true, params?: Params) => {
     }
 }
 
-const useUpdateProduct = (id = '') => {
+const useUpdateProduct = () => {
     const { data, error, isMutating, reset, update } = useSWRUpdateOne<CreateProductType>({
         path: EDIT_PRODUCT_PATH,
-        id,
         isCategoryAPI: true,
     })
 

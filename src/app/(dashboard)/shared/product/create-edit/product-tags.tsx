@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input, Button } from 'rizzui';
 import cn from '@/utils/class-names';
 import FormGroup from '@/app/(dashboard)/shared/form-group';
@@ -9,6 +9,13 @@ import { PiTagBold, PiXBold } from 'react-icons/pi';
 
 export default function ProductTags({ className }: { className?: string }) {
   const [tags, setTags] = useState<string[]>([]);
+  const { watch } = useFormContext();
+  const watchedTags = watch('tags');
+
+  useEffect(() => {
+    setTags(watchedTags || []);
+  }, [watchedTags]);
+
   return (
     <FormGroup
       title="Product Tags"

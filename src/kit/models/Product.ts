@@ -63,12 +63,16 @@ export interface ProductCustomField {
 
 export interface ProductLocationShipping {
   name: string;
-  shippingCharge: string;
+  shippingCharge: number;
 }
 
 export interface ProductVariant {
   name?: string;
   value?: string;
+  id: string
+  price: number
+  sku: string
+  stock: number
 }
 
 export interface CreateProductType extends BaseModel {

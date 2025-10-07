@@ -27,8 +27,8 @@ export default function UpdateProductPage() {
         <>
             <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
             <CreateEditProduct
-                productDetails={productDetails?.data ?? {}}
-                isLoading={isProductDetailsLoading}
+                productDetails={productDetails?.data}
+                productLoading={isProductDetailsLoading}
             />
         </>
     );
