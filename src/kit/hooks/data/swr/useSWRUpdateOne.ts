@@ -34,8 +34,12 @@ import { swrMutationConfig } from '@/config/swrConfigs'
 export const useSWRUpdateOne = <T extends BaseModel>({ path, id, apiVersion, isCategoryAPI }: UseSWRUpdateOne) => {
   const { data, error, trigger, reset, isMutating } = useSWRMutation(
     [id ? `${path}/${id}` : `${path}`],
-    ([], { arg }: { arg: FetcherUpdate<T> }) =>
-      updateOne<T>(path, arg.body, id, arg.params, arg.headers, apiVersion, isCategoryAPI)
+    ([], { arg }: { arg: FetcherUpdate<T> }) => {
+      if (!id) {
+        throw new Error('ID is required for update operation');
+      }
+      return updateOne<T>(path, id, arg.body, arg.params, arg.headers, apiVersion, isCategoryAPI);
+    }
   )
 
   const defaultOptimisticData = (currentRecord: Partial<T> | undefined, record: Partial<T>) => {

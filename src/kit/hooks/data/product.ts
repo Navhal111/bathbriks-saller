@@ -44,7 +44,7 @@ const useGetAllProductList = (params?: Params, shouldFetch = true) => {
 const useGetOneProduct = (id = '', params?: Params) => {
     const { data, error, isLoading, isValidating, mutate } = useSWR<GetOneResponse<CreateProductType>, CustomError[]>(
         id ? [`${PRODUCT_PATH}/${id}`, params] : null,
-        (): Promise<GetOneResponse<CreateProductType>> => fetchOne(PRODUCT_PATH, id, params, undefined, undefined, true),
+        (): Promise<GetOneResponse<CreateProductType>> => fetchOne(PRODUCT_PATH, id, params),
         {
             revalidateOnMount: true,
             revalidateIfStale: true,
@@ -72,7 +72,6 @@ const useCreateProduct = (shouldFetch = true, params?: Params) => {
                 name: name,
                 method: 'POST',
                 payload: arg.body,
-                isCategoryAPI: true,
                 headers: {
                     'x-seller-id': sellerId,
                 },
