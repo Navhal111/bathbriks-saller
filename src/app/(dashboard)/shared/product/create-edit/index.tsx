@@ -330,6 +330,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
   const isBtnLoading = isCreatingProduct || isUpdatingProduct
 
   const onSubmit = async (data: any) => {
+    console.log("data", data)
     const { productImages, ...rest } = data;
     const payload: Partial<CreateProductType> = {
       ...rest,
@@ -337,8 +338,25 @@ export default function CreateEditProduct({ className, productDetails, productLo
       user_id: user?.id,
       seller_id: user?.id,
       productUrl: [],
-      ...(productDetails && { id: productDetails.id })
+      ...(productDetails && { id: productDetails.id }),
+      locationShipping:
+        Array.isArray(data.locationShipping) &&
+          data.locationShipping.some((loc: any) => loc.name && loc.shippingCharge)
+          ? data.locationShipping.filter((loc: any) => loc.name && loc.shippingCharge)
+          : [],
+      customFields:
+        Array.isArray(data.customFields) &&
+          data.customFields.some((f: any) => f.label && f.value)
+          ? data.customFields.filter((f: any) => f.label && f.value)
+          : [],
+
+      productVariants:
+        Array.isArray(data.productVariants) &&
+          data.productVariants.some((v: any) => v.name && v.value)
+          ? data.productVariants.filter((v: any) => v.name && v.value)
+          : [],
     };
+    console.log("payload", payload)
 
     try {
       if (productDetails) {
