@@ -18,7 +18,7 @@ export default function ProductMedia({ className }: ProductMediaProps) {
     >
       <UploadZone
         className="col-span-full"
-        name="productImages"
+        name="productUrl"
         getValues={getValues}
         setValue={setValue}
       />

@@ -12,23 +12,7 @@ export default function ProductPricing() {
   return (
     <>
       <Input
-        label="Price"
-        placeholder="10"
-        {...register('price')}
-        error={errors.price?.message as string}
-        prefix={'₹'}
-        type="number"
-      />
-      <Input
-        label="Cost Price"
-        placeholder="15"
-        {...register('costPrice')}
-        error={errors.costPrice?.message as string}
-        prefix={'₹'}
-        type="number"
-      />
-      <Input
-        label="Retail Price"
+        label="MRP"
         placeholder="10"
         {...register('mrp')}
         error={errors.mrp?.message as string}
@@ -36,10 +20,18 @@ export default function ProductPricing() {
         type="number"
       />
       <Input
-        label="Sale Price"
-        placeholder="20"
-        {...register('salePrice')}
-        error={errors.salePrice?.message as string}
+        label="B2C Sale Price"
+        placeholder="15"
+        {...register('b2bSalePrice')}
+        error={errors.b2bSalePrice?.message as string}
+        prefix={'₹'}
+        type="number"
+      />
+      <Input
+        label="B2B Sale Price"
+        placeholder="10"
+        {...register('b2cSalePrice')}
+        error={errors.b2cSalePrice?.message as string}
         prefix={'₹'}
         type="number"
       />

@@ -13,6 +13,12 @@ export const locationShipping = [
     shippingCharge: '',
   },
 ];
+export const productQuantity = [
+  {
+    quantity: '',
+    price: '',
+  },
+];
 export const productVariants = [
   {
     name: '',
@@ -180,3 +186,38 @@ export const variantOption = [
     label: 'Multiple',
   },
 ];
+
+export const UOMOption = [
+  {
+    value: 'piece',
+    label: 'Piece',
+  },
+  {
+    value: 'kg',
+    label: 'KG',
+  },
+  {
+    value: 'dozen',
+    label: 'Dozen',
+  },
+  {
+    value: 'ton',
+    label: 'Ton',
+  },
+];
+
+export const PriceingTypeOption = [
+  {
+    value: 'saleBasePriceing',
+    label: 'Sale base priceing',
+  },
+  {
+    value: 'productBasePriceing',
+    label: 'Product Base Priceing',
+  },
+];
+
+export enum PriceingType {
+  SALEBASEPRICEING = "saleBasePriceing",
+  PRODUCTBASEPRICING = "productBasePriceing",
+}

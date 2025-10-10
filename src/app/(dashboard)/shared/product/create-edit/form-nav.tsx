@@ -5,11 +5,12 @@ export const formParts = {
   summary: 'summary',
   media: 'media',
   pricingInventory: 'pricingInventory',
+  orderQuantity: 'orderQuantity',
   productIdentifiers: 'productIdentifiers',
   shipping: 'shipping',
+  deliveryTime: 'deliveryTime',
   seo: 'seo',
   deliveryEvent: 'deliveryEvent',
-  variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
 };
 
@@ -27,6 +28,10 @@ export const menuItems = [
     value: formParts.pricingInventory,
   },
   {
+    label: 'Order Quantity',
+    value: formParts.orderQuantity,
+  },
+  {
     label: 'Product Identifiers & Custom Fields',
     value: formParts.productIdentifiers,
   },
@@ -35,13 +40,13 @@ export const menuItems = [
     value: formParts.shipping,
   },
   {
-    label: 'SEO',
-    value: formParts.seo,
+    label: 'Delivery Time',
+    value: formParts.deliveryTime,
   },
   {
-    label: 'Variant Options',
-    value: formParts.variantOptions,
-  },
+    label: 'SEO',
+    value: formParts.seo,
+  }
 ];
 
 interface FormNavProps {

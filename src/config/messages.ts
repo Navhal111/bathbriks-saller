@@ -28,6 +28,8 @@ export const messages = {
   costPriceIsRequired: "Cost price is required",
   retailPriceIsRequired: "Retail price is required",
   currentStockIsRequired: "Current stock is required",
+  minOrderIsRequired: "Min order is required",
+  maxOrderIsRequired: "Max order is required",
   lowStockIsRequired: "Low stock is required",
   productAvailabilityIsRequired: "Product availability is required",
   salePriceIsRequired: "Sale price is required",

@@ -2,8 +2,7 @@
 import useSWR from 'swr'
 import type { CustomError } from '@/kit/models/CustomError'
 import type { Params } from '@/kit/services/axiosService'
-import useSWRCreateOne from './swr/useSWRCreateOne';
-import { CreateOneResponse, GetAllObjectResponse, GetAllResponse, GetOneResponse } from '@/kit/models/_generic';
+import { GetAllObjectResponse, GetOneResponse } from '@/kit/models/_generic';
 import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
 import { API_VERSION, customRequest, fetchAll, fetchOne } from './fetchers';
@@ -12,12 +11,14 @@ import authConfig from '@/config/auth'
 import storage from '@/kit/services/storage'
 import useSWRMutation from 'swr/mutation';
 import { FetcherCreate } from './fetchers/type';
+import { MediaType } from '@/kit/models/media';
 
 const PRODUCT_LIST_PATH = 'products/fetch-products';
 const PRODUCT_PATH = 'products/fetch-product-detail';
 const ADD_PRODUCT_PATH = 'products/add-product';
 const EDIT_PRODUCT_PATH = 'products/edit-product';
 const DELETE_PRODUCT_PATH = 'products/delete-product';
+const UPDATE_MEDIA_PATH = 'products/add-product-media';
 
 const useGetAllProductList = (params?: Params, shouldFetch = true) => {
     const { data, error, isValidating, isLoading, mutate } = useSWR<GetAllObjectResponse<ProductType>, CustomError[]>(
@@ -124,4 +125,21 @@ const useDeleteProduct = (id = '', params?: Params) => {
     }
 }
 
-export { useGetAllProductList, useGetOneProduct, useCreateProduct, useUpdateProduct, useDeleteProduct }
+const useUpdateMedia = (id = '') => {
+    const { data, error, isMutating, reset, update } = useSWRUpdateOne<MediaType>({
+        path: UPDATE_MEDIA_PATH,
+        id,
+        isCategoryAPI: true,
+    })
+
+    return {
+        data,
+        error,
+        isUpdatingMedia: isMutating,
+        reset,
+        update
+    }
+}
+
+
+export { useGetAllProductList, useGetOneProduct, useCreateProduct, useUpdateProduct, useDeleteProduct, useUpdateMedia }

@@ -35,13 +35,6 @@ export default function ProductSeo({ className }: { className?: string }) {
         {...register('metaDescription')}
         error={errors.metaDescription?.message as string}
       />
-      <Input
-        label="Product URL"
-        type="url"
-        placeholder="https://"
-        {...register('productUrl')}
-        error={errors.productUrl?.message as string}
-      />
     </FormGroup>
   );
 }

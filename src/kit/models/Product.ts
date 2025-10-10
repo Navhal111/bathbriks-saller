@@ -66,6 +66,11 @@ export interface ProductLocationShipping {
   shippingCharge: number;
 }
 
+export interface ProductQuantity {
+  quantity: number;
+  price: number;
+}
+
 export interface ProductVariant {
   name?: string;
   value?: string;
@@ -82,14 +87,18 @@ export interface CreateProductType extends BaseModel {
   subcategory_id: string
   brand_id: string
   description: string;
-  productImages?: string[] | undefined
-  price: number | undefined;
-  costPrice: number | undefined;
+  productUrl?: string[]
+  priceingType: string
+  uom: string
   mrp: number | undefined;
-  salePrice: number | undefined;
-  inventoryTracking: string;
+  b2bSalePrice: number | undefined;
+  b2cSalePrice: number | undefined;
+  isQuantityPrice: boolean
+  quantityPrice: ProductQuantity[];
   quantity: number | undefined;
   lowStock: number | undefined
+  minOrder: number | undefined
+  maxOrder: number | undefined
   productAvailability: string;
   tradeNumber: string
   manufacturerNumber: string
@@ -102,7 +111,6 @@ export interface CreateProductType extends BaseModel {
   pageTitle: string;
   metaDescription: string;
   metaKeywords: string;
-  productUrl: string;
   isPurchaseSpecifyDate: boolean;
   isLimitDate: boolean;
   dateFieldName: string;

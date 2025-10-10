@@ -4,7 +4,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import isEmpty from "lodash/isEmpty";
 import prettyBytes from "pretty-bytes";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "@uploadthing/react";
 import { PiCheckBold, PiTrashBold, PiUploadSimpleBold } from "react-icons/pi";
 import { Button, Text, FieldError } from "rizzui";
@@ -15,6 +15,10 @@ import { ClientUploadedFileData } from "uploadthing/types";
 import UploadIcon from "../shape/upload";
 import { generateClientDropzoneAccept } from "uploadthing/client";
 import { useUploadThing } from "@/utils/uploadthing";
+import { useUpdateMedia } from "@/kit/hooks/data/product";
+import { useParams } from "next/navigation";
+import { CustomErrorType } from "@/kit/models/CustomError";
+import { MediaType } from "@/kit/models/media";
 
 interface UploadZoneProps {
   label?: string;
@@ -39,11 +43,15 @@ export default function UploadZone({
   setValue,
   error,
 }: UploadZoneProps) {
+  const { id } = useParams()
+  const isEditMode = Boolean(id);
+  const { update: onUpdateMedia, isUpdatingMedia } = useUpdateMedia(String(id))
+
   const [files, setFiles] = useState<File[]>([]);
+  console.log("files", files)
 
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
-      console.log("acceptedFiles", acceptedFiles);
       setFiles([
         ...acceptedFiles.map((file) =>
           Object.assign(file, {
@@ -67,46 +75,61 @@ export default function UploadZone({
     setFiles(updatedFiles);
   }
 
-  const uploadedItems = isEmpty(getValues(name)) ? [] : getValues(name);
+  // const uploadedItems = isEmpty(getValues(name)) ? [] : getValues(name);
+  const uploadedItems = isEditMode ? getValues(name) ?? [] : [];
 
   const notUploadedItems = files.filter(
     (file) => !uploadedItems?.some((uploadedFile: FileType) => uploadedFile.name === file.name)
   );
 
-  const { startUpload, routeConfig, isUploading } = useUploadThing("generalMedia", {
-    onClientUploadComplete: (res: ClientUploadedFileData<any>[] | undefined) => {
-      console.log("res", res);
-      if (setValue) {
-        // const respondedUrls = res?.map((r) => r.url);
-        setFiles([]);
-        const respondedUrls = res?.map((r) => ({
-          name: r.name,
-          size: r.size,
-          url: r.url,
-        }));
-        setValue(name, respondedUrls);
-      }
-      toast.success(
-        <Text
-          as="b"
-          className="font-semibold"
-        >
-          portfolio Images updated
-        </Text>
-      );
-    },
-    onUploadError: (error: Error) => {
-      console.error(error);
-      toast.error(error.message);
-    },
-  });
+  const startUpload = async (files: File[]) => {
 
-  const fileTypes = routeConfig ? Object.keys(routeConfig) : [];
+    const filePayloads = await Promise.all(
+      files.map((file: File) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            const base64 = (reader.result as string).split(',')[1];
+            resolve({
+              // order:,
+              type: file.type,
+              base64,
+              filename: file.name
+            });
+          };
+
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      })
+    );
+
+    // console.log("Upload payload:", filePayloads)
+
+    if (isEditMode) {
+      try {
+        await onUpdateMedia(filePayloads as Partial<MediaType>);
+        // setValue('mediaUploadComplete', true);
+      } catch (error) {
+        toast.error((error as CustomErrorType)?.message);
+        // setValue('mediaUploadComplete', false);
+      }
+    } else {
+      setValue('productUrl', filePayloads);
+      // setValue('mediaUploadComplete', true);
+    }
+  }
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
   });
+
+  // useEffect(() => {
+  //   if (files.length !== 0) {
+  //     setValue('mediaUploadComplete', false);
+  //   }
+  // }, [files]);
 
   return (
     <div className={cn("grid @container", className)}>
@@ -129,28 +152,41 @@ export default function UploadZone({
           <Text className="text-base font-medium">Drop or select file</Text>
         </div>
 
-        {!isEmpty(files) && !isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={notUploadedItems}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(notUploadedItems)}
-          />
-        )}
+        {isEditMode && (
+          <>
+            {!isEmpty(files) && !isEmpty(notUploadedItems) && (
+              <UploadButtons
+                files={notUploadedItems}
+                isLoading={isUpdatingMedia}
+                onClear={() => setFiles([])}
+                onUpload={() => startUpload(notUploadedItems)}
+              />
+            )}
 
-        {isEmpty(files) && !isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={notUploadedItems}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(notUploadedItems)}
-          />
-        )}
+            {isEmpty(files) && !isEmpty(notUploadedItems) && (
+              <UploadButtons
+                files={notUploadedItems}
+                isLoading={isUpdatingMedia}
+                onClear={() => setFiles([])}
+                onUpload={() => startUpload(notUploadedItems)}
+              />
+            )}
 
-        {!isEmpty(files) && isEmpty(notUploadedItems) && (
+            {!isEmpty(files) && isEmpty(notUploadedItems) && (
+              <UploadButtons
+                files={files}
+                isLoading={isUpdatingMedia}
+                onClear={() => setFiles([])}
+                onUpload={() => startUpload(files)}
+              />
+            )}
+          </>
+        )}
+        {!isEditMode && !isEmpty(files) && (
           <UploadButtons
+            isEditMode={false}
             files={files}
-            isLoading={isUploading}
+            isLoading={isUpdatingMedia}
             onClear={() => setFiles([])}
             onUpload={() => startUpload(files)}
           />
@@ -192,7 +228,7 @@ export default function UploadZone({
                   name={file.name}
                   url={file.preview}
                 />
-                {isUploading ? (
+                {isUpdatingMedia ? (
                   <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
                     <LoadingSpinner />
                   </div>
@@ -225,11 +261,13 @@ function UploadButtons({
   onClear,
   onUpload,
   isLoading,
+  isEditMode = true
 }: {
   files: any[];
   isLoading: boolean;
   onClear: () => void;
   onUpload: () => void;
+  isEditMode?: boolean
 }) {
   return (
     <div className="flex w-full flex-wrap items-center justify-center gap-4 px-6 pb-5 @sm:flex-nowrap @xl:w-auto @xl:justify-end @xl:px-0 @xl:pb-0">
@@ -247,29 +285,38 @@ function UploadButtons({
         isLoading={isLoading}
         onClick={onUpload}
       >
-        <PiUploadSimpleBold /> Upload {files.length} files
+        <PiUploadSimpleBold />
+        {`${isEditMode ? 'Upload' : 'Add'} ${files.length} files`}
       </Button>
     </div>
   );
 }
 
 function MediaPreview({ name, url }: { name: string; url: string }) {
-  return endsWith(name, ".pdf") ? (
-    <object
-      data={url}
-      type="application/pdf"
-      width="100%"
-      height="100%"
-    >
-      <p>
-        Alternative text - include a link <a href={url}>to the PDF!</a>
-      </p>
-    </object>
-  ) : (
+  // return endsWith(name, ".pdf") ? (
+  //   <object
+  //     data={url}
+  //     type="application/pdf"
+  //     width="100%"
+  //     height="100%"
+  //   >
+  //     <p>
+  //       Alternative text - include a link <a href={url}>to the PDF!</a>
+  //     </p>
+  //   </object>
+  // ) : (
+  //   <Image
+  //     fill
+  //     src={url}
+  //     alt={name}
+  //     className="transform rounded-md object-contain"
+  //   />
+  // );
+  return (
     <Image
       fill
-      src={url}
-      alt={name}
+      src={url ? url : '/logo.png'}
+      alt={name ? name : ''}
       className="transform rounded-md object-contain"
     />
   );
@@ -279,7 +326,7 @@ function MediaCaption({ name, size }: { name: string; size: number }) {
   return (
     <div className="mt-1 text-xs">
       <p className="break-words font-medium text-gray-700">{name}</p>
-      <p className="mt-1 font-mono">{prettyBytes(size)}</p>
+      {/* <p className="mt-1 font-mono">{prettyBytes(size)}</p> */}
     </div>
   );
 }

@@ -1,18 +1,13 @@
 'use client';
 
-import { Controller, useFormContext } from 'react-hook-form';
-import { Radio, RadioGroup, Input } from 'rizzui';
-
-const options = [
-  {
-    value: 'yes',
-    label: 'Track inventory for this product',
-  },
-  {
-    value: 'no',
-    label: 'Do not track inventory for this product',
-  }
-];
+import { useFieldArray, useFormContext } from 'react-hook-form';
+import { Input, Button, ActionIcon } from 'rizzui';
+import { useCallback } from 'react';
+import {
+  productVariants,
+} from '@/app/(dashboard)/shared/product/create-edit/form-utils';
+import TrashIcon from '@/components/icons/trash';
+import { PiPlusBold } from 'react-icons/pi';
 
 export default function InventoryTracing() {
   const {
@@ -21,32 +16,54 @@ export default function InventoryTracing() {
     formState: { errors },
   } = useFormContext();
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'productVariants',
+  });
+
+  const addVariant = useCallback(() => append([...productVariants]), [append]);
+
   return (
     <>
-      <Controller
-        name="inventoryTracking"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <RadioGroup
-            value={value}
-            setValue={onChange}
-            className="col-span-full grid gap-4"
-          >
-            {options.map((item) => (
-              <Radio
-                key={item.value}
-                value={item.value}
-                label={item.label}
-                inputClassName="dark:checked:!bg-gray-200 dark:checked:!border-muted dark:focus:ring-gray-200 dark:focus:ring-offset-gray-0"
-              />
-            ))}
-          </RadioGroup>
-        )}
-      />
+      {fields.map((item, index) => (
+        <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
+          <Input
+            label="Variant Name"
+            placeholder="Variant name"
+            {...register(`productVariants.${index}.name`)}
+            error={(errors.productVariants as any)?.[index]?.name?.message}
+          />
+          <Input
+            type="number"
+            label="Variant Value"
+            placeholder="150.00"
+            className="flex-grow"
+            prefix={'₹'}
+            {...register(`productVariants.${index}.value`)}
+            error={(errors.productVariants as any)?.[index]?.value?.message}
+          />
+          {fields.length > 1 && (
+            <ActionIcon
+              onClick={() => remove(index)}
+              variant="flat"
+              className="mt-7 shrink-0"
+            >
+              <TrashIcon className="h-4 w-4" />
+            </ActionIcon>
+          )}
+        </div>
+      ))}
+      <Button
+        onClick={addVariant}
+        variant="outline"
+        className="col-span-full ml-auto w-auto"
+      >
+        <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
+      </Button>
 
       <Input
         type="number"
-        label="Current Stock Level"
+        label="Quantity"
         placeholder="150"
         {...register('quantity')}
         error={errors.quantity?.message as string}
