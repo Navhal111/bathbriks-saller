@@ -72,12 +72,19 @@ export interface ProductQuantity {
 }
 
 export interface ProductVariant {
-  name?: string;
-  value?: string;
+  name: string;
+  value: string;
   id: string
   price: number
   sku: string
   stock: number
+}
+
+export interface MediaPayload {
+  order: number;
+  type: string;
+  base64: string;
+  name: string;
 }
 
 export interface CreateProductType extends BaseModel {
@@ -87,7 +94,7 @@ export interface CreateProductType extends BaseModel {
   subcategory_id: string
   brand_id: string
   description: string;
-  productUrl?: string[]
+  productUrl: MediaPayload[]
   priceingType: string
   uom: string
   mrp: number | undefined;
@@ -108,6 +115,8 @@ export interface CreateProductType extends BaseModel {
   shippingPrice?: number | undefined;
   locationBasedShipping: boolean;
   locationShipping: ProductLocationShipping[];
+  minDeliveryTime?: string
+  maxDeliveryTime?: string
   pageTitle: string;
   metaDescription: string;
   metaKeywords: string;

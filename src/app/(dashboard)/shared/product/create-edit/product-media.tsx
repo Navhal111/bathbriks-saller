@@ -5,10 +5,19 @@ import cn from '@/utils/class-names';
 
 interface ProductMediaProps {
   className?: string;
+  files: any[];
+  setFiles: React.Dispatch<React.SetStateAction<any[]>>;
+  isUpdatingMedia?: boolean
 }
 
-export default function ProductMedia({ className }: ProductMediaProps) {
-  const { getValues, setValue } = useFormContext();
+export default function ProductMedia({ className, files, setFiles, isUpdatingMedia }: ProductMediaProps) {
+
+  const {
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
+
 
   return (
     <FormGroup
@@ -21,6 +30,10 @@ export default function ProductMedia({ className }: ProductMediaProps) {
         name="productUrl"
         getValues={getValues}
         setValue={setValue}
+        error={errors.productUrl?.message as string}
+        files={files}
+        setFiles={setFiles}
+        isUpdatingMedia={isUpdatingMedia}
       />
     </FormGroup>
   );

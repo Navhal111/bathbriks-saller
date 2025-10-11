@@ -4,7 +4,7 @@ import ProductAvailability from '@/app/(dashboard)/shared/product/create-edit/pr
 import InventoryTracing from '@/app/(dashboard)/shared/product/create-edit/inventory-tracking';
 import ProductPricing from '@/app/(dashboard)/shared/product/create-edit/product-pricing';
 import { PriceingType, PriceingTypeOption, productQuantity, productVariants, UOMOption } from './form-utils';
-import { Select } from 'rizzui/select';
+import { Select, SelectOption } from 'rizzui/select';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Flex } from 'rizzui/flex';
 import KitShow from '@/kit/components/KitShow/KitShow';
@@ -32,7 +32,7 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
       setValue('quantityPrice', productQuantity);
       setValue('productVariants', productVariants);
     } else if (isPriceingType === PriceingType.PRODUCTBASEPRICING) {
-      setValue('mrp', null);
+      setValue('isQuantityPrice', true);
       setValue('b2bSalePrice', null);
       setValue('b2cSalePrice', null);
     }
@@ -40,41 +40,53 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
 
   return (
     <>
-      <Flex align="center" className="order-2 @3xl:order-1 @3xl:max-w-[400px]">
+      <Flex align="start" className="order-2 @3xl:order-1 @3xl:max-w-[400px]">
         <Controller
-          name='priceingType'
+          name="priceingType"
           control={control}
-          render={({ field: { onChange, value } }) => (
-            <Select
-              selectClassName="h-9 !min-w-[200px]"
-              optionClassName="h-9"
-              className="w-full pt-5"
-              dropdownClassName="!z-100 h-auto p-1.5"
-              options={PriceingTypeOption}
-              placeholder={'Select Priceing Type'}
-              value={value ?? null}
-              onChange={onChange}
-              getOptionValue={(option) => option.value}
-            />
-          )}
+          render={({ field }) => {
+            const selectedOption = PriceingTypeOption.find(opt => opt.value === field.value) ?? null;
+
+            return (
+              <Select
+                options={PriceingTypeOption}
+                value={selectedOption}
+                onChange={(selected: any) => field.onChange(selected?.value)}
+                displayValue={(selected: SelectOption | null) => selected?.label || ""}
+                selectClassName="h-9 !min-w-[200px]"
+                optionClassName="h-9"
+                className="w-full pt-5"
+                dropdownClassName="!z-100 h-auto p-1.5"
+                placeholder="Select Priceing Type"
+                error={errors?.priceingType?.message as string}
+              />
+            );
+          }}
         />
+
         <Controller
-          name='uom'
+          name="uom"
           control={control}
-          render={({ field: { onChange, value } }) => (
-            <Select
-              selectClassName="h-9 !min-w-[150px]"
-              optionClassName="h-9"
-              className="w-full pt-5"
-              dropdownClassName="!z-100 h-auto p-1.5"
-              options={UOMOption}
-              placeholder={'Select UOM'}
-              value={value ?? null}
-              onChange={onChange}
-              getOptionValue={(option) => option.label}
-            />
-          )}
+          render={({ field }) => {
+            const selectedOption = UOMOption.find(opt => opt.value === field.value) ?? null;
+
+            return (
+              <Select
+                options={UOMOption}
+                value={selectedOption}
+                onChange={(selected: any) => field.onChange(selected?.value)}
+                displayValue={(selected: SelectOption | null) => selected?.label || ""}
+                selectClassName="h-9 !min-w-[200px]"
+                optionClassName="h-9"
+                className="w-full pt-5"
+                dropdownClassName="!z-100 h-auto p-1.5"
+                placeholder="Select Priceing Type"
+                error={errors?.uom?.message as string}
+              />
+            );
+          }}
         />
+
       </Flex>
       <KitShow show={isPriceingType === PriceingType.SALEBASEPRICEING}>
         <FormGroup
@@ -93,14 +105,14 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
         >
           <ProductQuantity />
         </FormGroup>
-        <FormGroup
-          title="Variant Options"
-          description="Add your product variants here"
-          className={cn(className)}
-        >
-          <InventoryTracing />
-        </FormGroup>
       </KitShow>
+      <FormGroup
+        title="Variant Options"
+        description="Add your product variants here"
+        className={cn(className)}
+      >
+        <InventoryTracing />
+      </FormGroup>
       <FormGroup
         title="Availability"
         description="Add your product inventory info here"

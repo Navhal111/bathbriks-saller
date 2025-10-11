@@ -29,9 +29,10 @@ interface ProductSummaryprops {
   categoryList: CategoryType[]
   BrandList: BrandType[]
   SubCategoryList: SubCategoryData[]
+  isSubCategoryListLoading?: boolean
 }
 
-export default function ProductSummary({ className, categoryList, BrandList, SubCategoryList }: ProductSummaryprops) {
+export default function ProductSummary({ className, categoryList, BrandList, SubCategoryList, isSubCategoryListLoading }: ProductSummaryprops) {
   const {
     register,
     control,
@@ -134,6 +135,7 @@ export default function ProductSummary({ className, categoryList, BrandList, Sub
               onChange(selected?.value || "");
             }}
             error={errors?.subcategory_id && errors.subcategory_id.message as string}
+            isLoading={isSubCategoryListLoading}
             noOptionsMessage={() =>
               selectedMainCategoryId
                 ? "No subcategories available"

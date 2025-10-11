@@ -12,14 +12,6 @@ export default function ProductPricing() {
   return (
     <>
       <Input
-        label="MRP"
-        placeholder="10"
-        {...register('mrp')}
-        error={errors.mrp?.message as string}
-        prefix={'₹'}
-        type="number"
-      />
-      <Input
         label="B2C Sale Price"
         placeholder="15"
         {...register('b2bSalePrice')}

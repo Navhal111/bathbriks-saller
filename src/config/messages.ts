@@ -24,6 +24,8 @@ export const messages = {
   productTypeIsRequired: "Product type is required",
   categoryIsRequired: "Category is required",
   brandIsRequired: "Brand type is required",
+  productURLIsRequired: "Product URL is required",
+  uomIsRequired:"UOM is required",
   priceIsRequired: "Product price is required",
   costPriceIsRequired: "Cost price is required",
   retailPriceIsRequired: "Retail price is required",

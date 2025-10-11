@@ -25,6 +25,28 @@ export default function InventoryTracing() {
 
   return (
     <>
+      <Input
+        type="number"
+        label="Quantity"
+        placeholder="150"
+        {...register('quantity')}
+        error={errors.quantity?.message as string}
+      />
+      <Input
+        type="number"
+        label="Low Stock Level"
+        placeholder="20"
+        {...register('lowStock')}
+        error={errors.lowStock?.message as string}
+      />
+      <Input
+        label="MRP"
+        placeholder="10"
+        {...register('mrp')}
+        error={errors.mrp?.message as string}
+        prefix={'₹'}
+        type="number"
+      />
       {fields.map((item, index) => (
         <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
           <Input
@@ -60,21 +82,6 @@ export default function InventoryTracing() {
       >
         <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
       </Button>
-
-      <Input
-        type="number"
-        label="Quantity"
-        placeholder="150"
-        {...register('quantity')}
-        error={errors.quantity?.message as string}
-      />
-      <Input
-        type="number"
-        label="Low Stock Level"
-        placeholder="20"
-        {...register('lowStock')}
-        error={errors.lowStock?.message as string}
-      />
     </>
   );
 }

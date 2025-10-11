@@ -32,6 +32,7 @@ interface KitWindowedSelectProps {
     error?: string;
     isClearable?: boolean
     noOptionsMessage?: () => string;
+    isLoading?: boolean
 }
 
 const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
@@ -45,7 +46,8 @@ const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
     disabled = false,
     error,
     isClearable = false,
-    noOptionsMessage
+    noOptionsMessage,
+    isLoading
 }) => {
     return (
         <div className={`${width}`}>
@@ -58,6 +60,7 @@ const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
             <WindowedSelect
                 instanceId="play-frequency-select"
                 isClearable={isClearable}
+                isLoading={isLoading}
                 isSearchable
                 options={options}
                 value={options.find((opt) => opt.value === value) || null}

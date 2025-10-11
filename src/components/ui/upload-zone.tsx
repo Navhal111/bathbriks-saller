@@ -1,24 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
 import isEmpty from "lodash/isEmpty";
-import prettyBytes from "pretty-bytes";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "@uploadthing/react";
-import { PiCheckBold, PiTrashBold, PiUploadSimpleBold } from "react-icons/pi";
-import { Button, Text, FieldError } from "rizzui";
+import { PiTrashBold } from "react-icons/pi";
+import { Text, FieldError } from "rizzui";
 import cn from "../../utils/class-names";
-import { endsWith } from "lodash";
 import { FileWithPath } from "react-dropzone";
-import { ClientUploadedFileData } from "uploadthing/types";
 import UploadIcon from "../shape/upload";
-import { generateClientDropzoneAccept } from "uploadthing/client";
-import { useUploadThing } from "@/utils/uploadthing";
-import { useUpdateMedia } from "@/kit/hooks/data/product";
-import { useParams } from "next/navigation";
-import { CustomErrorType } from "@/kit/models/CustomError";
-import { MediaType } from "@/kit/models/media";
+import { SortableItem } from "@/views/product/SortableItem";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 interface UploadZoneProps {
   label?: string;
@@ -27,12 +20,13 @@ interface UploadZoneProps {
   setValue: any;
   className?: string;
   error?: string;
+  files: any[];
+  setFiles: React.Dispatch<React.SetStateAction<any[]>>;
+  isUpdatingMedia?: boolean
 }
 
-interface FileType {
-  name: string;
-  url: string;
-  size: number;
+export interface UploadableFile extends File {
+  preview: string;
 }
 
 export default function UploadZone({
@@ -42,94 +36,40 @@ export default function UploadZone({
   getValues,
   setValue,
   error,
+  files,
+  setFiles,
+  isUpdatingMedia,
 }: UploadZoneProps) {
-  const { id } = useParams()
-  const isEditMode = Boolean(id);
-  const { update: onUpdateMedia, isUpdatingMedia } = useUpdateMedia(String(id))
 
-  const [files, setFiles] = useState<File[]>([]);
-  console.log("files", files)
+  const maxSize = 2 * 1024 * 1024;
 
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
-      setFiles([
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        ),
-      ]);
+      const existingPaths = files.map((f) => f.name);
+      const newFiles = acceptedFiles.filter((file) => !existingPaths.includes(file.name));
+
+      const enriched: UploadableFile[] = newFiles.map((file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+        })
+      );
+
+      setFiles((prev) => [...prev, ...enriched]);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [files]
   );
 
-  function handleRemoveFile(index: number) {
-    // Make a copy of the files array
-    const updatedFiles = [...files];
-
-    // Remove the file at the specified index
-    updatedFiles.splice(index, 1);
-
-    // Update the state
+  function handleRemoveFile(name: string) {
+    const updatedFiles = files.filter((file) => file.name !== name);
     setFiles(updatedFiles);
-  }
-
-  // const uploadedItems = isEmpty(getValues(name)) ? [] : getValues(name);
-  const uploadedItems = isEditMode ? getValues(name) ?? [] : [];
-
-  const notUploadedItems = files.filter(
-    (file) => !uploadedItems?.some((uploadedFile: FileType) => uploadedFile.name === file.name)
-  );
-
-  const startUpload = async (files: File[]) => {
-
-    const filePayloads = await Promise.all(
-      files.map((file: File) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            const base64 = (reader.result as string).split(',')[1];
-            resolve({
-              // order:,
-              type: file.type,
-              base64,
-              filename: file.name
-            });
-          };
-
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      })
-    );
-
-    // console.log("Upload payload:", filePayloads)
-
-    if (isEditMode) {
-      try {
-        await onUpdateMedia(filePayloads as Partial<MediaType>);
-        // setValue('mediaUploadComplete', true);
-      } catch (error) {
-        toast.error((error as CustomErrorType)?.message);
-        // setValue('mediaUploadComplete', false);
-      }
-    } else {
-      setValue('productUrl', filePayloads);
-      // setValue('mediaUploadComplete', true);
-    }
   }
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
+    maxSize,
   });
 
-  // useEffect(() => {
-  //   if (files.length !== 0) {
-  //     setValue('mediaUploadComplete', false);
-  //   }
-  // }, [files]);
+  const sensors = useSensors(useSensor(PointerSensor));
 
   return (
     <div className={cn("grid @container", className)}>
@@ -137,6 +77,7 @@ export default function UploadZone({
       <div
         className={cn(
           "rounded-md border-[1.8px]",
+          error ? "border-[2px] border-[#ee0000]" : "border-gray-200",
           !isEmpty(files) && "flex flex-wrap items-center justify-between @xl:flex-nowrap @xl:pr-6"
         )}
       >
@@ -151,143 +92,61 @@ export default function UploadZone({
           <UploadIcon className="h-12 w-12" />
           <Text className="text-base font-medium">Drop or select file</Text>
         </div>
-
-        {isEditMode && (
-          <>
-            {!isEmpty(files) && !isEmpty(notUploadedItems) && (
-              <UploadButtons
-                files={notUploadedItems}
-                isLoading={isUpdatingMedia}
-                onClear={() => setFiles([])}
-                onUpload={() => startUpload(notUploadedItems)}
-              />
-            )}
-
-            {isEmpty(files) && !isEmpty(notUploadedItems) && (
-              <UploadButtons
-                files={notUploadedItems}
-                isLoading={isUpdatingMedia}
-                onClear={() => setFiles([])}
-                onUpload={() => startUpload(notUploadedItems)}
-              />
-            )}
-
-            {!isEmpty(files) && isEmpty(notUploadedItems) && (
-              <UploadButtons
-                files={files}
-                isLoading={isUpdatingMedia}
-                onClear={() => setFiles([])}
-                onUpload={() => startUpload(files)}
-              />
-            )}
-          </>
-        )}
-        {!isEditMode && !isEmpty(files) && (
-          <UploadButtons
-            isEditMode={false}
-            files={files}
-            isLoading={isUpdatingMedia}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(files)}
-          />
-        )}
       </div>
 
-      {(!isEmpty(uploadedItems) || !isEmpty(notUploadedItems)) && (
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
-          {uploadedItems.map((file: any, index: number) => (
-            <div
-              key={index}
-              className={cn("relative")}
-            >
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview
-                  name={file.name}
-                  url={file.url}
-                />
-                <button
-                  type="button"
-                  className="absolute right-0 top-0 rounded-full bg-gray-700 p-1.5 transition duration-300"
-                >
-                  <PiCheckBold className="text-white" />
-                </button>
-              </figure>
-              <MediaCaption
-                name={file.name}
-                size={file.size}
-              />
-            </div>
-          ))}
-          {notUploadedItems.map((file: any, index: number) => (
-            <div
-              key={index}
-              className={cn("relative")}
-            >
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview
-                  name={file.name}
-                  url={file.preview}
-                />
-                {isUpdatingMedia ? (
-                  <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
-                    <LoadingSpinner />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFile(index)}
-                    className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
+      {(!isEmpty(files)) && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={({ active, over }) => {
+            if (active.id !== over?.id) {
+              const oldIndex = files.findIndex((f) => f.name === active.id);
+              const newIndex = files.findIndex((f) => f.name === over?.id);
+              setFiles(arrayMove(files, oldIndex, newIndex));
+            }
+          }}
+        >
+          <SortableContext items={files.map((f) => f.name).filter((id): id is string => !!id)} strategy={verticalListSortingStrategy}>
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
+              {files.map((file: any, index: number) => (
+                <SortableItem key={file.name} id={file.name}>
+                  <div
+                    key={index}
+                    className={cn("relative")}
                   >
-                    <PiTrashBold className="text-white" />
-                  </button>
-                )}
-              </figure>
-              <MediaCaption
-                name={file.path}
-                size={file.size}
-              />
+                    <figure className="group relative h-40 rounded-md bg-gray-50">
+                      <MediaPreview
+                        name={file.name}
+                        url={file.preview}
+                      />
+                      {isUpdatingMedia ? (
+                        <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
+                          <LoadingSpinner />
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(file.name)}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
+                        >
+                          <PiTrashBold className="text-white" />
+                        </button>
+                      )}
+                    </figure>
+                    <MediaCaption
+                      name={file.path}
+                      size={file.size}
+                    />
+                  </div>
+                </SortableItem>
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
       )}
 
-      {error && <FieldError error={error} />}
-    </div>
-  );
-}
-
-function UploadButtons({
-  files,
-  onClear,
-  onUpload,
-  isLoading,
-  isEditMode = true
-}: {
-  files: any[];
-  isLoading: boolean;
-  onClear: () => void;
-  onUpload: () => void;
-  isEditMode?: boolean
-}) {
-  return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-4 px-6 pb-5 @sm:flex-nowrap @xl:w-auto @xl:justify-end @xl:px-0 @xl:pb-0">
-      <Button
-        variant="outline"
-        className="w-full gap-2 @xl:w-auto"
-        isLoading={isLoading}
-        onClick={onClear}
-      >
-        <PiTrashBold />
-        Clear {files.length} files
-      </Button>
-      <Button
-        className="w-full gap-2 @xl:w-auto"
-        isLoading={isLoading}
-        onClick={onUpload}
-      >
-        <PiUploadSimpleBold />
-        {`${isEditMode ? 'Upload' : 'Add'} ${files.length} files`}
-      </Button>
+      {error && <FieldError className="mt-1 text-xs" error={error} />}
     </div>
   );
 }

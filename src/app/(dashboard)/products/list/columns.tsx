@@ -67,12 +67,12 @@ export const productsListColumns = [
   //   header: 'Stock',
   //   cell: ({ row }) => getStockStatus(row.original.stock),
   // }),
-  columnHelper.accessor('price', {
-    id: 'price',
+  columnHelper.accessor('mrp', {
+    id: 'mrp',
     size: 150,
-    header: 'Price',
+    header: 'MRP',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.price}</Text>
+      <Text className="font-medium text-gray-700">${row.original.mrp}</Text>
     ),
   }),
   // columnHelper.display({
