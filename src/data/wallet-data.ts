@@ -2,7 +2,7 @@ import { WalletType } from "@/kit/models/Wallet";
 
 export const walletData: WalletType[] = [
     {
-        id: '0o0265633',
+        id: 0o0265633,
         amount: 200,
         transactionType: 'bank',
         status: 'completed',
@@ -11,7 +11,7 @@ export const walletData: WalletType[] = [
         updatedAt: '2025-10-01T11:00:00Z',
     },
     {
-        id: '0o0265634',
+        id: 0o0265634,
         amount: 150,
         transactionType: 'credit_card',
         status: 'pending',
@@ -20,7 +20,7 @@ export const walletData: WalletType[] = [
         updatedAt: '2025-10-02T16:00:00Z',
     },
     {
-        id: '0o0265635',
+        id: 265635,
         amount: 300,
         transactionType: 'paypal',
         status: 'cancelled',

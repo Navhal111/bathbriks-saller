@@ -17,6 +17,10 @@ export type GetAllResponse<T extends BaseModel> = {
   meta: Meta
   data: T[]
 }
+export type GetAllObjectResponse<T extends BaseModel> = {
+  meta: Meta
+  data: T
+}
 export type GetOneResponse<T extends BaseModel> = {
   data: T
 }

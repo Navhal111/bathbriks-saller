@@ -36,8 +36,8 @@ export const OrderViewProductsColumn = [
         size: 200,
         header: 'Price',
         cell: ({ row }) => {
-            const price = parseFloat(row.original.price) || 0;
-            const quantity = parseFloat(row.original.quantity) || 0;
+            const price = row.original.price || 0;
+            const quantity = row.original.quantity || 0;
             const total = price * quantity;
 
             return <Text className="text-sm">{total}</Text>;

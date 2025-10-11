@@ -28,3 +28,8 @@ export enum CouponType {
   PERCENTAGE = "percentage",
   FREE_SHIPPING = "free_shipping",
 }
+
+export enum AccountType {
+  SAVINGS = "SAVINGS",
+  CURRENT = "CURRENT",
+}

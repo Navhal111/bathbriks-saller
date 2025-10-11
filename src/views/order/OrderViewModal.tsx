@@ -26,7 +26,7 @@ const transitions = [
             image:
                 'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/master.png',
         },
-        price: '$1575.00',
+        price: '₹1575.00',
     }
 ];
 
@@ -115,7 +115,7 @@ export default function OrderViewModal({ isOpen, onClose, selectedOrder }: Props
                             2 Items
                         </span>
                         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
-                            Total <span className="font-bold">$20</span>
+                            Total <span className="font-bold">₹20</span>
                         </span>
                     </div>
                     <div className="items-start pt-10 @5xl:grid @5xl:grid-cols-12 @5xl:gap-7 @6xl:grid-cols-10 @7xl:gap-10">
@@ -134,13 +134,13 @@ export default function OrderViewModal({ isOpen, onClose, selectedOrder }: Props
                                 <div className="border-t border-muted pt-7 @5xl:mt-3">
                                     <div className="ms-auto max-w-lg space-y-6">
                                         <div className="flex justify-between font-medium">
-                                            Subtotal <span>${subtotal}</span>
+                                            Subtotal <span>₹{subtotal}</span>
                                         </div>
                                         <div className="flex justify-between font-medium">
-                                            Discount <span>${discount}</span>
+                                            Discount <span>₹{discount}</span>
                                         </div>
                                         <div className="flex justify-between border-t border-muted pt-5 text-base font-semibold">
-                                            Total <span>${subtotal - discount}</span>
+                                            Total <span>₹{subtotal - discount}</span>
                                         </div>
                                     </div>
                                 </div>

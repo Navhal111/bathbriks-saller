@@ -2,7 +2,7 @@ import { OrderType } from "@/kit/models/Order";
 
 export const ordersData: OrderType[] = [
     {
-        id: '0o02051402',
+        id: 0o02051402,
         orderID: '0o02051402',
         customerName: 'John Doe',
         status: 'dispatched',
@@ -43,7 +43,7 @@ export const ordersData: OrderType[] = [
         updatedAt: '2023-10-01T10:00:00Z',
     },
     {
-        id: '0o02051403',
+        id: 0o02051403,
         orderID: '0o02051403',
         customerName: 'Jane Smith',
         productQty: 8,
@@ -84,7 +84,7 @@ export const ordersData: OrderType[] = [
         updatedAt: '2023-10-02T11:30:00Z',
     },
     {
-        id: '0o02051404',
+        id: 0o02051404,
         orderID: '0o02051404',
         customerName: 'Alice Johnson',
         productQty: 8,
@@ -125,7 +125,7 @@ export const ordersData: OrderType[] = [
         updatedAt: '2023-10-03T14:15:00Z',
     },
     {
-        id: '0o02051405',
+        id: 0o02051405,
         orderID: '0o02051405',
         customerName: 'Bob Brown',
         productQty: 8,
@@ -166,7 +166,7 @@ export const ordersData: OrderType[] = [
         updatedAt: '2023-10-04T09:00:00Z',
     },
     {
-        id: '0o02051406',
+        id: 0o02051406,
         orderID: '0o02051406',
         customerName: 'Charlie Davis',
         productQty: 8,
@@ -207,7 +207,7 @@ export const ordersData: OrderType[] = [
         updatedAt: '2023-10-05T16:45:00Z',
     },
     {
-        id: '0o02051407',
+        id: 0o02051407,
         orderID: '0o02051407',
         customerName: 'Diana Evans',
         productQty: 8,
@@ -248,7 +248,7 @@ export const ordersData: OrderType[] = [
         updatedAt: '2023-10-06T12:20:00Z',
     },
     {
-        id: '0o02051408',
+        id: 2051408,
         orderID: '0o02051408',
         customerName: 'Ethan Foster',
         productQty: 8,

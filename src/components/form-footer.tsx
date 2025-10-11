@@ -9,6 +9,7 @@ interface FormFooterProps {
   submitBtnText?: string;
   isLoading?: boolean;
   handleAltBtn?: () => void;
+  isDisabled?: boolean
 }
 
 export const negMargin = "-mx-4 md:-mx-5 lg:-mx-6 3xl:-mx-8 4xl:-mx-10";
@@ -19,6 +20,7 @@ export default function FormFooter({
   submitBtnText = "Submit",
   className,
   handleAltBtn,
+  isDisabled = false,
 }: FormFooterProps) {
   return (
     <div
@@ -35,7 +37,7 @@ export default function FormFooter({
       >
         {altBtnText}
       </Button>
-      <Button type="submit" isLoading={isLoading} className="w-full @xl:w-auto">
+      <Button type="submit" isLoading={isLoading} className="w-full @xl:w-auto" disabled={isDisabled}>
         {submitBtnText}
       </Button>
     </div>

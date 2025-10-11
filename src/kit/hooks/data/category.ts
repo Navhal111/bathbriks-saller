@@ -1,4 +1,4 @@
-import { API_VERSION, fetchAll } from '@/kit/hooks/data/fetchers'
+
 import useSWR from 'swr'
 import type { CustomError } from '@/kit/models/CustomError'
 import type { Params } from '@/kit/services/axiosService'
@@ -7,13 +7,17 @@ import { CreateOneResponse, GetAllResponse } from '@/kit/models/_generic';
 import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
 import { CategoryType } from '@/kit/models/Category';
+import { API_VERSION, fetchAll } from './fetchers';
 
-const CATEGORY_LIST_PATH = 'admin/product-category';
+const CATEGORY_LIST_PATH = 'products/fetch-categories-list';
+const ADD_CATEGORY_PATH = 'products/add-category';
+const EDIT_CATEGORY_PATH = 'products/edit-category';
+const DELETE_CATEGORY_PATH = 'products/delete-category';
 
 const useGetAllCategoryList = (params?: Params, shouldFetch = true) => {
     const { data, error, isValidating, isLoading, mutate } = useSWR<GetAllResponse<CategoryType>, CustomError[]>(
         shouldFetch ? [`${API_VERSION}/${CATEGORY_LIST_PATH}`, params] : null,
-        (): Promise<GetAllResponse<CategoryType>> => fetchAll(CATEGORY_LIST_PATH, params),
+        (): Promise<GetAllResponse<CategoryType>> => fetchAll(CATEGORY_LIST_PATH, params, undefined, undefined, true),
         {
             revalidateOnMount: true,
             revalidateIfStale: true,
@@ -34,8 +38,9 @@ const useGetAllCategoryList = (params?: Params, shouldFetch = true) => {
 
 const useCreateCategory = (params?: Params) => {
     const { data, error, isMutating, reset, create } = useSWRCreateOne<CreateOneResponse<CategoryType>>({
-        path: CATEGORY_LIST_PATH,
-        key: params
+        path: ADD_CATEGORY_PATH,
+        key: params,
+        isCategoryAPI: true,
     })
 
     return {
@@ -49,8 +54,9 @@ const useCreateCategory = (params?: Params) => {
 
 const useUpdateCategory = (id = '') => {
     const { data, error, isMutating, reset, update } = useSWRUpdateOne<CategoryType>({
-        path: CATEGORY_LIST_PATH,
-        id
+        path: EDIT_CATEGORY_PATH,
+        id,
+        isCategoryAPI: true,
     })
 
     return {
@@ -64,9 +70,10 @@ const useUpdateCategory = (id = '') => {
 
 const useDeleteCategory = (id = '', params?: Params) => {
     const { data, error, isDeleting, reset, deleteRecord } = useSWRDeleteOneAndRefreshAll<CategoryType>({
-        path: CATEGORY_LIST_PATH,
+        path: DELETE_CATEGORY_PATH,
         id,
-        key: params
+        key: params,
+        isCategoryAPI: true,
     })
 
     return {

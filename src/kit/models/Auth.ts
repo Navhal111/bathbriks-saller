@@ -1,6 +1,7 @@
 import type BaseModel from "@/kit/models/BaseModel";
 import type { User } from "@/kit/models/User";
 import type { Tokens } from "@/kit/models/_generic";
+import { Seller } from "./Seller";
 
 export interface Login extends BaseModel {
   statusCode: number;
@@ -22,14 +23,14 @@ export interface Verify2FASecurity extends BaseModel {
 }
 
 export interface LoginData {
-  user: User;
   accessToken?: string;
-  requires2FA?: boolean;
+  refreshToken?: string
   tokens: Tokens;
+  seller: Seller
 }
 
 export interface SignUp extends BaseModel {
-  statusCode: number;
+  success: boolean;
   message: string;
   data: SignUpData;
 }

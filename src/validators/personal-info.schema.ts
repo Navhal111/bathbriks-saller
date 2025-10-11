@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { messages } from "@/config/messages";
 import { fileSchema, validateEmail } from "./common-rules";
+import { AccountType } from "@/config/enums";
 
 // form zod validation schema
 export const personalInfoFormSchema = z.object({
@@ -18,7 +19,7 @@ export const personalInfoFormSchema = z.object({
   accountNo: z.string().optional(),
   emailId: z.string().email('Invalid email address').optional().or(z.literal('')),
   ifscCode: z.string().optional(),
-  accountType: z.enum(['savings', 'current']).optional(),
+  accountType: z.enum([AccountType.SAVINGS, AccountType.CURRENT]).optional(),
   dealershipDocuments: z.string().optional(),
 });
 
@@ -42,6 +43,6 @@ export const defaultValues = {
   accountNo: '',
   emailId: '',
   ifscCode: '',
-  accountType: 'savings' as const,
+  accountType: AccountType.SAVINGS as const,
   dealershipDocuments: '',
 };

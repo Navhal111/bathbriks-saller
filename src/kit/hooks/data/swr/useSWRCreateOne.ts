@@ -37,11 +37,11 @@ import { swrMutationConfig } from '@/config/swrConfigs'
  * updating the local cache.
  *
  */
-const useSWRCreateOne = <T extends BaseModel>({ path, key, apiVersion }: UseSWRCreateOne) => {
+const useSWRCreateOne = <T extends BaseModel>({ path, key, apiVersion, isCategoryAPI }: UseSWRCreateOne) => {
   const { data, error, trigger, reset, isMutating } = useSWRMutation(
     key ? [path, key] : [path],
     ([name]: string[], { arg }: { arg: FetcherCreate<T> }) =>
-      createOne<T>(name, arg.body, arg.params, arg.headers, apiVersion)
+      createOne<T>(name, arg.body, arg.params, arg.headers, apiVersion, isCategoryAPI)
   )
 
   return {
@@ -49,10 +49,11 @@ const useSWRCreateOne = <T extends BaseModel>({ path, key, apiVersion }: UseSWRC
     error,
     isMutating,
     reset,
-    create: (record: Partial<T>, options?: SWRMutationConfiguration) => {
+    create: (record: Partial<T>, options?: SWRMutationConfiguration, headers?: { [key: string]: string }) => {
       return trigger(
         {
-          body: record
+          body: record,
+          headers,
         },
         {
           optimisticData: (currentRecords: GetAllResponse<T> | undefined): GetAllResponse<T> => {

@@ -1472,3 +1472,13 @@ div[style="z-index: 1000001;"],
 .custom-pill-select .rizzui-select-button {
   border-radius: 20px;
 }
+
+.no-ring__input:focus {
+  box-shadow: #f1f1f1 !important;
+  outline: none !important;
+  border-color: #ced4da !important;
+}
+
+#react-select-play-frequency-select-input{
+  box-shadow: none !important;
+}

@@ -16,4 +16,5 @@ export interface OrderProducts {
     price: number
     mrp: number
     quantity: number
+    finaPrice?: number
 }

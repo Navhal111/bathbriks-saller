@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { inter, lexendDeca } from "@/app/fonts";
 import cn from "@/utils/class-names";
 import NextProgress from "@/components/next-progress";
-import { ThemeProvider, JotaiProvider } from "@/app/shared/theme-provider";
+import { ThemeProvider, JotaiProvider } from "@/app/(dashboard)/shared/theme-provider";
 import { ReduxProvider } from "@/store/ReduxProvider";
-import GlobalDrawer from "@/app/shared/drawer-views/container";
-import GlobalModal from "@/app/shared/modal-views/container";
+import GlobalDrawer from "@/app/(dashboard)/shared/drawer-views/container";
+import GlobalModal from "@/app/(dashboard)/shared/modal-views/container";
 import "./globals.css";
 import LayoutVisibility from "@/layouts/layoutVisibility";
+import { AuthProvider } from "@/@core/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "App Name",
@@ -29,16 +30,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={cn(inter.variable, lexendDeca.variable, "font-inter")}
       >
-        <ThemeProvider>
-          <ReduxProvider>
-            <NextProgress />
-            <JotaiProvider>
-              <LayoutVisibility>{children}</LayoutVisibility>
-              <GlobalDrawer />
-              <GlobalModal />
-            </JotaiProvider>
-          </ReduxProvider>
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

@@ -18,10 +18,6 @@ export type Params = Record<
 >;
 export type Headers = Record<string, string>;
 
-console.log(
-  `Axios Service initialized with base URL: ${process.env.NEXT_PUBLIC_BASE_API}`
-);
-
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BASE_API}`,
 });
@@ -266,7 +262,7 @@ function handleLogout() {
   storage.removeItem(authConfig.storageTokenKeyName);
   storage.removeItem(authConfig.storageRefreshKeyName);
 
-  window.location.href = "/login"; // Example: Redirect to login page
+  window.location.href = "/sign-in"; // Example: Redirect to login page
 }
 
 export default { get, post, patch, remove, request };
