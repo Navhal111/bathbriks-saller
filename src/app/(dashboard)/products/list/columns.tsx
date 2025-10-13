@@ -36,37 +36,43 @@ export const productsListColumns = [
       />
     ),
   }),
-  columnHelper.accessor('name', {
+  // columnHelper.accessor('name', {
+  //   id: 'name',
+  //   size: 300,
+  //   header: 'Product',
+  //   enableSorting: false,
+  //   cell: ({ row }) => (
+  //     <AvatarCard
+  //       // src={row.original.image}
+  //       src={''}
+  //       name={row.original.name}
+  //       description={row.original.description}
+  //       avatarProps={{
+  //         name: row.original.name,
+  //         size: 'lg',
+  //         className: 'rounded-lg',
+  //       }}
+  //     />
+  //   ),
+  // }),
+  columnHelper.display({
     id: 'name',
-    size: 300,
+    size: 150,
     header: 'Product',
-    enableSorting: false,
-    cell: ({ row }) => (
-      <AvatarCard
-        // src={row.original.image}
-        src={''}
-        name={row.original.name}
-        description={row.original.description}
-        avatarProps={{
-          name: row.original.name,
-          size: 'lg',
-          className: 'rounded-lg',
-        }}
-      />
-    ),
+    cell: ({ row }) => <Text className="text-sm">{row.original.name}</Text>,
   }),
-  // columnHelper.display({
-  //   id: 'sku',
-  //   size: 150,
-  //   header: 'SKU',
-  //   cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
-  // }),
-  // columnHelper.accessor('stock', {
-  //   id: 'stock',
-  //   size: 200,
-  //   header: 'Stock',
-  //   cell: ({ row }) => getStockStatus(row.original.stock),
-  // }),
+  columnHelper.display({
+    id: 'category',
+    size: 150,
+    header: 'Category',
+    cell: ({ row }) => <Text className="text-sm">{row.original.category?.name}</Text>,
+  }),
+  columnHelper.display({
+    id: 'brand',
+    size: 150,
+    header: 'Brand',
+    cell: ({ row }) => <Text className="text-sm">{row.original.brand?.name}</Text>,
+  }),
   columnHelper.accessor('mrp', {
     id: 'mrp',
     size: 150,
@@ -75,19 +81,12 @@ export const productsListColumns = [
       <Text className="font-medium text-gray-700">${row.original.mrp}</Text>
     ),
   }),
-  // columnHelper.display({
-  //   id: 'rating',
-  //   size: 200,
-  //   header: 'Rating',
-  //   cell: ({ row }) => getRatings(row.original.rating),
-  // }),
-  // columnHelper.accessor('status', {
-  //   id: 'status',
-  //   size: 120,
-  //   header: 'Status',
-  //   enableSorting: false,
-  //   cell: ({ row }) => getBadge(row.original.status),
-  // }),
+  columnHelper.display({
+    id: 'quantity',
+    size: 150,
+    header: 'Quantity',
+    cell: ({ row }) => <Text className="text-sm">{row.original.quantity}</Text>,
+  }),
   columnHelper.display({
     id: 'action',
     size: 120,

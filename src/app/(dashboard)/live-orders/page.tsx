@@ -6,37 +6,54 @@ import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
 import { useDeleteOrder, useGetAllOrderList, useUpdateOrder } from '@/kit/hooks/data/order';
 import { ordersData } from '@/data/orders-data';
-import OrdersTable from './list/table';
 import { OrderType } from '@/kit/models/Order';
 import toast from 'react-hot-toast';
 import OrderViewModal from '@/views/order/OrderViewModal';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
+import { liveOrdersData } from '@/data/live-orders-data';
+import LiveOrdersTable from './list/table';
+import { CustomErrorType } from '@/kit/models/CustomError';
+import KitStatusDialog from '@/kit/components/KitStatusDialog';
 
 const pageHeader = {
-    title: 'Orders',
+    title: 'Live Orders',
     breadcrumb: [
         {
             href: "/dashboard",
             name: 'Dashboard',
         },
         {
-            name: 'Orders List',
+            name: 'Live Orders List',
         },
     ],
+};
+
+export interface filterParamsProps {
+    minAmount: string,
+    maxAmount: string,
+    startDate: string,
+    endDate: string,
+    status: string,
+}
+
+export const filterParams: filterParamsProps = {
+    minAmount: '',
+    maxAmount: '',
+    startDate: '',
+    endDate: '',
+    status: '',
 };
 
 export default function OrdersPage() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
-    const [search, setSearch] = useState({
-        minAmount: '',
-        maxAmount: '',
-    })
+    const [search, setSearch] = useState<filterParamsProps>(filterParams);
     const [selectedOrder, setSelectedOrder] = useState<OrderType>()
     const [orderId, setOrderId] = useState<string>('');
     const [actionType, setActionType] = useState<'delete' | 'update' | null>(null);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false)
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState<boolean>(false)
 
     const debouncedSearch = KitDebouncedSearchInput(searchQuery, 500);
 
@@ -50,9 +67,10 @@ export default function OrdersPage() {
 
     const { OrderList, isOrderListLoading, refreshOrderList } = useGetAllOrderList(queryParams);
     const { deleteRecord, isDeleting } = useDeleteOrder(orderId || '');
-    const { update: onUpdateOrder, isUpdatingOrder } = useUpdateOrder(orderId);
+    const { update: onUpdateOrder, isUpdatingOrder } = useUpdateOrder(String(selectedOrder?.id));;
 
     const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen)
+    const toggleStatusModal = () => setIsStatusModalOpen(!isStatusModalOpen)
 
     const orderDelete = async (data: OrderType) => {
         setOrderId(String(data.id))
@@ -61,14 +79,26 @@ export default function OrdersPage() {
     };
 
     const onStatusUpdate = async (data: OrderType) => {
-        setOrderId(String(data.id))
         setSelectedOrder(data)
-        setActionType('update');
+        toggleStatusModal()
     };
 
     const orderView = (data: OrderType) => {
         setSelectedOrder(data)
         toggleOrderModal()
+    }
+
+    const onhandleStatusUpdate = async () => {
+        if (!selectedOrder) return
+
+        try {
+            const response = await onUpdateOrder({ ...selectedOrder })
+            toast.success(response?.message || 'Order updated successfully!')
+            toggleStatusModal()
+            refreshOrderList?.();
+        } catch (error) {
+            toast.error((error as CustomErrorType)?.message)
+        }
     }
 
     useEffect(() => {
@@ -113,8 +143,8 @@ export default function OrdersPage() {
                 </div>
             </PageHeader>
 
-            <OrdersTable
-                OrderList={ordersData}
+            <LiveOrdersTable
+                OrderList={liveOrdersData}
                 isLoading={false}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
@@ -135,6 +165,16 @@ export default function OrdersPage() {
                     isOpen={isOrderModalOpen}
                     onClose={toggleOrderModal}
                     selectedOrder={selectedOrder}
+                />
+            </KitShow>
+
+            <KitShow show={isStatusModalOpen}>
+                <KitStatusDialog
+                    isOpen={isStatusModalOpen}
+                    onClose={toggleStatusModal}
+                    title={selectedOrder?.status}
+                    onDelete={onhandleStatusUpdate}
+                    isBtnLoading={false}
                 />
             </KitShow>
         </>

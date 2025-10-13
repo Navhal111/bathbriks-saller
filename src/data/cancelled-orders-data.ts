@@ -1,14 +1,19 @@
-import { ReturnOrderType } from "@/kit/models/ReturnOrder";
+import { OrderType } from "@/kit/models/Order";
 
-
-export const returnOrdersData: ReturnOrderType[] = [
+export const cancelledOrdersData: OrderType[] = [
     {
         id: 0o02051402,
         orderID: '0o02051402',
         customerName: 'John Doe',
+        customerNumber: '9876543210',
+        status: 'cancelled',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -39,7 +44,6 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'dispatched',
         createdAt: '2023-10-01T10:00:00Z',
         updatedAt: '2023-10-01T10:00:00Z',
     },
@@ -47,9 +51,14 @@ export const returnOrdersData: ReturnOrderType[] = [
         id: 0o02051403,
         orderID: '0o02051403',
         customerName: 'Jane Smith',
+        customerNumber: '9876543210',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -80,7 +89,7 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'order_started',
+        status: 'cancelled',
         createdAt: '2023-10-02T11:30:00Z',
         updatedAt: '2023-10-02T11:30:00Z',
     },
@@ -88,9 +97,14 @@ export const returnOrdersData: ReturnOrderType[] = [
         id: 0o02051404,
         orderID: '0o02051404',
         customerName: 'Alice Johnson',
+        customerNumber: '9876543210',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -121,7 +135,7 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'cancel',
+        status: 'cancelled',
         createdAt: '2023-10-03T14:15:00Z',
         updatedAt: '2023-10-03T14:15:00Z',
     },
@@ -129,9 +143,14 @@ export const returnOrdersData: ReturnOrderType[] = [
         id: 0o02051405,
         orderID: '0o02051405',
         customerName: 'Bob Brown',
+        customerNumber: '9876543210',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -162,7 +181,7 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'completed',
+        status: 'cancelled',
         createdAt: '2023-10-04T09:00:00Z',
         updatedAt: '2023-10-04T09:00:00Z',
     },
@@ -170,9 +189,14 @@ export const returnOrdersData: ReturnOrderType[] = [
         id: 0o02051406,
         orderID: '0o02051406',
         customerName: 'Charlie Davis',
+        customerNumber: '9876543210',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -203,7 +227,7 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'order_started',
+        status: 'cancelled',
         createdAt: '2023-10-05T16:45:00Z',
         updatedAt: '2023-10-05T16:45:00Z',
     },
@@ -211,9 +235,14 @@ export const returnOrdersData: ReturnOrderType[] = [
         id: 0o02051407,
         orderID: '0o02051407',
         customerName: 'Diana Evans',
+        customerNumber: '9876543210',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -244,7 +273,7 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'cancel',
+        status: 'cancelled',
         createdAt: '2023-10-06T12:20:00Z',
         updatedAt: '2023-10-06T12:20:00Z',
     },
@@ -252,9 +281,14 @@ export const returnOrdersData: ReturnOrderType[] = [
         id: 2051408,
         orderID: '0o02051408',
         customerName: 'Ethan Foster',
+        customerNumber: '9876543210',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
+        date: '2025-10-01T10:00:00Z',
+        deliveryPincode: '986526',
+        deliveryCity: 'surat',
+        paymentMode: 'net banking',
         orderProducts: [
             {
                 id: '5465465',
@@ -285,7 +319,7 @@ export const returnOrdersData: ReturnOrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'dispatched',
+        status: 'cancelled',
         createdAt: '2023-10-07T08:10:00Z',
         updatedAt: '2023-10-07T08:10:00Z',
     }

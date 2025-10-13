@@ -5,14 +5,23 @@ import { allStatus, StatusTypes } from '@/components/table-utils/get-status-badg
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
-import { ReturnOrderType } from '@/kit/models/ReturnOrder';
+import { OrderType } from '@/kit/models/Order';
 import EyeIcon from '@/components/icons/eye';
 import { ORDER_STATUS_OPTIONS } from '@/config/orders';
 import cn from '@/utils/class-names';
+import dayjs from 'dayjs';
 
-const columnHelper = createColumnHelper<ReturnOrderType>();
+const columnHelper = createColumnHelper<OrderType>();
 
-export const returnOrdersListColumns = [
+export const ordersListColumns = [
+    columnHelper.accessor('date', {
+        id: 'date',
+        size: 150,
+        header: 'Date',
+        cell: ({ row }) => (
+            <Text className="font-medium text-gray-700">{dayjs(row.original.date).format('DD-MMM-YYYY')}</Text>
+        ),
+    }),
     columnHelper.accessor('orderID', {
         id: 'orderID',
         size: 200,
@@ -25,10 +34,16 @@ export const returnOrdersListColumns = [
         header: 'Customer Name',
         cell: ({ row }) => <Text className="text-sm">{row.original.customerName}</Text>,
     }),
+    columnHelper.display({
+        id: 'customerNumber',
+        size: 150,
+        header: 'Customer Number',
+        cell: ({ row }) => <Text className="text-sm">{row.original.customerNumber}</Text>,
+    }),
     columnHelper.accessor('productQty', {
         id: 'productQty',
         size: 150,
-        header: 'Product Quantity',
+        header: 'Quantity',
         cell: ({ row }) => (
             <Text className="font-medium text-gray-700">{row.original.productQty}</Text>
         ),
@@ -36,22 +51,46 @@ export const returnOrdersListColumns = [
     columnHelper.accessor('totalMrp', {
         id: 'totalMrp',
         size: 150,
-        header: 'Price',
+        header: 'Amount',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">₹{row.original.totalMrp}</Text>
+            <Text className="font-medium text-gray-700">₹ {row.original.totalMrp}</Text>
         ),
     }),
-    columnHelper.accessor('totalPrice', {
-        id: 'totalPrice',
+    // columnHelper.accessor('totalPrice', {
+    //     id: 'totalPrice',
+    //     size: 150,
+    //     header: 'Final Price',
+    //     cell: ({ row }) => (
+    //         <Text className="font-medium text-gray-700">₹{row.original.totalPrice}</Text>
+    //     ),
+    // }),
+    columnHelper.accessor('deliveryPincode', {
+        id: 'deliveryPincode',
         size: 150,
-        header: 'Final Price',
+        header: 'Delivery Pincode',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">₹{row.original.totalPrice}</Text>
+            <Text className="text-gray-700">{row.original.deliveryPincode}</Text>
+        ),
+    }),
+    columnHelper.accessor('deliveryCity', {
+        id: 'deliveryCity',
+        size: 150,
+        header: 'Delivery City',
+        cell: ({ row }) => (
+            <Text className="text-gray-700">{row.original.deliveryCity}</Text>
+        ),
+    }),
+    columnHelper.accessor('paymentMode', {
+        id: 'paymentMode',
+        size: 150,
+        header: 'Payment Mode',
+        cell: ({ row }) => (
+            <Text className="text-gray-700">{row.original.paymentMode}</Text>
         ),
     }),
     columnHelper.accessor('status', {
         id: 'status',
-        size: 120,
+        size: 150,
         header: 'Status',
         enableSorting: false,
         cell: ({ row, table }) => {
@@ -64,15 +103,14 @@ export const returnOrdersListColumns = [
             };
 
             const key = String(currentValue).toLowerCase() as StatusTypes;
-            const currentBgClass = allStatus[key]?.[1] || "bg-gray-600";
-
-            const filteredStatusOptions = ORDER_STATUS_OPTIONS.filter(option => option.value !== 'return');
+            const currentBgClass = allStatus[key]?.[0] || "bg-gray-600";
 
             return (
                 <Select
-                    className={cn("custom-pill-select rounded-full text-white", currentBgClass)}
-                    options={filteredStatusOptions}
-                    value={filteredStatusOptions.find((opt) => opt.value === String(currentValue)) || null}
+                    className={cn("custom-pill-select rounded-full text-white border", currentBgClass, allStatus[key]?.[2])}
+                    size='sm'
+                    options={ORDER_STATUS_OPTIONS}
+                    value={ORDER_STATUS_OPTIONS.find((opt) => opt.value === String(currentValue)) || null}
                     displayValue={(selected: SelectOption | null) => selected?.label || ''}
                     onChange={handleChange}
                 />
@@ -91,7 +129,7 @@ export const returnOrdersListColumns = [
             <Flex align="center" justify="end" gap="3" className="pe-4">
                 <Tooltip
                     size="sm"
-                    content={'View Return Order'}
+                    content={'View Order'}
                     placement="top"
                     color="invert"
                 >
@@ -100,7 +138,7 @@ export const returnOrdersListColumns = [
                             as="span"
                             size="sm"
                             variant="outline"
-                            aria-label={'View Return Order'}
+                            aria-label={'View Order'}
                             onClick={() => meta?.handleView && meta?.handleView?.(row.original)}
                         >
                             <EyeIcon className="h-4 w-4" />
@@ -108,8 +146,8 @@ export const returnOrdersListColumns = [
                     </Link>
                 </Tooltip>
                 <DeletePopover
-                    title={`Delete the Return Order`}
-                    description={`Are you sure you want to delete this #${row.original.id} Return Order?`}
+                    title={`Delete the Order`}
+                    description={`Are you sure you want to delete this #${row.original.id} Order?`}
                     onDelete={() =>
                         meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
                     }

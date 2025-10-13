@@ -91,7 +91,7 @@ function FilterElements({
     useEffect(() => {
         onTempChange?.({ minAmount, maxAmount });
     }, [minAmount, maxAmount]);
-
+    
     const isFiltered = minAmount !== '' || maxAmount !== '';
 
     return (
@@ -122,3 +122,5 @@ function FilterElements({
         </>
     );
 }
+
+

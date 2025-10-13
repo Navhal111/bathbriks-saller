@@ -5,22 +5,21 @@ import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
 import { exportToCSV } from '@/utils/export-to-csv';
-import { ReturnOrderType } from '@/kit/models/ReturnOrder';
-import { returnOrdersListColumns } from './column';
-import Filters from './filter';
-import ServerPagination from '@/kit/components/Table/ServerPagination';
+import { OrderType } from '@/kit/models/Order';
+import { ordersListColumns } from './columns';
+import Filters from './filters';
 import { Meta } from '@/kit/models/_generic';
+import ServerPagination from '@/kit/components/Table/ServerPagination';
 
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends unknown> {
         handleDeleteRow?: (data: TData) => void;
-        handleUpdateRow?: (data: TData) => void;
         handleView?: (data: TData) => void;
     }
 }
 
-export default function ReturnOrdersTable({
-    ReturnOrderList,
+export default function DeliveredOrdersTable({
+    DeliveredOrderList,
     isLoading,
     hideFilters = false,
     hidePagination = false,
@@ -34,16 +33,15 @@ export default function ReturnOrdersTable({
     setSearchQuery,
     meta,
     page,
-    pageSize = 5,
     setPage,
+    pageSize = 5,
     setPageSize,
-    onStatusUpdate,
     onDelete,
     onView,
     search,
     setSearch
 }: {
-    ReturnOrderList: ReturnOrderType[];
+    DeliveredOrderList: OrderType[];
     isLoading: boolean;
     hideFilters?: boolean;
     hidePagination?: boolean;
@@ -57,28 +55,23 @@ export default function ReturnOrdersTable({
     setPage: (page: number) => void;
     pageSize: number;
     setPageSize: (size: number) => void;
-    onStatusUpdate: (data: ReturnOrderType) => void;
-    onDelete: (data: ReturnOrderType) => void;
-    onView: (data: ReturnOrderType) => void;
+    onDelete: (data: OrderType) => void;
+    onView: (data: OrderType) => void;
     search?: { minAmount: string; maxAmount: string };
     setSearch?: (search: { minAmount: string; maxAmount: string }) => void;
 }) {
 
-    const handleView = (data: ReturnOrderType) => {
+    const handleView = (data: OrderType) => {
         onView(data)
     }
 
-    const handleUpdateRow = (data: ReturnOrderType) => {
-        onStatusUpdate(data)
-    };
-
-    const handleDeleteRow = (data: ReturnOrderType) => {
+    const handleDeleteRow = (data: OrderType) => {
         onDelete(data)
     };
 
-    const { table, setData } = useTanStackTable<ReturnOrderType>({
-        tableData: ReturnOrderList,
-        columnConfig: returnOrdersListColumns,
+    const { table, setData } = useTanStackTable<OrderType>({
+        tableData: DeliveredOrderList,
+        columnConfig: ordersListColumns,
         options: {
             initialState: {
                 pagination: {
@@ -88,7 +81,6 @@ export default function ReturnOrdersTable({
             },
             meta: {
                 handleDeleteRow,
-                handleUpdateRow,
                 handleView
             },
             enableColumnResizing: false,

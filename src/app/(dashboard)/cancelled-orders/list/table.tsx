@@ -14,13 +14,12 @@ import ServerPagination from '@/kit/components/Table/ServerPagination';
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends unknown> {
         handleDeleteRow?: (data: TData) => void;
-        handleUpdateRow?: (data: TData) => void;
         handleView?: (data: TData) => void;
     }
 }
 
-export default function OrdersTable({
-    OrderList,
+export default function CancelOrdersTable({
+    CancelOrderList,
     isLoading,
     hideFilters = false,
     hidePagination = false,
@@ -37,13 +36,12 @@ export default function OrdersTable({
     setPage,
     pageSize = 5,
     setPageSize,
-    onStatusUpdate,
     onDelete,
     onView,
     search,
     setSearch
 }: {
-    OrderList: OrderType[];
+    CancelOrderList: OrderType[];
     isLoading: boolean;
     hideFilters?: boolean;
     hidePagination?: boolean;
@@ -57,7 +55,6 @@ export default function OrdersTable({
     setPage: (page: number) => void;
     pageSize: number;
     setPageSize: (size: number) => void;
-    onStatusUpdate: (data: OrderType) => void;
     onDelete: (data: OrderType) => void;
     onView: (data: OrderType) => void;
     search?: { minAmount: string; maxAmount: string };
@@ -68,16 +65,12 @@ export default function OrdersTable({
         onView(data)
     }
 
-    const handleUpdateRow = (data: OrderType) => {
-        onStatusUpdate(data)
-    };
-
     const handleDeleteRow = (data: OrderType) => {
         onDelete(data)
     };
 
     const { table, setData } = useTanStackTable<OrderType>({
-        tableData: OrderList,
+        tableData: CancelOrderList,
         columnConfig: ordersListColumns,
         options: {
             initialState: {
@@ -88,7 +81,6 @@ export default function OrdersTable({
             },
             meta: {
                 handleDeleteRow,
-                handleUpdateRow,
                 handleView
             },
             enableColumnResizing: false,

@@ -1,13 +1,11 @@
 'use client';
 
 import { useTanStackTable } from '@/components/table/use-TanStack-Table';
-import { Input } from 'rizzui';
-import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import cn from '@/utils/class-names';
 import WidgetCard from '@/components/cards/widget-card';
 import Table from '@/components/table';
 import { OrderType } from '@/kit/models/Order';
-import { ordersListColumns } from '@/app/(dashboard)/orders/list/columns';
+import { ordersListColumns } from '@/app/(dashboard)/live-orders/list/columns';
 import KitButton from '@/kit/components/KitButton/KitButton';
 import { useRouter } from 'next/navigation';
 

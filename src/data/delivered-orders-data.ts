@@ -1,12 +1,12 @@
 import { OrderType } from "@/kit/models/Order";
 
-export const ordersData: OrderType[] = [
+export const deliveredOrdersData: OrderType[] = [
     {
         id: 0o02051402,
         orderID: '0o02051402',
         customerName: 'John Doe',
         customerNumber: '9876543210',
-        status: 'dispatched',
+        status: 'delivered',
         productQty: 8,
         totalMrp: 525.00,
         totalPrice: 425.00,
@@ -89,7 +89,7 @@ export const ordersData: OrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'return',
+        status: 'delivered',
         createdAt: '2023-10-02T11:30:00Z',
         updatedAt: '2023-10-02T11:30:00Z',
     },
@@ -135,7 +135,7 @@ export const ordersData: OrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'cancelled',
+        status: 'delivered',
         createdAt: '2023-10-03T14:15:00Z',
         updatedAt: '2023-10-03T14:15:00Z',
     },
@@ -227,7 +227,7 @@ export const ordersData: OrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'order_started',
+        status: 'delivered',
         createdAt: '2023-10-05T16:45:00Z',
         updatedAt: '2023-10-05T16:45:00Z',
     },
@@ -273,7 +273,7 @@ export const ordersData: OrderType[] = [
                 quantity: 2,
             },
         ],
-        status: 'cancelled',
+        status: 'delivered',
         createdAt: '2023-10-06T12:20:00Z',
         updatedAt: '2023-10-06T12:20:00Z',
     },

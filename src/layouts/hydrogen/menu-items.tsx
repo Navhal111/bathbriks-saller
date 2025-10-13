@@ -70,12 +70,20 @@ export const menuItems: MenuItem[] = [
     icon: <PiAcorn />,
     dropdownItems: [
       {
-        name: "Orders List",
-        href: "/orders",
+        name: "Live Orders",
+        href: "/live-orders",
       },
       {
-        name: "Return Orders",
-        href: "/return-orders",
+        name: "Cancelled Orders",
+        href: "/cancelled-orders",
+      },
+      {
+        name: "Delivered Orders",
+        href: "/delivered-orders",
+      },
+      {
+        name: "Order Reports",
+        href: "/order-reports",
       },
     ],
   },

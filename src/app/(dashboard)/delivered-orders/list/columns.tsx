@@ -1,18 +1,26 @@
 'use client';
 
 import DeletePopover from '@/components/delete-popover';
-import { allStatus, StatusTypes } from '@/components/table-utils/get-status-badge';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
-import { ActionIcon, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
+import { ActionIcon, Badge, Flex, Text, Tooltip } from 'rizzui';
 import { OrderType } from '@/kit/models/Order';
 import EyeIcon from '@/components/icons/eye';
-import { ORDER_STATUS_OPTIONS } from '@/config/orders';
-import cn from '@/utils/class-names';
+import dayjs from 'dayjs';
+import { getStatusColors } from '@/components/table-utils/get-status-color';
+import { StatusType } from '@/config/categories';
 
 const columnHelper = createColumnHelper<OrderType>();
 
 export const ordersListColumns = [
+    columnHelper.accessor('date', {
+        id: 'date',
+        size: 150,
+        header: 'Date',
+        cell: ({ row }) => (
+            <Text className="font-medium text-gray-700">{dayjs(row.original.date).format('DD-MMM-YYYY')}</Text>
+        ),
+    }),
     columnHelper.accessor('orderID', {
         id: 'orderID',
         size: 200,
@@ -25,10 +33,16 @@ export const ordersListColumns = [
         header: 'Customer Name',
         cell: ({ row }) => <Text className="text-sm">{row.original.customerName}</Text>,
     }),
+    columnHelper.display({
+        id: 'customerNumber',
+        size: 150,
+        header: 'Customer Number',
+        cell: ({ row }) => <Text className="text-sm">{row.original.customerNumber}</Text>,
+    }),
     columnHelper.accessor('productQty', {
         id: 'productQty',
         size: 150,
-        header: 'Product Quantity',
+        header: 'Quantity',
         cell: ({ row }) => (
             <Text className="font-medium text-gray-700">{row.original.productQty}</Text>
         ),
@@ -36,46 +50,52 @@ export const ordersListColumns = [
     columnHelper.accessor('totalMrp', {
         id: 'totalMrp',
         size: 150,
-        header: 'Price',
+        header: 'Amount',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">₹{row.original.totalMrp}</Text>
+            <Text className="font-medium text-gray-700">₹ {row.original.totalMrp}</Text>
         ),
     }),
-    columnHelper.accessor('totalPrice', {
-        id: 'totalPrice',
+    columnHelper.accessor('deliveryPincode', {
+        id: 'deliveryPincode',
         size: 150,
-        header: 'Final Price',
+        header: 'Delivery Pincode',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">₹{row.original.totalPrice}</Text>
+            <Text className="text-gray-700">{row.original.deliveryPincode}</Text>
+        ),
+    }),
+    columnHelper.accessor('deliveryCity', {
+        id: 'deliveryCity',
+        size: 150,
+        header: 'Delivery City',
+        cell: ({ row }) => (
+            <Text className="text-gray-700">{row.original.deliveryCity}</Text>
+        ),
+    }),
+    columnHelper.accessor('paymentMode', {
+        id: 'paymentMode',
+        size: 150,
+        header: 'Payment Mode',
+        cell: ({ row }) => (
+            <Text className="text-gray-700">{row.original.paymentMode}</Text>
         ),
     }),
     columnHelper.accessor('status', {
         id: 'status',
-        size: 150,
+        size: 170,
         header: 'Status',
         enableSorting: false,
-        cell: ({ row, table }) => {
-            const currentValue = row.original.status;
-
-            const handleChange = (selected: SelectOption | null) => {
-                const newValue: string = selected?.value ? String(selected.value) : '';
-                const updatedRow = { ...row.original, status: newValue };
-                table.options.meta?.handleUpdateRow?.(updatedRow);
-            };
-
-            const key = String(currentValue).toLowerCase() as StatusTypes;
-            const currentBgClass = allStatus[key]?.[1] || "bg-gray-600";
-
+        cell: ({ row }) => {
             return (
-                <Select
-                    className={cn("custom-pill-select rounded-full text-white", currentBgClass)}
-                    options={ORDER_STATUS_OPTIONS}
-                    value={ORDER_STATUS_OPTIONS.find((opt) => opt.value === String(currentValue)) || null}
-                    displayValue={(selected: SelectOption | null) => selected?.label || ''}
-                    onChange={handleChange}
-                />
+                <Badge
+                    variant="outline"
+                    className="w-32 font-medium"
+                    color={getStatusColors(row.original.status as StatusType)}
+                    data-color={getStatusColors(row.original.status as StatusType)}
+                >
+                    {row.original.status}
+                </Badge>
             );
-        }
+        },
     }),
     columnHelper.display({
         id: 'action',
