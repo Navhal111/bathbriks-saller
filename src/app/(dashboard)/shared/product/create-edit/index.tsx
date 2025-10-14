@@ -452,7 +452,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
       description: data?.description || '',
       productUrl: data.productUrl,
       uom: data.uom,
-      isQuantityPrice: data?.isQuantityPrice,
+      isQuantityPrice: data.priceingType === PriceingType.PRODUCTBASEPRICING,
       ...(data.priceingType === PriceingType.PRODUCTBASEPRICING && {
         quantityPrice: data.quantityPrice
       }),
