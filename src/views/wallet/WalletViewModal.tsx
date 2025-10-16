@@ -3,7 +3,6 @@
 import { Modal, Text, Title } from "rizzui";
 import cn from "@/utils/class-names";
 import { formatDate } from "@/utils/format-date";
-import { useGetAllOrderList } from "@/kit/hooks/data/order";
 import { WalletType } from "@/kit/models/Wallet";
 import { getBadge } from "@/components/table-utils/get-badge";
 

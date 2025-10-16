@@ -5,11 +5,13 @@ import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
 import { exportToCSV } from '@/utils/export-to-csv';
-import { OrderType } from '@/kit/models/Order';
-import { ordersListColumns } from './columns';
+import { SellerOrderType } from '@/kit/models/Order';
 import Filters from './filters';
 import { Meta } from '@/kit/models/_generic';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
+import { filterParamsProps } from '../page';
+import { useEffect } from 'react';
+import { ordersListColumns } from './columns';
 
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends unknown> {
@@ -41,7 +43,7 @@ export default function DeliveredOrdersTable({
     search,
     setSearch
 }: {
-    DeliveredOrderList: OrderType[];
+    DeliveredOrderList: SellerOrderType[];
     isLoading: boolean;
     hideFilters?: boolean;
     hidePagination?: boolean;
@@ -55,21 +57,21 @@ export default function DeliveredOrdersTable({
     setPage: (page: number) => void;
     pageSize: number;
     setPageSize: (size: number) => void;
-    onDelete: (data: OrderType) => void;
-    onView: (data: OrderType) => void;
-    search?: { minAmount: string; maxAmount: string };
-    setSearch?: (search: { minAmount: string; maxAmount: string }) => void;
+    onDelete: (data: SellerOrderType) => void;
+    onView: (data: SellerOrderType) => void;
+    search?: filterParamsProps;
+    setSearch?: (search: filterParamsProps) => void;
 }) {
 
-    const handleView = (data: OrderType) => {
+    const handleView = (data: SellerOrderType) => {
         onView(data)
     }
 
-    const handleDeleteRow = (data: OrderType) => {
+    const handleDeleteRow = (data: SellerOrderType) => {
         onDelete(data)
     };
 
-    const { table, setData } = useTanStackTable<OrderType>({
+    const { table, setData } = useTanStackTable<SellerOrderType>({
         tableData: DeliveredOrderList,
         columnConfig: ordersListColumns,
         options: {
@@ -99,6 +101,12 @@ export default function DeliveredOrdersTable({
         );
     }
 
+    useEffect(() => {
+        if (Array.isArray(DeliveredOrderList)) {
+            setData(DeliveredOrderList);
+        }
+    }, [DeliveredOrderList, setData]);
+
     return (
         <>
             {!hideFilters && <Filters table={table} searchQuery={searchQuery} setSearchQuery={setSearchQuery} search={search} setSearch={setSearch} />}
@@ -120,3 +128,5 @@ export default function DeliveredOrdersTable({
         </>
     );
 }
+
+

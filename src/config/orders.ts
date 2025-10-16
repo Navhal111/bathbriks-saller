@@ -45,3 +45,11 @@ export const LIVE_ORDER_STATUS_OPTIONS: DropdownOptions[] = [
         value: 'CANCELLED',
     },
 ]
+
+export enum OrderStatus {
+    PLACED = "PLACED",
+    SHIPPED = "SHIPPED",
+    CANCELLED = "CANCELLED",
+    DELIVERED = "DELIVERED",
+    CONFIRMED = "CONFIRMED",
+}

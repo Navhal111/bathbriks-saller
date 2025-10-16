@@ -40,6 +40,8 @@ export default function Filters<TData extends Record<string, any>>({
         },
     });
 
+    const { register, handleSubmit, setValue, reset, watch } = methods;
+
     const onSubmit = (values: filterParamsProps) => {
         setSearch?.(values);
     };
@@ -61,7 +63,7 @@ export default function Filters<TData extends Record<string, any>>({
                     isOpen={openDrawer}
                     drawerTitle="Table Filters"
                     setOpenDrawer={setOpenDrawer}
-                    onSubmit={methods.handleSubmit(onSubmit)}
+                    onSubmit={handleSubmit(onSubmit)}
                 >
                     <div className="grid grid-cols-1 gap-6">
                         <FilterElements />
@@ -163,5 +165,3 @@ function FilterElements() {
         </>
     );
 }
-
-

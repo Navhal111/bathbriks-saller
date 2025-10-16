@@ -4,14 +4,13 @@ import PageHeader from '@/app/(dashboard)/shared/page-header';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
-import { useDeleteOrder, useGetAllOrderList } from '@/kit/hooks/data/order';
-import { ordersData } from '@/data/orders-data';
-import { OrderType } from '@/kit/models/Order';
+import { SellerOrderType } from '@/kit/models/Order';
 import toast from 'react-hot-toast';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
-import { cancelledOrdersData } from '@/data/cancelled-orders-data';
 import CancelOrdersTable from './list/table';
-import OrderStatusViewModal from '@/views/order/OrderStatusViewModal';
+import { OrderStatus } from '@/config/orders';
+import { useDeleteSellerOrder, useGetSellerOrderList } from '@/kit/hooks/data/liveOrder';
+import OrderViewModal from '@/views/order/OrderViewModal';
 
 const pageHeader = {
     title: 'Cancelled Orders',
@@ -26,15 +25,28 @@ const pageHeader = {
     ],
 };
 
+export interface filterParamsProps {
+    minAmount: string,
+    maxAmount: string,
+    startDate: string,
+    endDate: string,
+    status: string,
+}
+
+export const filterParams: filterParamsProps = {
+    minAmount: '',
+    maxAmount: '',
+    startDate: '',
+    endDate: '',
+    status: '',
+};
+
 export default function CancelledOrdersPage() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
-    const [search, setSearch] = useState({
-        minAmount: '',
-        maxAmount: '',
-    })
-    const [selectedOrder, setSelectedOrder] = useState<OrderType>()
+    const [search, setSearch] = useState<filterParamsProps>(filterParams);
+    const [selectedOrder, setSelectedOrder] = useState<SellerOrderType>()
     const [orderId, setOrderId] = useState<string>('');
     const [actionType, setActionType] = useState<'delete' | 'update' | null>(null);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false)
@@ -44,26 +56,28 @@ export default function CancelledOrdersPage() {
     const queryParams = {
         page: page,
         size: pageSize,
+        status: OrderStatus.CANCELLED,
         ...(debouncedSearch && { search: debouncedSearch }),
         ...(search.minAmount && { startDate: search.minAmount }),
         ...(search.maxAmount && { endDate: search.maxAmount }),
     }
 
-    const { OrderList, isOrderListLoading, refreshOrderList } = useGetAllOrderList(queryParams);
-    const { deleteRecord, isDeleting } = useDeleteOrder(orderId || '');
+    const { SellerOrderList, isSellerOrderListLoading, refreshSellerOrderList } = useGetSellerOrderList(queryParams);
+    const { deleteRecord, isDeleting } = useDeleteSellerOrder(orderId || '');
 
     const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen)
 
-    const orderDelete = async (data: OrderType) => {
+    const orderDelete = async (data: SellerOrderType) => {
         setOrderId(String(data.id))
         setSelectedOrder(data)
         setActionType('delete');
     };
 
-    const orderView = (data: OrderType) => {
+    const orderView = (data: SellerOrderType) => {
         setSelectedOrder(data)
         toggleOrderModal()
     }
+
 
     useEffect(() => {
         const performAction = async () => {
@@ -74,7 +88,8 @@ export default function CancelledOrdersPage() {
                     await deleteRecord(selectedOrder);
                     toast.success("Order deleted successfully!");
                 }
-                refreshOrderList?.();
+
+                refreshSellerOrderList?.();
             } catch (error) {
                 toast.error("Failed to perform action");
             } finally {
@@ -92,7 +107,11 @@ export default function CancelledOrdersPage() {
             <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
                 <div className="mt-4 flex items-center gap-3 @lg:mt-0">
                     <ExportButton
-                        data={ordersData}
+                        data={Array.isArray(SellerOrderList?.data)
+                            ? SellerOrderList?.data
+                            : SellerOrderList?.data
+                                ? [SellerOrderList.data]
+                                : []}
                         fileName="category_data"
                         header="ID,OrderID,CustomerName,ProductQty,Price,FinalPrice,Status"
                     />
@@ -100,11 +119,11 @@ export default function CancelledOrdersPage() {
             </PageHeader>
 
             <CancelOrdersTable
-                CancelOrderList={cancelledOrdersData}
-                isLoading={false}
+                CancelOrderList={Array.isArray(SellerOrderList?.data) ? SellerOrderList.data : []}
+                isLoading={isSellerOrderListLoading || isDeleting}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
-                meta={OrderList?.meta}
+                meta={SellerOrderList?.meta}
                 page={page}
                 setPage={setPage}
                 pageSize={pageSize}
@@ -116,10 +135,11 @@ export default function CancelledOrdersPage() {
             />
 
             <KitShow show={isOrderModalOpen}>
-                <OrderStatusViewModal
+                <OrderViewModal
                     isOpen={isOrderModalOpen}
                     onClose={toggleOrderModal}
                     selectedOrder={selectedOrder}
+                    isStatus={false}
                 />
             </KitShow>
         </>

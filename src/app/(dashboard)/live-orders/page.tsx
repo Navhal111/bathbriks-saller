@@ -5,15 +5,14 @@ import ExportButton from '@/app/(dashboard)/shared/export-button';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
 import { useGetSellerOrderList, useUpdateSellerOrder, useDeleteSellerOrder } from '@/kit/hooks/data/liveOrder';
-import { ordersData } from '@/data/orders-data';
-import { OrderType, SellerOrderType } from '@/kit/models/Order';
+import { SellerOrderType } from '@/kit/models/Order';
 import toast from 'react-hot-toast';
 import OrderViewModal from '@/views/order/OrderViewModal';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
-import { liveOrdersData } from '@/data/live-orders-data';
 import LiveOrdersTable from './list/table';
 import { CustomErrorType } from '@/kit/models/CustomError';
 import KitStatusDialog from '@/kit/components/KitStatusDialog';
+import { OrderStatus } from '@/config/orders';
 
 const pageHeader = {
     title: 'Live Orders',
@@ -60,15 +59,15 @@ export default function OrdersPage() {
     const queryParams = {
         page: page,
         size: pageSize,
+        status: OrderStatus.PLACED,
         ...(debouncedSearch && { search: debouncedSearch }),
         ...(search.minAmount && { startDate: search.minAmount }),
         ...(search.maxAmount && { endDate: search.maxAmount }),
     }
 
-    // Use seller order hooks instead of regular order hooks
     const { SellerOrderList, isSellerOrderListLoading, refreshSellerOrderList } = useGetSellerOrderList(queryParams);
     const { deleteRecord, isDeleting } = useDeleteSellerOrder(orderId || '');
-    const { update: onUpdateOrder, isUpdatingSellerOrder } = useUpdateSellerOrder(String(selectedOrder?.id));;
+    const { updateSellerOrder: onUpdateOrder, isMutating: isUpdateLoading } = useUpdateSellerOrder(String(selectedOrder?.id));
 
     const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen)
     const toggleStatusModal = () => setIsStatusModalOpen(!isStatusModalOpen)
@@ -93,8 +92,8 @@ export default function OrdersPage() {
         if (!selectedOrder) return
 
         try {
-            const response = await onUpdateOrder({ ...selectedOrder })
-            toast.success(response?.message || 'Order updated successfully!')
+            await onUpdateOrder({ status: selectedOrder?.status })
+            toast.success('Order updated successfully!')
             toggleStatusModal()
             refreshSellerOrderList?.();
         } catch (error) {
@@ -110,12 +109,6 @@ export default function OrdersPage() {
                 if (actionType === 'delete' && selectedOrder) {
                     await deleteRecord(selectedOrder);
                     toast.success("Order deleted successfully!");
-                }
-
-                if (actionType === 'update' && selectedOrder) {
-                    const updatedRow = { ...selectedOrder };
-                    await onUpdateOrder(updatedRow as Partial<SellerOrderType>);
-                    toast.success("Order updated successfully!");
                 }
 
                 refreshSellerOrderList?.();
@@ -136,7 +129,11 @@ export default function OrdersPage() {
             <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
                 <div className="mt-4 flex items-center gap-3 @lg:mt-0">
                     <ExportButton
-                        data={ordersData}
+                        data={Array.isArray(SellerOrderList?.data)
+                            ? SellerOrderList?.data
+                            : SellerOrderList?.data
+                                ? [SellerOrderList.data]
+                                : []}
                         fileName="category_data"
                         header="ID,OrderID,CustomerName,ProductQty,Price,FinalPrice,Status"
                     />
@@ -145,7 +142,7 @@ export default function OrdersPage() {
 
             <LiveOrdersTable
                 OrderList={Array.isArray(SellerOrderList?.data) ? SellerOrderList.data : []}
-                isLoading={isSellerOrderListLoading}
+                isLoading={isSellerOrderListLoading || isUpdateLoading || isDeleting}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 meta={SellerOrderList?.meta}

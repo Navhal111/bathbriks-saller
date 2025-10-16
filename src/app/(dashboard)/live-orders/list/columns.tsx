@@ -5,7 +5,7 @@ import { allStatus, StatusTypes } from '@/components/table-utils/get-status-badg
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
-import { OrderType, SellerOrderType } from '@/kit/models/Order';
+import { SellerOrderType } from '@/kit/models/Order';
 import EyeIcon from '@/components/icons/eye';
 import { LIVE_ORDER_STATUS_OPTIONS } from '@/config/orders';
 import cn from '@/utils/class-names';
@@ -82,7 +82,8 @@ export const ordersListColumns = [
             const currentValue = row.original.status;
 
             const handleChange = (selected: SelectOption | null) => {
-                const newValue: string = selected?.value ? String(selected.value) : '';
+                // const newValue: string = selected?.value ? String(selected.value) : '';
+                const newValue = selected?.value as SellerOrderType["status"];
                 const updatedRow = { ...row.original, status: newValue };
                 table.options.meta?.handleUpdateRow?.(updatedRow);
             };

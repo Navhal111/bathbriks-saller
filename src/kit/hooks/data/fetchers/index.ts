@@ -87,7 +87,7 @@ const updateOne = async <T extends BaseModel>(
   if (isCategoryAPI) {
     return CategoryAPI.post(path, body, params, headers)
   } else if (isOrderAPI) {
-    return OrderAPI.patch(path, body, params, headers)
+    return OrderAPI.post(path, body, params, headers)
   } else {
     return API.patch(path, body, params, headers)
   }

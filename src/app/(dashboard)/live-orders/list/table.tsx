@@ -5,12 +5,13 @@ import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
 import { exportToCSV } from '@/utils/export-to-csv';
-import { OrderType, SellerOrderType } from '@/kit/models/Order';
+import { SellerOrderType } from '@/kit/models/Order';
 import { ordersListColumns } from './columns';
 import Filters from './filters';
 import { Meta } from '@/kit/models/_generic';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
 import { filterParamsProps } from '../page';
+import { useEffect } from 'react';
 
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends unknown> {
@@ -107,6 +108,12 @@ export default function LiveOrdersTable({
             `category_data_${selectedData.length}`
         );
     }
+
+    useEffect(() => {
+        if (Array.isArray(OrderList)) {
+            setData(OrderList);
+        }
+    }, [OrderList, setData]);
 
     return (
         <>

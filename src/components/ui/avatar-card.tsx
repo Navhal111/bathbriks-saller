@@ -5,11 +5,12 @@ import cn from "@/utils/class-names";
 
 interface AvatarCardProps {
   src: string;
-  name: string;
+  name?: string;
   className?: string;
   nameClassName?: string;
   avatarProps?: AvatarProps;
   description?: React.ReactNode;
+  onClick?: () => void
 }
 
 export default function AvatarCard({
@@ -19,19 +20,23 @@ export default function AvatarCard({
   description,
   avatarProps,
   nameClassName,
+  onClick
 }: AvatarCardProps) {
+  
   return (
     <figure className={cn("flex items-center gap-3", className)}>
-      <Avatar name={name} src={src} {...avatarProps} />
+      <Avatar name={name ? name : ''} src={src} onClick={onClick} {...avatarProps} />
       <figcaption className="grid gap-0.5">
-        <Text
-          className={cn(
-            "font-lexend text-sm font-medium text-gray-900 dark:text-gray-700",
-            nameClassName
-          )}
-        >
-          {name}
-        </Text>
+        {name &&
+          <Text
+            className={cn(
+              "font-lexend text-sm font-medium text-gray-900 dark:text-gray-700",
+              nameClassName
+            )}
+          >
+            {name}
+          </Text>
+        }
         {description && (
           <Text className="text-[13px] text-gray-500">{description}</Text>
         )}

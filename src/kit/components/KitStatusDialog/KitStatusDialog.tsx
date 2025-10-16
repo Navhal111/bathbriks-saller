@@ -17,7 +17,7 @@ const KitStatusDialog = ({ isOpen, onClose, onDelete, title, isBtnLoading }: Pro
     <KitModal
       isOpen={isOpen}
       onClose={onClose}
-      title={<Title as='h4' className="text-lg font-semibold">Status {title}</Title>}
+      title={<Title as='h4' className="text-lg font-semibold">Update Status</Title>}
       size="sm"
     >
       <div className="p-4 px-0">
@@ -37,7 +37,7 @@ const KitStatusDialog = ({ isOpen, onClose, onDelete, title, isBtnLoading }: Pro
           disabled={isBtnLoading}
           isLoading={isBtnLoading}
         >
-          Yes, Delete
+          Yes, Update
         </KitButton>
       </div>
     </KitModal>

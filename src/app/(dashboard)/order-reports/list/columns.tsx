@@ -5,87 +5,72 @@ import { allStatus, StatusTypes } from '@/components/table-utils/get-status-badg
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Flex, Select, SelectOption, Text, Tooltip } from 'rizzui';
-import { OrderType } from '@/kit/models/Order';
+import { SellerOrderType } from '@/kit/models/Order';
 import EyeIcon from '@/components/icons/eye';
-import { ORDER_STATUS_OPTIONS } from '@/config/orders';
+import { LIVE_ORDER_STATUS_OPTIONS } from '@/config/orders';
 import cn from '@/utils/class-names';
 import dayjs from 'dayjs';
 
-const columnHelper = createColumnHelper<OrderType>();
+const columnHelper = createColumnHelper<SellerOrderType>();
 
 export const ordersListColumns = [
-    columnHelper.accessor('date', {
-        id: 'date',
+    columnHelper.accessor('order_date', {
+        id: 'order_date',
         size: 150,
         header: 'Date',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">{dayjs(row.original.date).format('DD-MMM-YYYY')}</Text>
+            <Text className="font-medium text-gray-700">{dayjs(row.original.order_date).format('DD-MMM-YYYY')}</Text>
         ),
     }),
-    columnHelper.accessor('orderID', {
-        id: 'orderID',
+    columnHelper.accessor('id', {
+        id: 'id',
         size: 200,
         header: 'Order ID',
-        cell: ({ row }) => <Text className="text-sm">{row.original.orderID}</Text>,
+        cell: ({ row }) => <Text className="text-sm">#{row.original.id}</Text>,
     }),
     columnHelper.display({
         id: 'customerName',
         size: 150,
         header: 'Customer Name',
-        cell: ({ row }) => <Text className="text-sm">{row.original.customerName}</Text>,
+        cell: ({ row }) => <Text className="text-sm">{row.original.user?.name || 'N/A'}</Text>,
     }),
     columnHelper.display({
         id: 'customerNumber',
         size: 150,
         header: 'Customer Number',
-        cell: ({ row }) => <Text className="text-sm">{row.original.customerNumber}</Text>,
+        cell: ({ row }) => <Text className="text-sm">{row.original.user?.mobile || 'N/A'}</Text>,
     }),
-    columnHelper.accessor('productQty', {
+    columnHelper.display({
         id: 'productQty',
         size: 150,
         header: 'Quantity',
-        cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">{row.original.productQty}</Text>
-        ),
+        cell: ({ row }) => {
+            const totalQty = row.original.orderitems?.reduce((sum, item) => sum + item.qty, 0) || 0;
+            return <Text className="font-medium text-gray-700">{totalQty}</Text>;
+        },
     }),
-    columnHelper.accessor('totalMrp', {
-        id: 'totalMrp',
+    columnHelper.accessor('total_price', {
+        id: 'total_price',
         size: 150,
         header: 'Amount',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">₹ {row.original.totalMrp}</Text>
+            <Text className="font-medium text-gray-700">₹ {row.original.total_price}</Text>
         ),
     }),
-    // columnHelper.accessor('totalPrice', {
-    //     id: 'totalPrice',
-    //     size: 150,
-    //     header: 'Final Price',
-    //     cell: ({ row }) => (
-    //         <Text className="font-medium text-gray-700">₹{row.original.totalPrice}</Text>
-    //     ),
-    // }),
-    columnHelper.accessor('deliveryPincode', {
-        id: 'deliveryPincode',
+    columnHelper.display({
+        id: 'email',
         size: 150,
-        header: 'Delivery Pincode',
+        header: 'Customer Email',
         cell: ({ row }) => (
-            <Text className="text-gray-700">{row.original.deliveryPincode}</Text>
+            <Text className="text-gray-700">{row.original.user?.email || 'N/A'}</Text>
         ),
     }),
-    columnHelper.accessor('deliveryCity', {
-        id: 'deliveryCity',
-        size: 150,
-        header: 'Delivery City',
-        cell: ({ row }) => (
-            <Text className="text-gray-700">{row.original.deliveryCity}</Text>
-        ),
-    }),
-    columnHelper.accessor('paymentMode', {
-        id: 'paymentMode',
+    columnHelper.accessor('paymentType', {
+        id: 'paymentType',
         size: 150,
         header: 'Payment Mode',
         cell: ({ row }) => (
-            <Text className="text-gray-700">{row.original.paymentMode}</Text>
+            <Text className="text-gray-700 capitalize">{row.original.paymentType}</Text>
         ),
     }),
     columnHelper.accessor('status', {
@@ -97,7 +82,8 @@ export const ordersListColumns = [
             const currentValue = row.original.status;
 
             const handleChange = (selected: SelectOption | null) => {
-                const newValue: string = selected?.value ? String(selected.value) : '';
+                // const newValue: string = selected?.value ? String(selected.value) : '';
+                const newValue = selected?.value as SellerOrderType["status"];
                 const updatedRow = { ...row.original, status: newValue };
                 table.options.meta?.handleUpdateRow?.(updatedRow);
             };
@@ -109,8 +95,8 @@ export const ordersListColumns = [
                 <Select
                     className={cn("custom-pill-select rounded-full text-white border", currentBgClass, allStatus[key]?.[2])}
                     size='sm'
-                    options={ORDER_STATUS_OPTIONS}
-                    value={ORDER_STATUS_OPTIONS.find((opt) => opt.value === String(currentValue)) || null}
+                    options={LIVE_ORDER_STATUS_OPTIONS}
+                    value={LIVE_ORDER_STATUS_OPTIONS.find((opt) => opt.value === String(currentValue)) || null}
                     displayValue={(selected: SelectOption | null) => selected?.label || ''}
                     onChange={handleChange}
                 />

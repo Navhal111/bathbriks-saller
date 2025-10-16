@@ -1,23 +1,24 @@
 'use client';
 
+import DateFiled from '@/components/controlled-table/date-field';
 import PriceField from '@/components/controlled-table/price-field';
 import { FilterDrawerView } from '@/components/controlled-table/table-filter';
 import ToggleColumns from '@/components/table-utils/toggle-columns';
 import { type Table as ReactTableType } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
-import {
-    PiFunnel,
-    PiMagnifyingGlassBold,
-    PiTrashDuotone,
-} from 'react-icons/pi';
-import { Button, Flex, Input } from 'rizzui';
+import { useState } from 'react';
+import { PiFunnel, PiMagnifyingGlassBold, PiTrashDuotone } from 'react-icons/pi';
+import { Button, Flex, Input, SelectOption } from 'rizzui';
+import { filterParamsProps } from '../page';
+import StatusField from '@/components/controlled-table/status-field';
+import { statusOptions } from '../../shared/invoice/form-utils';
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
 
 interface TableToolbarProps<T extends Record<string, any>> {
     table: ReactTableType<T>;
     searchQuery?: string;
     setSearchQuery?: (query: string) => void;
-    search?: { minAmount: string; maxAmount: string };
-    setSearch?: (search: { minAmount: string; maxAmount: string }) => void;
+    search?: filterParamsProps;
+    setSearch?: (search: filterParamsProps) => void;
 }
 
 export default function Filters<TData extends Record<string, any>>({
@@ -28,11 +29,21 @@ export default function Filters<TData extends Record<string, any>>({
     setSearch
 }: TableToolbarProps<TData>) {
     const [openDrawer, setOpenDrawer] = useState(false);
-    const [tempSearch, setTempSearch] = useState(search || { minAmount: '', maxAmount: '' });
 
-    const {
-        options: { meta },
-    } = table;
+    const methods = useForm<filterParamsProps>({
+        defaultValues: search ?? {
+            minAmount: '',
+            maxAmount: '',
+            startDate: '',
+            endDate: '',
+        },
+    });
+
+    const { register, handleSubmit, setValue, reset, watch } = methods;
+
+    const onSubmit = (values: filterParamsProps) => {
+        setSearch?.(values);
+    };
 
     return (
         <Flex align="center" justify="between" className="mb-4">
@@ -46,20 +57,18 @@ export default function Filters<TData extends Record<string, any>>({
                 clearable={true}
                 prefix={<PiMagnifyingGlassBold className="size-4" />}
             />
-
-            <FilterDrawerView
-                isOpen={openDrawer}
-                drawerTitle="Table Filters"
-                setOpenDrawer={setOpenDrawer}
-                onSubmit={() => setSearch?.(tempSearch)}
-            >
-                <div className="grid grid-cols-1 gap-6">
-                    <FilterElements
-                        initialSearch={search}
-                        onTempChange={(values) => setTempSearch(values)}
-                    />
-                </div>
-            </FilterDrawerView>
+            <FormProvider {...methods}>
+                <FilterDrawerView
+                    isOpen={openDrawer}
+                    drawerTitle="Table Filters"
+                    setOpenDrawer={setOpenDrawer}
+                    onSubmit={handleSubmit(onSubmit)}
+                >
+                    <div className="grid grid-cols-1 gap-6">
+                        <FilterElements />
+                    </div>
+                </FilterDrawerView>
+            </FormProvider>
 
             <Flex align="center" gap="3" className="w-auto">
                 <Button
@@ -77,41 +86,55 @@ export default function Filters<TData extends Record<string, any>>({
     );
 }
 
+function FilterElements() {
 
-function FilterElements({
-    initialSearch,
-    onTempChange,
-}: {
-    initialSearch?: { minAmount: string; maxAmount: string };
-    onTempChange?: (search: { minAmount: string; maxAmount: string }) => void;
-}) {
-    const [minAmount, setMinAmount] = useState(initialSearch?.minAmount || '');
-    const [maxAmount, setMaxAmount] = useState(initialSearch?.maxAmount || '');
+    const { control, watch, setValue, reset } = useFormContext<filterParamsProps>();
 
-    useEffect(() => {
-        onTempChange?.({ minAmount, maxAmount });
-    }, [minAmount, maxAmount]);
-    
-    const isFiltered = minAmount !== '' || maxAmount !== '';
+    const values = watch();
+    const isFiltered = Object.values(values).some((val) => val !== '');
 
     return (
         <>
-            <PriceField
-                value={[minAmount, maxAmount]}
-                onChange={(value) => {
-                    setMinAmount(value[0]);
-                    setMaxAmount(value[1]);
+            <Controller
+                name="minAmount"
+                control={control}
+                render={({ field: { value: minValue, onChange: onMinChange } }) => (
+                    <Controller
+                        name="maxAmount"
+                        control={control}
+                        render={({ field: { value: maxValue, onChange: onMaxChange } }) => (
+                            <PriceField
+                                value={[minValue, maxValue]}
+                                onChange={([min, max]) => {
+                                    onMinChange(min);
+                                    onMaxChange(max);
+                                }}
+                                label="Amount"
+                            />
+                        )}
+                    />
+                )}
+            />
+
+            <DateFiled
+                selectsRange
+                dateFormat={'dd-MMM-yyyy'}
+                className="w-full"
+                placeholderText="Select date range"
+                startDate={watch('startDate') ? new Date(watch('startDate')) : null}
+                endDate={watch('endDate') ? new Date(watch('endDate')) : null}
+                onChange={(date) => {
+                    setValue('startDate', date[0]?.toLocaleDateString('en-CA') ?? '');
+                    setValue('endDate', date[1]?.toLocaleDateString('en-CA') ?? '');
                 }}
-                label="Amount"
+                inputProps={{ label: 'Date Range' }}
             />
 
             {isFiltered && (
                 <Button
                     size="sm"
                     onClick={() => {
-                        setMinAmount('');
-                        setMaxAmount('');
-                        onTempChange?.({ minAmount: '', maxAmount: '' });
+                        reset();
                     }}
                     variant="flat"
                     className="h-9 bg-gray-200/70"

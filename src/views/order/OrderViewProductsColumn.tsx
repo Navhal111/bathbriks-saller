@@ -3,15 +3,29 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Text } from 'rizzui';
 import { OrderProducts } from '@/kit/models/Order';
+import ProductImageCell from './ProductImageCell';
 
 const columnHelper = createColumnHelper<OrderProducts>();
 
 export const OrderViewProductsColumn = [
+    columnHelper.accessor('productUrl', {
+        id: 'productUrl',
+        size: 100,
+        header: 'Image',
+        enableSorting: false,
+        cell: ({ row }) => <ProductImageCell product={row.original} />,
+    }),
     columnHelper.accessor('productName', {
         id: 'productName',
         size: 200,
         header: 'Product',
         cell: ({ row }) => <Text className="text-sm">{row.original.productName}</Text>,
+    }),
+    columnHelper.accessor('sku', {
+        id: 'sku',
+        size: 200,
+        header: 'SKU',
+        cell: ({ row }) => <Text className="text-sm">{row.original.sku}</Text>,
     }),
     columnHelper.accessor('mrp', {
         id: 'mrp',

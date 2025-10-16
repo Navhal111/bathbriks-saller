@@ -1482,3 +1482,26 @@ div[style="z-index: 1000001;"],
 #react-select-play-frequency-select-input{
   box-shadow: none !important;
 }
+
+.thumbnail .keen-slider__slide {
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  padding: 5px;
+}
+
+.thumbnail .keen-slider__slide.active {
+  opacity: 1;
+  border: 1px solid theme('colors.white');
+  border-radius: 5px;
+}
+
+.desktopThumbnail .keen-slider__slide {
+  transition: opacity 0.3s;
+  padding: 5px;
+}
+
+.desktopThumbnail .keen-slider__slide.active {
+  opacity: 1;
+  border: 1px solid theme('colors.white');
+  border-radius: 5px;
+}

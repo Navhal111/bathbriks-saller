@@ -4,9 +4,7 @@ import PageHeader from '@/app/(dashboard)/shared/page-header';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
-import { useDeleteOrder, useGetAllOrderList, useUpdateOrder } from '@/kit/hooks/data/order';
-import { ordersData } from '@/data/orders-data';
-import { OrderType } from '@/kit/models/Order';
+import { SellerOrderType } from '@/kit/models/Order';
 import toast from 'react-hot-toast';
 import OrderViewModal from '@/views/order/OrderViewModal';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
@@ -16,6 +14,7 @@ import KitMetricCard from '@/kit/components/KitMetricCard/KitMetricCard';
 import TicketIcon from '@/components/icons/ticket';
 import { CustomErrorType } from '@/kit/models/CustomError';
 import KitStatusDialog from '@/kit/components/KitStatusDialog';
+import { useDeleteSellerOrder, useGetSellerOrderList, useUpdateSellerOrder } from '@/kit/hooks/data/liveOrder';
 
 const pageHeader = {
     title: 'Order Reports',
@@ -70,7 +69,7 @@ export default function OrderReportsPage() {
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
     const [search, setSearch] = useState<filterParamsProps>(filterParams);
-    const [selectedOrder, setSelectedOrder] = useState<OrderType>()
+    const [selectedOrder, setSelectedOrder] = useState<SellerOrderType>()
     const [orderId, setOrderId] = useState<string>('');
     const [actionType, setActionType] = useState<'delete' | 'update' | null>(null);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false)
@@ -86,25 +85,25 @@ export default function OrderReportsPage() {
         ...(search.maxAmount && { endDate: search.maxAmount }),
     }
 
-    const { OrderList, isOrderListLoading, refreshOrderList } = useGetAllOrderList(queryParams);
-    const { deleteRecord, isDeleting } = useDeleteOrder(orderId || '');
-    const { update: onUpdateOrder, isUpdatingOrder } = useUpdateOrder(String(selectedOrder?.id));
+    const { SellerOrderList, isSellerOrderListLoading, refreshSellerOrderList } = useGetSellerOrderList(queryParams);
+    const { deleteRecord, isDeleting } = useDeleteSellerOrder(orderId || '');
+    const { updateSellerOrder: onUpdateOrder, isMutating: isUpdateLoading } = useUpdateSellerOrder(String(selectedOrder?.id));
 
     const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen)
     const toggleStatusModal = () => setIsStatusModalOpen(!isStatusModalOpen)
 
-    const orderDelete = async (data: OrderType) => {
+    const orderDelete = async (data: SellerOrderType) => {
         setOrderId(String(data.id))
         setSelectedOrder(data)
         setActionType('delete');
     };
 
-    const onStatusUpdate = async (data: OrderType) => {
+    const onStatusUpdate = async (data: SellerOrderType) => {
         setSelectedOrder(data)
         toggleStatusModal()
     };
 
-    const orderView = (data: OrderType) => {
+    const orderView = (data: SellerOrderType) => {
         setSelectedOrder(data)
         toggleOrderModal()
     }
@@ -113,10 +112,10 @@ export default function OrderReportsPage() {
         if (!selectedOrder) return
 
         try {
-            const response = await onUpdateOrder({ ...selectedOrder })
-            toast.success(response?.message || 'Order updated successfully!')
+            await onUpdateOrder({ status: selectedOrder?.status })
+            toast.success('Order updated successfully!')
             toggleStatusModal()
-            refreshOrderList?.();
+            refreshSellerOrderList?.();
         } catch (error) {
             toast.error((error as CustomErrorType)?.message)
         }
@@ -131,7 +130,8 @@ export default function OrderReportsPage() {
                     await deleteRecord(selectedOrder);
                     toast.success("Order deleted successfully!");
                 }
-                refreshOrderList?.();
+
+                refreshSellerOrderList?.();
             } catch (error) {
                 toast.error("Failed to perform action");
             } finally {
@@ -149,7 +149,11 @@ export default function OrderReportsPage() {
             <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
                 <div className="mt-4 flex items-center gap-3 @lg:mt-0">
                     <ExportButton
-                        data={ordersData}
+                        data={Array.isArray(SellerOrderList?.data)
+                            ? SellerOrderList?.data
+                            : SellerOrderList?.data
+                                ? [SellerOrderList.data]
+                                : []}
                         fileName="category_data"
                         header="ID,OrderID,CustomerName,ProductQty,Price,FinalPrice,Status"
                     />
@@ -169,11 +173,11 @@ export default function OrderReportsPage() {
             </div>
 
             <OrderReportsTable
-                OrderList={ordersData}
-                isLoading={false}
+                OrderList={Array.isArray(SellerOrderList?.data) ? SellerOrderList.data : []}
+                isLoading={isSellerOrderListLoading || isUpdateLoading || isDeleting}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
-                meta={OrderList?.meta}
+                meta={SellerOrderList?.meta}
                 page={page}
                 setPage={setPage}
                 pageSize={pageSize}

@@ -22,6 +22,8 @@ export interface OrderProducts {
     mrp: number
     quantity: number
     finaPrice?: number
+    sku: string
+    productUrl: string[]
 }
 
 // New interfaces for the seller orders API response
@@ -51,6 +53,7 @@ export interface OrderItem {
     price: number;
     type: string | null;
     product: ProductDetails;
+    sku: string
 }
 
 export interface ProductDetails {
@@ -115,6 +118,7 @@ export interface ProductDetails {
     uom: string;
     product_group_id: number | null;
     isVariant: boolean;
+    productUrl: string[]
 }
 
 export interface CustomField {

@@ -1,19 +1,21 @@
-import { API_VERSION, fetchAll, fetchOne } from '@/kit/hooks/data/fetchers'
+import { API_VERSION, customRequest, fetchAll, fetchOne } from '@/kit/hooks/data/fetchers'
 import useSWR from 'swr'
 import type { CustomError } from '@/kit/models/CustomError'
 import type { Params } from '@/kit/services/axiosService'
-import { GetAllObjectResponse, GetOneResponse } from '@/kit/models/_generic';
+import { GetAllObjectResponse, GetAllResponse, GetOneResponse } from '@/kit/models/_generic';
 import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
 import { SellerOrderType } from '@/kit/models/Order';
+import useSWRMutation from 'swr/mutation';
+import { FetcherCreate } from './fetchers/type';
 
 // Live order API paths
 const SELLER_ORDER_LIST_PATH = 'orders/seller/orders';
 
 const useGetSellerOrderList = (params?: Params, shouldFetch = true) => {
-    const { data, error, isValidating, isLoading, mutate } = useSWR<GetAllObjectResponse<SellerOrderType>, CustomError[]>(
+    const { data, error, isValidating, isLoading, mutate } = useSWR<GetAllResponse<SellerOrderType>, CustomError[]>(
         shouldFetch ? [`${API_VERSION}/${SELLER_ORDER_LIST_PATH}`, params] : null,
-        (): Promise<GetAllObjectResponse<SellerOrderType>> => fetchAll(SELLER_ORDER_LIST_PATH, params, undefined, API_VERSION, false, true),
+        (): Promise<GetAllResponse<SellerOrderType>> => fetchAll(SELLER_ORDER_LIST_PATH, params, undefined, API_VERSION, false, true),
         {
             revalidateOnMount: true,
             revalidateIfStale: true,
@@ -54,20 +56,30 @@ const useGetOneSellerOrder = (id = '', params?: Params) => {
 }
 
 const useUpdateSellerOrder = (id = '') => {
-    const { data, error, isMutating, reset, update } = useSWRUpdateOne<SellerOrderType>({
-        path: SELLER_ORDER_LIST_PATH,
-        id,
-        isOrderAPI: true
-    })
+    const { data, error, trigger, reset, isMutating } = useSWRMutation(
+        id ? [`${SELLER_ORDER_LIST_PATH}/${id}/status`] : null,
+        ([name]: string[], { arg }: { arg: FetcherCreate<SellerOrderType> }) =>
+            customRequest<SellerOrderType, SellerOrderType>({
+                name: name,
+                method: 'POST',
+                payload: arg.body,
+                isOrderAPI: true
+            })
+    )
 
     return {
         data,
         error,
-        isUpdatingSellerOrder: isMutating,
+        isMutating,
         reset,
-        update
+        updateSellerOrder: (record: Partial<SellerOrderType>) => {
+            return trigger({
+                body: record
+            })
+        }
     }
 }
+
 
 const useDeleteSellerOrder = (id = '', params?: Params) => {
     const { data, error, isDeleting, reset, deleteRecord } = useSWRDeleteOneAndRefreshAll<SellerOrderType>({
