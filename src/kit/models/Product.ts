@@ -46,6 +46,7 @@ export interface ProductData extends BaseModel {
   category: CategoryType | null;
   images: ProductImageType[];
   variants: ProductVariantType[];
+  status?: string;
 }
 
 export interface ProductType extends BaseModel {
@@ -72,12 +73,16 @@ export interface ProductQuantity {
 }
 
 export interface ProductVariant {
-  name: string;
-  value: string;
-  id: string
-  price: number
-  sku: string
-  stock: number
+  dimension?: string;
+  dimension_id?: string | number;
+  value?: string;
+  product_group_name?: string;
+  // Legacy fields for backward compatibility
+  name?: string;
+  id?: string;
+  price?: number;
+  sku?: string;
+  stock?: number;
 }
 
 export interface MediaPayload {
@@ -130,4 +135,11 @@ export interface CreateProductType extends BaseModel {
   is_fragile?: boolean
   user_id?: number
   seller_id?: number
+  isVariant?: boolean
+  group_name?: string
+  product_group_id?: number
+  productVariantsGroup?: {
+    product_group_id: number;
+    product_group_name: string;
+  }
 }

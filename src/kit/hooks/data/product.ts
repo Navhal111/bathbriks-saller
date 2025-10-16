@@ -141,5 +141,22 @@ const useUpdateMedia = (id = '') => {
     }
 }
 
+const SUBMIT_APPROVAL_PATH = 'products/submit-approval';
 
-export { useGetAllProductList, useGetOneProduct, useCreateProduct, useUpdateProduct, useDeleteProduct, useUpdateMedia }
+const useSubmitProductApproval = () => {
+    const { data, error, isMutating, reset, trigger } = useSWRMutation(
+        SUBMIT_APPROVAL_PATH,
+        (url: string, { arg }: { arg: { id: string | number } }) =>
+            fetchOne(SUBMIT_APPROVAL_PATH, String(arg.id), undefined, undefined, undefined, true)
+    )
+
+    return {
+        submitForReview: (id: string | number) => trigger({ id }),
+        isSubmitting: isMutating,
+        submitError: error,
+        submitData: data,
+        resetSubmit: reset
+    }
+}
+
+export { useGetAllProductList, useGetOneProduct, useCreateProduct, useUpdateProduct, useDeleteProduct, useUpdateMedia, useSubmitProductApproval }

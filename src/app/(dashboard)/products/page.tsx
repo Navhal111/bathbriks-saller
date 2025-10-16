@@ -107,6 +107,7 @@ export default function ProductsPage() {
         pageSize={pageSize}
         setPageSize={setPageSize}
         onDelete={productDelete}
+        onRefresh={refreshProductList}
       />
     </>
   );

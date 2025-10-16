@@ -5,7 +5,7 @@ import { useTanStackTable } from '@/components/table/use-TanStack-Table';
 import TableFooter from '@/components/table/footer';
 import { TableClassNameProps } from '@/components/table/table-types';
 import { exportToCSV } from '@/utils/export-to-csv';
-import { OrderType } from '@/kit/models/Order';
+import { OrderType, SellerOrderType } from '@/kit/models/Order';
 import { ordersListColumns } from './columns';
 import Filters from './filters';
 import { Meta } from '@/kit/models/_generic';
@@ -44,7 +44,7 @@ export default function LiveOrdersTable({
     search,
     setSearch
 }: {
-    OrderList: OrderType[];
+    OrderList: SellerOrderType[];
     isLoading: boolean;
     hideFilters?: boolean;
     hidePagination?: boolean;
@@ -58,26 +58,26 @@ export default function LiveOrdersTable({
     setPage: (page: number) => void;
     pageSize: number;
     setPageSize: (size: number) => void;
-    onStatusUpdate: (data: OrderType) => void;
-    onDelete: (data: OrderType) => void;
-    onView: (data: OrderType) => void;
+    onStatusUpdate: (data: SellerOrderType) => void;
+    onDelete: (data: SellerOrderType) => void;
+    onView: (data: SellerOrderType) => void;
     search?: filterParamsProps;
     setSearch?: (search: filterParamsProps) => void;
 }) {
 
-    const handleView = (data: OrderType) => {
+    const handleView = (data: SellerOrderType) => {
         onView(data)
     }
 
-    const handleUpdateRow = (data: OrderType) => {
+    const handleUpdateRow = (data: SellerOrderType) => {
         onStatusUpdate(data)
     };
 
-    const handleDeleteRow = (data: OrderType) => {
+    const handleDeleteRow = (data: SellerOrderType) => {
         onDelete(data)
     };
 
-    const { table, setData } = useTanStackTable<OrderType>({
+    const { table, setData } = useTanStackTable<SellerOrderType>({
         tableData: OrderList,
         columnConfig: ordersListColumns,
         options: {

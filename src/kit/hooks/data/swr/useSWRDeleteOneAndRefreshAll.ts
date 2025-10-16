@@ -29,12 +29,13 @@ const useSWRDeleteOneAndRefreshAll = <T extends BaseModel>({
   id,
   key,
   apiVersion,
-  isCategoryAPI
+  isCategoryAPI,
+  isOrderAPI
 }: useSWRDeleteOneAndRefresh) => {
   const { data, error, trigger, reset, isMutating } = useSWRMutation(
     key ? [path, key] : [path],
     ([name]: string[], { arg }: { arg: FetcherUpdate<T> }) =>
-      deleteOne(name, id, arg.params, arg.headers, apiVersion, isCategoryAPI)
+      deleteOne(name, id, arg.params, arg.headers, apiVersion, isCategoryAPI, isOrderAPI)
   )
 
   return {

@@ -16,6 +16,7 @@ export interface UseSWRUpdateOne {
   id?: string
   apiVersion?: string
   isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }
 
 export interface useSWRUpdateOneAndRefresh {
@@ -23,6 +24,7 @@ export interface useSWRUpdateOneAndRefresh {
   id: string
   key?: Params
   isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }
 
 export interface useSWRDeleteOneAndRefresh {
@@ -31,12 +33,14 @@ export interface useSWRDeleteOneAndRefresh {
   key?: Params
   apiVersion?: string
   isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }
 
 export interface useCustomSWRDeleteOneAndRefreshAll {
   path: string
   key?: Params
   isCategoryAPI?: boolean
+  isOrderAPI?: boolean
   options: {
     path: string
     payload?: object
@@ -50,4 +54,5 @@ export interface UseSWRCreateOne {
   key?: Params
   apiVersion?: string
   isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }

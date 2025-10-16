@@ -10,8 +10,9 @@ import PencilIcon from '@/components/icons/pencil';
 import AvatarCard from '@/components/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
+import { ActionIcon, Badge, Checkbox, Flex, Text, Tooltip } from 'rizzui';
 import { ProductData } from '@/kit/models/Product';
+import { ProductStatus } from '@/config/enums';
 
 const columnHelper = createColumnHelper<ProductData>();
 
@@ -86,6 +87,42 @@ export const productsListColumns = [
     size: 150,
     header: 'Quantity',
     cell: ({ row }) => <Text className="text-sm">{row.original.quantity}</Text>,
+  }),
+  columnHelper.display({
+    id: 'status',
+    size: 150,
+    header: 'Status',
+    cell: ({ row, table: { options: { meta } } }) => {
+      const status = row.original.status || ProductStatus.DRAFT;
+      const canSendForReview = status === ProductStatus.DRAFT || status === ProductStatus.REJECTED;
+
+      const getStatusBadge = (status: string) => {
+        const badgeProps = {
+          className: canSendForReview ? 'cursor-pointer hover:opacity-80 transition-opacity' : '',
+          onClick: canSendForReview ? () => meta?.handleSendForReview && meta?.handleSendForReview(row.original) : undefined,
+        };
+
+        switch (status) {
+          case ProductStatus.DRAFT:
+            return <Badge variant="outline" color="secondary" className={`text-gray-600 border-gray-300 ${badgeProps.className}`} {...(badgeProps.onClick && { onClick: badgeProps.onClick })}>{status}</Badge>;
+          case ProductStatus.PENDING_APPROVAL:
+            return <Badge variant="outline" color="warning" className="text-orange-600 border-orange-300">{status.replace('_', ' ')}</Badge>;
+          case ProductStatus.REJECTED:
+            return <Badge variant="outline" color="danger" className={`text-red-600 border-red-300 ${badgeProps.className}`} {...(badgeProps.onClick && { onClick: badgeProps.onClick })}>{status}</Badge>;
+          case ProductStatus.LIVE:
+            return <Badge variant="outline" color="success" className="text-green-600 border-green-300">{status}</Badge>;
+          case ProductStatus.DELETED_BY_SELLER:
+            return <Badge variant="outline" color="danger" className="text-red-700 border-red-400">{status.replace(/_/g, ' ')}</Badge>;
+          case ProductStatus.REMOVED_BY_ADMIN:
+            return <Badge variant="outline" color="danger" className="text-red-800 border-red-500">{status.replace(/_/g, ' ')}</Badge>;
+          case ProductStatus.DEACTIVATED:
+            return <Badge variant="outline" color="secondary" className="text-gray-700 border-gray-400">{status}</Badge>;
+          default:
+            return <Badge variant="outline" color="secondary">{status}</Badge>;
+        }
+      };
+      return getStatusBadge(status);
+    },
   }),
   columnHelper.display({
     id: 'action',

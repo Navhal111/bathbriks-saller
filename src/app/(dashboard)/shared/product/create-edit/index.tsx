@@ -24,6 +24,7 @@ import { CreateProductType, ProductCustomField, ProductLocationShipping, Product
 import { useAuth } from '@/kit/hooks/useAuth';
 import { useGetAllBrandList } from '@/kit/hooks/data/brand';
 import { useGetAllSubCategoryList } from '@/kit/hooks/data/subCategory';
+import { useGetAllDimensionsList } from '@/kit/hooks/data/dimensions';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import KitLoader from '@/kit/components/KitLoader/KitLoader';
 import { useRouter } from 'next/navigation';
@@ -98,6 +99,9 @@ interface FormData {
   is_fragile?: boolean
   user_id?: number
   seller_id?: number
+  isVariant?: boolean
+  group_name?: string
+  product_group_id?: number
 }
 
 // type FormData = InferType<typeof productFormSchema>;
@@ -305,11 +309,47 @@ const productFormSchema = yup.object({
 
   productVariants: yup.array(
     yup.object({
-      name: yup.string().nullable(),
+      dimension: yup.string().nullable(),
+      dimension_id: yup.mixed().nullable(),
       value: yup.string().nullable(),
+      product_group_name: yup.string().nullable(),
     })
-  ).nullable(),
+  ).nullable()
+    .test('unique-dimensions', 'Each dimension can only be selected once', function (variants) {
+      if (!variants || !Array.isArray(variants)) return true;
 
+      const dimensionIds = variants
+        .map(variant => variant?.dimension_id)
+        .filter(id => id && id !== '');
+
+      const uniqueDimensionIds = new Set(dimensionIds);
+
+      if (dimensionIds.length !== uniqueDimensionIds.size) {
+        // Find duplicate dimension
+        const duplicates = dimensionIds.filter((id, index) =>
+          id && dimensionIds.indexOf(id) !== index
+        );
+
+        if (duplicates.length > 0) {
+          // Create error for each duplicate
+          variants.forEach((variant, index) => {
+            if (variant?.dimension_id && duplicates.includes(variant.dimension_id)) {
+              return this.createError({
+                path: `productVariants[${index}].dimension_id`,
+                message: 'This dimension is already selected. Please choose a different one.'
+              });
+            }
+          });
+        }
+        return false;
+      }
+
+      return true;
+    }),
+
+  isVariant: yup.boolean().optional(),
+  group_name: yup.string().optional(),
+  product_group_id: yup.number().optional(),
   tags: yup.array(yup.string()).optional(),
   is_fragile: yup.boolean().optional(),
   user_id: yup.number().optional(),
@@ -328,6 +368,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
   const { CategoryList, isCategoryListLoading } = useGetAllCategoryList({ page: 1, size: 10000 });
   const { SubCategoryList, isSubCategoryListLoading } = useGetAllSubCategoryList({ page: 1, size: 10000 });
   const { BrandList, isBrandListLoading } = useGetAllBrandList({ page: 1, size: 10000 });
+  const { DimensionsList, isDimensionsListLoading } = useGetAllDimensionsList();
   const { createProduct: onCreateProduct, isCreatingProduct } = useCreateProduct()
   const { update: onUpdateProduct, isUpdatingProduct } = useUpdateProduct()
   const { update: onUpdateMedia, isUpdatingMedia } = useUpdateMedia(String(productDetails?.id))
@@ -371,14 +412,17 @@ export default function CreateEditProduct({ className, productDetails, productLo
     availableDate: productDetails?.availableDate ? productDetails.availableDate : '',
     endDate: productDetails?.endDate ? productDetails.endDate : '',
     productVariants: Array.isArray(productDetails?.productVariants)
-      ? productDetails.productVariants
-        .filter(item => typeof item?.sku === 'string' && item.sku.includes('-'))
-        .map(item => ({
-          name: item.sku.split('-')[1],
-          value: item.stock ?? '',
-        }))
+      ? productDetails.productVariants.map(item => ({
+        dimension: item.dimension || '',
+        dimension_id: item.dimension_id || '',
+        value: item.value || '',
+        product_group_name: item.product_group_name || '',
+      }))
       : productVariants,
     tags: productDetails?.tags || [],
+    isVariant: productDetails?.isVariant || false,
+    group_name: productDetails?.group_name || productDetails?.productVariantsGroup?.product_group_name || '',
+    product_group_id: productDetails?.productVariantsGroup?.product_group_id,
   } as unknown as FormData;;
 
   const methods = useForm({
@@ -393,52 +437,70 @@ export default function CreateEditProduct({ className, productDetails, productLo
   const isBtnLoading = isCreatingProduct || isUpdatingProduct
 
   const handleSubmitWithMedia = async () => {
+    // Filter out only new files (File objects) that need to be processed
+    const newFiles = files.filter(file => file instanceof File);
 
-    const filePayloads = await Promise.all(
-      files.map((file: File, index: number) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
+    // If there are new files to upload, process them
+    if (newFiles.length > 0) {
+      const filePayloads = await Promise.all(
+        newFiles.map((file: File, index: number) => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
-          reader.onload = () => {
-            const base64 = (reader.result as string).split(',')[1];
+            reader.onload = () => {
+              const base64 = (reader.result as string).split(',')[1];
 
-            const mediaCategory = file.type.startsWith('image/')
-              ? 'image'
-              : file.type.startsWith('video/')
-                ? 'video'
-                : 'other';
+              const mediaCategory = file.type.startsWith('image/')
+                ? 'image'
+                : file.type.startsWith('video/')
+                  ? 'video'
+                  : 'other';
 
-            resolve({
-              order: index + 1,
-              type: mediaCategory,
-              base64,
-              filename: file.name,
-            });
+              resolve({
+                order: index + 1,
+                type: mediaCategory,
+                base64,
+                filename: file.name,
+              });
+            };
+
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+      console.log("filePayloads", filePayloads)
+
+      if (productDetails) {
+        try {
+          // Wrap filePayloads in productUrl key for the API
+          const mediaPayload = {
+            productUrl: filePayloads
           };
-
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      })
-    );
-    console.log("filePayloads", filePayloads)
-
-    if (productDetails) {
-      try {
-        await onUpdateMedia(filePayloads as Partial<MediaType>);
-      } catch (error) {
-        toast.error((error as CustomErrorType)?.message);
-        throw error;
+          console.log("Media payload being sent:", mediaPayload);
+          await onUpdateMedia(mediaPayload as Partial<MediaType>);
+        } catch (error) {
+          toast.error((error as CustomErrorType)?.message);
+          throw error;
+        }
+      } else {
+        methods.setValue('productUrl', filePayloads);
       }
+    } else if (productDetails) {
+      // In edit mode with no new files, keep existing URLs
+      console.log("No new files to upload, keeping existing media");
     } else {
-      methods.setValue('productUrl', filePayloads);
+      // In create mode, ensure we have productUrl set
+      methods.setValue('productUrl', []);
     }
-    console.log("filePayloads", filePayloads)
 
     methods.handleSubmit(handleValidSubmit)();
   };
 
   const handleValidSubmit = async (data: any) => {
+    // For edit mode, only include productUrl if there are new files
+    const shouldIncludeProductUrl = !productDetails || (files.some(file => file instanceof File));
+
     const payload: Partial<CreateProductType> = {
       ...(productDetails && { id: productDetails.id }),
       is_fragile: true,
@@ -450,7 +512,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
       subcategory_id: data.subcategory_id,
       brand_id: data.brand_id,
       description: data?.description || '',
-      productUrl: data.productUrl,
+      ...(shouldIncludeProductUrl && { productUrl: data.productUrl }),
       uom: data.uom,
       isQuantityPrice: data.priceingType === PriceingType.PRODUCTBASEPRICING,
       ...(data.priceingType === PriceingType.PRODUCTBASEPRICING && {
@@ -465,9 +527,17 @@ export default function CreateEditProduct({ className, productDetails, productLo
       lowStock: data.lowStock,
       productVariants:
         Array.isArray(data.productVariants) &&
-          data.productVariants.some((v: any) => v.name && v.value)
-          ? data.productVariants.filter((v: any) => v.name && v.value)
+          data.productVariants.some((v: any) => v.dimension && v.value)
+          ? data.productVariants.filter((v: any) => v.dimension && v.value).map((v: any) => ({
+            dimension: v.dimension,
+            dimension_id: v.dimension_id,
+            value: v.value,
+            product_group_name: data.group_name || v.product_group_name,
+          }))
           : [],
+      isVariant: data?.isVariant || false,
+      group_name: data?.group_name || '',
+      product_group_id: data?.product_group_id,
       productAvailability: data.productAvailability,
       minOrder: data.minOrder,
       maxOrder: data.maxOrder,
@@ -555,10 +625,13 @@ export default function CreateEditProduct({ className, productDetails, productLo
                     categoryList={CategoryList?.data ?? []}
                     SubCategoryList={SubCategoryList?.data?.items ?? []}
                     BrandList={BrandList?.data ?? []}
+                    DimensionsList={DimensionsList?.data ?? []}
                     files={files}
                     setFiles={setFiles}
                     isUpdatingMedia={isUpdatingMedia}
                     isSubCategoryListLoading={isSubCategoryListLoading}
+                    isDimensionsListLoading={isDimensionsListLoading}
+                    productDetails={productDetails}
                   />}
                 </Element>
               ))}

@@ -19,7 +19,7 @@ export type Params = Record<
 export type Headers = Record<string, string>;
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_BASE_API}`,
+  baseURL: `${process.env.NEXT_PUBLIC_ORDER_BASE_API}`,
 });
 
 /** Add request/response interceptor */

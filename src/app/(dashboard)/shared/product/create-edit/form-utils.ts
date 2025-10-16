@@ -21,8 +21,10 @@ export const productQuantity = [
 ];
 export const productVariants = [
   {
-    name: '',
+    dimension: '',
+    dimension_id: '',
     value: '',
+    product_group_name: '',
   },
 ];
 

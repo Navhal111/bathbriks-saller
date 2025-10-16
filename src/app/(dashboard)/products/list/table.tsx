@@ -13,12 +13,14 @@ import { exportToCSV } from '@/utils/export-to-csv';
 import { Meta } from '@/kit/models/_generic';
 import { ProductData, ProductType } from '@/kit/models/Product';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import SendReviewPopup from './send-review-popup';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends unknown> {
     handleEditRow?: (data: TData) => void;
     handleDeleteRow?: (data: TData) => void;
+    handleSendForReview?: (data: TData) => void;
   }
 }
 
@@ -41,6 +43,7 @@ export default function ProductsTable({
   setPageSize,
   onEdit,
   onDelete,
+  onRefresh,
 }: {
   ProductList: ProductData[];
   isLoading: boolean;
@@ -57,7 +60,10 @@ export default function ProductsTable({
   setPageSize: (size: number) => void;
   onEdit: (data: ProductData) => void;
   onDelete: (data: ProductData) => void;
+  onRefresh?: () => void;
 }) {
+  const [selectedProductForReview, setSelectedProductForReview] = useState<ProductData | null>(null);
+  const [isReviewPopupOpen, setIsReviewPopupOpen] = useState(false);
 
   const handleEditRow = (data: ProductData) => {
     onEdit(data)
@@ -65,6 +71,20 @@ export default function ProductsTable({
 
   const handleDeleteRow = (data: ProductData) => {
     onDelete(data)
+  }
+
+  const handleSendForReview = (data: ProductData) => {
+    setSelectedProductForReview(data);
+    setIsReviewPopupOpen(true);
+  }
+
+  const handleReviewSuccess = () => {
+    onRefresh && onRefresh();
+  }
+
+  const handleCloseReviewPopup = () => {
+    setIsReviewPopupOpen(false);
+    setSelectedProductForReview(null);
   }
 
   const { table, setData } = useTanStackTable<ProductData>({
@@ -79,7 +99,8 @@ export default function ProductsTable({
       },
       meta: {
         handleDeleteRow,
-        handleEditRow
+        handleEditRow,
+        handleSendForReview
       },
       enableColumnResizing: false,
     },
@@ -121,6 +142,13 @@ export default function ProductsTable({
           className="py-4"
         />
       )}
+
+      <SendReviewPopup
+        isOpen={isReviewPopupOpen}
+        onClose={handleCloseReviewPopup}
+        product={selectedProductForReview}
+        onSuccess={handleReviewSuccess}
+      />
     </>
   );
 }

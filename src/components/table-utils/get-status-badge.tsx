@@ -41,6 +41,10 @@ export const allStatus = {
   cancel: statusColors.danger,
   return: statusColors.warning,
   delivered: statusColors.success,
+  // New order statuses from API
+  placed: statusColors.warning,
+  confirmed: statusColors.success,
+  shipped: statusColors.success,
 };
 
 export type StatusTypes = keyof typeof allStatus;

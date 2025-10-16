@@ -4,9 +4,9 @@ import PageHeader from '@/app/(dashboard)/shared/page-header';
 import ExportButton from '@/app/(dashboard)/shared/export-button';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect, useState } from 'react';
-import { useDeleteOrder, useGetAllOrderList, useUpdateOrder } from '@/kit/hooks/data/order';
+import { useGetSellerOrderList, useUpdateSellerOrder, useDeleteSellerOrder } from '@/kit/hooks/data/liveOrder';
 import { ordersData } from '@/data/orders-data';
-import { OrderType } from '@/kit/models/Order';
+import { OrderType, SellerOrderType } from '@/kit/models/Order';
 import toast from 'react-hot-toast';
 import OrderViewModal from '@/views/order/OrderViewModal';
 import KitDebouncedSearchInput from '@/kit/components/KitDebouncedSearchInput';
@@ -49,7 +49,7 @@ export default function OrdersPage() {
     const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
     const [search, setSearch] = useState<filterParamsProps>(filterParams);
-    const [selectedOrder, setSelectedOrder] = useState<OrderType>()
+    const [selectedOrder, setSelectedOrder] = useState<SellerOrderType>()
     const [orderId, setOrderId] = useState<string>('');
     const [actionType, setActionType] = useState<'delete' | 'update' | null>(null);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false)
@@ -65,25 +65,26 @@ export default function OrdersPage() {
         ...(search.maxAmount && { endDate: search.maxAmount }),
     }
 
-    const { OrderList, isOrderListLoading, refreshOrderList } = useGetAllOrderList(queryParams);
-    const { deleteRecord, isDeleting } = useDeleteOrder(orderId || '');
-    const { update: onUpdateOrder, isUpdatingOrder } = useUpdateOrder(String(selectedOrder?.id));;
+    // Use seller order hooks instead of regular order hooks
+    const { SellerOrderList, isSellerOrderListLoading, refreshSellerOrderList } = useGetSellerOrderList(queryParams);
+    const { deleteRecord, isDeleting } = useDeleteSellerOrder(orderId || '');
+    const { update: onUpdateOrder, isUpdatingSellerOrder } = useUpdateSellerOrder(String(selectedOrder?.id));;
 
     const toggleOrderModal = () => setIsOrderModalOpen(!isOrderModalOpen)
     const toggleStatusModal = () => setIsStatusModalOpen(!isStatusModalOpen)
 
-    const orderDelete = async (data: OrderType) => {
+    const orderDelete = async (data: SellerOrderType) => {
         setOrderId(String(data.id))
         setSelectedOrder(data)
         setActionType('delete');
     };
 
-    const onStatusUpdate = async (data: OrderType) => {
+    const onStatusUpdate = async (data: SellerOrderType) => {
         setSelectedOrder(data)
         toggleStatusModal()
     };
 
-    const orderView = (data: OrderType) => {
+    const orderView = (data: SellerOrderType) => {
         setSelectedOrder(data)
         toggleOrderModal()
     }
@@ -95,7 +96,7 @@ export default function OrdersPage() {
             const response = await onUpdateOrder({ ...selectedOrder })
             toast.success(response?.message || 'Order updated successfully!')
             toggleStatusModal()
-            refreshOrderList?.();
+            refreshSellerOrderList?.();
         } catch (error) {
             toast.error((error as CustomErrorType)?.message)
         }
@@ -112,13 +113,12 @@ export default function OrdersPage() {
                 }
 
                 if (actionType === 'update' && selectedOrder) {
-                    const { id, createdAt, updatedAt, ...rest } = selectedOrder;
-                    const updatedRow = { ...rest };
-                    await onUpdateOrder(updatedRow as Partial<OrderType>);
+                    const updatedRow = { ...selectedOrder };
+                    await onUpdateOrder(updatedRow as Partial<SellerOrderType>);
                     toast.success("Order updated successfully!");
                 }
 
-                refreshOrderList?.();
+                refreshSellerOrderList?.();
             } catch (error) {
                 toast.error("Failed to perform action");
             } finally {
@@ -144,11 +144,11 @@ export default function OrdersPage() {
             </PageHeader>
 
             <LiveOrdersTable
-                OrderList={liveOrdersData}
-                isLoading={false}
+                OrderList={Array.isArray(SellerOrderList?.data) ? SellerOrderList.data : []}
+                isLoading={isSellerOrderListLoading}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
-                meta={OrderList?.meta}
+                meta={SellerOrderList?.meta}
                 page={page}
                 setPage={setPage}
                 pageSize={pageSize}

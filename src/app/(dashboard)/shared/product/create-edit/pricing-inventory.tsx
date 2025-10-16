@@ -10,12 +10,16 @@ import { Flex } from 'rizzui/flex';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect } from 'react';
 import ProductQuantity from './product-quantity';
+import { DimensionType } from '@/kit/hooks/data/dimensions';
 
 interface PricingInventoryProps {
   className?: string;
+  DimensionsList?: DimensionType[];
+  isDimensionsListLoading?: boolean;
+  productDetails?: any;
 }
 
-export default function PricingInventory({ className }: PricingInventoryProps) {
+export default function PricingInventory({ className, DimensionsList, isDimensionsListLoading, productDetails }: PricingInventoryProps) {
 
   const {
     control,
@@ -111,7 +115,11 @@ export default function PricingInventory({ className }: PricingInventoryProps) {
         description="Add your product variants here"
         className={cn(className)}
       >
-        <InventoryTracing />
+        <InventoryTracing
+          DimensionsList={DimensionsList}
+          isDimensionsListLoading={isDimensionsListLoading}
+          productDetails={productDetails}
+        />
       </FormGroup>
       <FormGroup
         title="Availability"

@@ -25,15 +25,23 @@ export const ORDER_STATUS_OPTIONS: DropdownOptions[] = [
 
 export const LIVE_ORDER_STATUS_OPTIONS: DropdownOptions[] = [
     {
-        label: 'order started',
-        value: 'order_started',
+        label: 'Placed',
+        value: 'PLACED',
     },
     {
-        label: 'dispatched',
-        value: 'dispatched',
+        label: 'Confirmed',
+        value: 'CONFIRMED',
     },
     {
-        label: 'return',
-        value: 'return',
+        label: 'Shipped',
+        value: 'SHIPPED',
+    },
+    {
+        label: 'Delivered',
+        value: 'DELIVERED',
+    },
+    {
+        label: 'Cancelled',
+        value: 'CANCELLED',
     },
 ]
