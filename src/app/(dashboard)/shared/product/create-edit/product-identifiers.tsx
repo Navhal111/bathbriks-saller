@@ -1,0 +1,48 @@
+'use client';
+
+import { useFormContext } from 'react-hook-form';
+import { Input } from 'rizzui';
+import cn from '@/utils/class-names';
+import FormGroup from '@/app/(dashboard)/shared/form-group';
+import CustomFields from '@/app/(dashboard)/shared/product/create-edit/custom-fields';
+
+interface ProductIdentifiersProps {
+  className?: string;
+}
+
+export default function ProductIdentifiers({
+  className,
+}: ProductIdentifiersProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  return (
+    <FormGroup
+      title="Product Identifiers"
+      description="Edit your product identifiers here"
+      className={cn(className)}
+    >
+      <Input
+        label="Global Trade Item Number"
+        placeholder="12345"
+        {...register('tradeNumber')}
+        error={errors.tradeNumber?.message as string}
+      />
+      <Input
+        label="Manufacturer Part Number"
+        placeholder="145782"
+        {...register('manufacturerNumber')}
+        error={errors.manufacturerNumber?.message as string}
+      />
+      <Input
+        label="Product UPC/EAN "
+        placeholder="145782"
+        {...register('upcEan')}
+        error={errors.upcEan?.message as string}
+      />
+      <CustomFields />
+    </FormGroup>
+  );
+}

@@ -23,14 +23,14 @@ interface Props {
 
 interface FormData {
     name: string
-    description?: string
-    status: string
+    slug: string
+    // status: string
 }
 
 const formSchema = yup.object().shape({
     name: yup.string().required('Name is a required'),
-    description: yup.string().optional(),
-    status: yup.string().required('Status is a required'),
+    slug: yup.string().required('Slug is a required'),
+    // status: yup.string().required('Status is a required'),
 })
 
 export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, updateCategory }: Props) {
@@ -40,8 +40,8 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
 
     const defaultValues: FormData = {
         name: updateCategory?.name || '',
-        description: updateCategory?.description || '',
-        status: updateCategory?.status || '',
+        slug: updateCategory?.slug || '',
+        // status: updateCategory?.status || '',
     }
 
     const {
@@ -60,23 +60,23 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
     const onSubmit = async (data: FormData) => {
         const payload = {
             name: data.name,
-            description: data.description,
-            status: data.status,
+            slug: data.slug,
+            // status: data.status,
         };
 
-        // try {
-        //     if (updateCategory) {
-        //         await onUpdateCategory(payload as Partial<CategoryType>)
-        //         toast.success('Category updated successfully.')
-        //     } else {
-        //         await onCreateCategory(payload as Partial<CategoryType>)
-        //         toast.success('Category created successfully.')
-        //     }
-        //     onClose()
-        //     onRefresh?.()
-        // } catch (error) {
-        //     toast.error((error as CustomErrorType)?.message)
-        // }
+        try {
+            if (updateCategory) {
+                await onUpdateCategory(payload as Partial<CategoryType>)
+                toast.success('Category updated successfully.')
+            } else {
+                await onCreateCategory(payload as Partial<CategoryType>)
+                toast.success('Category created successfully.')
+            }
+            onClose()
+            onRefresh?.()
+        } catch (error) {
+            toast.error((error as CustomErrorType)?.message)
+        }
     }
 
     useEffect(() => {
@@ -118,24 +118,26 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
                                     )}
                                 />
                             </Grid.Col>
-                            <Grid.Col>
+                            <Grid.Col >
                                 <Controller
-                                    name="description"
+                                    name="slug"
                                     control={control}
                                     render={({ field: { value, onChange, ref } }) => (
                                         <div className="w-full">
                                             <KitTextInput
                                                 ref={ref}
-                                                label="Description"
+                                                label="Slug"
+                                                required
                                                 value={value}
                                                 onChange={onChange}
-                                                placeholder="Enter Description"
+                                                error={errors.slug && errors.slug.message}
+                                                placeholder="Enter Slug"
                                             />
                                         </div>
                                     )}
                                 />
                             </Grid.Col>
-                            <Grid.Col>
+                            {/* <Grid.Col>
                                 <Controller
                                     control={control}
                                     name="status"
@@ -154,7 +156,7 @@ export default function AddUpdateCategoryModal({ isOpen, onClose, onRefresh, upd
                                         </div>
                                     )}
                                 />
-                            </Grid.Col>
+                            </Grid.Col> */}
                         </Grid>
                         <Grid className="flex justify-end mt-3 gap-3">
                             <KitButton

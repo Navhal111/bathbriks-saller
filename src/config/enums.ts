@@ -28,3 +28,18 @@ export enum CouponType {
   PERCENTAGE = "percentage",
   FREE_SHIPPING = "free_shipping",
 }
+
+export enum AccountType {
+  SAVINGS = "SAVINGS",
+  CURRENT = "CURRENT",
+}
+
+export enum ProductStatus {
+  DRAFT = "DRAFT",
+  PENDING_APPROVAL = "PENDING_APPROVAL",
+  REJECTED = "REJECTED",
+  LIVE = "LIVE",
+  DELETED_BY_SELLER = "DELETED_BY_SELLER",
+  REMOVED_BY_ADMIN = "REMOVED_BY_ADMIN",
+  DEACTIVATED = "DEACTIVATED",
+}

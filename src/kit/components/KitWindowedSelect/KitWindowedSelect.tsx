@@ -4,21 +4,21 @@ import React from 'react';
 import { SelectOption } from "rizzui/select";
 import WindowedSelect from 'react-windowed-select';
 
-const customStyles = {
+const customStyles = (error?: string) => ({
     control: (provided: any, state: any) => ({
         ...provided,
-        borderColor: '#ced4da',
-        border: '2px solid #ced4da',
+        borderColor: error ? '#ef4444' : '#ced4da',
+        border: `2px solid ${error ? '#ef4444' : '#ced4da'}`,
         borderRadius: '6px',
         '&:hover': {
-            border: '2px solid #1976d2',
+            border: `2px solid ${error ? '#ef4444' : '#1976d2'}`,
         },
         boxShadow: 'none',
     }),
     indicatorSeparator: () => ({
         display: 'none',
     }),
-};
+});
 
 interface KitWindowedSelectProps {
     options: SelectOption[];
@@ -29,6 +29,10 @@ interface KitWindowedSelectProps {
     width?: string;
     windowThreshold?: number;
     disabled?: boolean;
+    error?: string;
+    isClearable?: boolean
+    noOptionsMessage?: () => string;
+    isLoading?: boolean
 }
 
 const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
@@ -39,7 +43,11 @@ const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
     required = false,
     width = "w-[280px]",
     windowThreshold = 100,
-    disabled = false
+    disabled = false,
+    error,
+    isClearable = false,
+    noOptionsMessage,
+    isLoading
 }) => {
     return (
         <div className={`${width}`}>
@@ -51,7 +59,8 @@ const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
             )}
             <WindowedSelect
                 instanceId="play-frequency-select"
-                isClearable
+                isClearable={isClearable}
+                isLoading={isLoading}
                 isSearchable
                 options={options}
                 value={options.find((opt) => opt.value === value) || null}
@@ -61,9 +70,13 @@ const KitWindowedSelect: React.FC<KitWindowedSelectProps> = ({
                 getOptionLabel={(option: any) => option.label}
                 getOptionValue={(option: any) => option.value}
                 windowThreshold={windowThreshold}
-                styles={customStyles}
+                styles={customStyles(error)}
                 isDisabled={disabled}
+                noOptionsMessage={noOptionsMessage}
             />
+            {error && (
+                <p className="mt-1 text-xs text-red-500">{error}</p>
+            )}
         </div>
     );
 };

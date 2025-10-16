@@ -1,13 +1,9 @@
-export interface BrandsDataData {
-  brands: string[];
-  totalItems: number;
-}
+import BaseModel from "./BaseModel";
 
-export interface BrandsResponse {
-  status: number;
-  responseCode: number;
-  success: boolean;
-  message: string;
-  data: BrandsDataData;
-  err: null;
+export interface BrandType extends BaseModel {
+    name: string;
+    slug: string
+    image:string
+    description?: string;
+    status?: string;
 }
