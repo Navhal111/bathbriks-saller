@@ -1,14 +1,8 @@
 'use client';
 
-import DeletePopover from '@/components/delete-popover';
-import PencilIcon from '@/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
-import Link from 'next/link';
-import { ActionIcon, Badge, Flex, Text, Tooltip } from 'rizzui';
-import { getBadge } from '@/components/table-utils/get-badge';
+import { Text } from 'rizzui';
 import { BrandType } from '@/kit/models/Brand';
-import { getStatusColors } from '@/components/table-utils/get-status-color';
-import { StatusType } from '@/config/categories';
 
 const columnHelper = createColumnHelper<BrandType>();
 
@@ -50,42 +44,4 @@ export const brandListColumns = [
     //         );
     //     },
     // }),
-    columnHelper.display({
-        id: 'action',
-        size: 120,
-        cell: ({
-            row,
-            table: {
-                options: { meta },
-            },
-        }) => (
-            <Flex align="center" justify="end" gap="3" className="pe-4">
-                <Tooltip
-                    size="sm"
-                    content={'Edit Brand'}
-                    placement="top"
-                    color="invert"
-                >
-                    <Link href={""}>
-                        <ActionIcon
-                            as="span"
-                            size="sm"
-                            variant="outline"
-                            aria-label={'Edit Brand'}
-                            onClick={() => meta?.handleEditRow && meta?.handleEditRow?.(row.original)}
-                        >
-                            <PencilIcon className="h-4 w-4" />
-                        </ActionIcon>
-                    </Link>
-                </Tooltip>
-                <DeletePopover
-                    title={`Delete the Brand`}
-                    description={`Are you sure you want to delete this #${row.original.id} Brand?`}
-                    onDelete={() =>
-                        meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
-                    }
-                />
-            </Flex>
-        ),
-    }),
 ];

@@ -10,12 +10,6 @@ import ServerPagination from '@/kit/components/Table/ServerPagination';
 import { SubCategoryData } from '@/kit/models/SubCategory';
 import { useEffect } from 'react';
 
-declare module '@tanstack/react-table' {
-  interface TableMeta<TData extends unknown> {
-    handleEditRow?: (data: TData) => void;
-    handleDeleteRow?: (data: TData) => void;
-  }
-}
 
 export default function SubCategoriesTable({
   SubCategoryList,
@@ -33,8 +27,6 @@ export default function SubCategoriesTable({
   setPage,
   pageSize = 5,
   setPageSize,
-  onEdit,
-  onDelete
 }: {
   hideFilters?: boolean;
   hidePagination?: boolean;
@@ -48,17 +40,7 @@ export default function SubCategoriesTable({
   setPageSize: (size: number) => void;
   SubCategoryList: SubCategoryData[];
   isLoading: boolean;
-  onEdit: (data: SubCategoryData) => void;
-  onDelete: (data: SubCategoryData) => void;
 }) {
-
-  const handleEditRow = (data: SubCategoryData) => {
-    onEdit(data)
-  }
-
-  const handleDeleteRow = (data: SubCategoryData) => {
-    onDelete(data)
-  }
 
   const { table, setData } = useTanStackTable<SubCategoryData>({
     tableData: SubCategoryList,
@@ -69,10 +51,6 @@ export default function SubCategoriesTable({
           pageIndex: 0,
           pageSize: pageSize,
         },
-      },
-      meta: {
-        handleDeleteRow,
-        handleEditRow
       },
       enableColumnResizing: false,
     },

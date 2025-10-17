@@ -139,7 +139,6 @@ export default function CancelledOrdersPage() {
                     isOpen={isOrderModalOpen}
                     onClose={toggleOrderModal}
                     selectedOrder={selectedOrder}
-                    isStatus={false}
                 />
             </KitShow>
         </>

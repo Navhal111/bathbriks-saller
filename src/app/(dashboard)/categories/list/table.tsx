@@ -10,12 +10,6 @@ import { Meta } from '@/kit/models/_generic';
 import ServerPagination from '@/kit/components/Table/ServerPagination';
 import { useEffect } from 'react';
 
-declare module '@tanstack/react-table' {
-  interface TableMeta<TData extends unknown> {
-    handleEditRow?: (data: TData) => void;
-    handleDeleteRow?: (data: TData) => void;
-  }
-}
 
 export default function CategoriesTable({
   CategoryList,
@@ -33,8 +27,6 @@ export default function CategoriesTable({
   pageSize = 5,
   setPage,
   setPageSize,
-  onEdit,
-  onDelete,
 }: {
   CategoryList: CategoryType[];
   isLoading: boolean;
@@ -48,17 +40,7 @@ export default function CategoriesTable({
   setPage: (page: number) => void;
   pageSize: number;
   setPageSize: (size: number) => void;
-  onEdit: (data: CategoryType) => void;
-  onDelete: (data: CategoryType) => void;
 }) {
-
-  const handleEditRow = (data: CategoryType) => {
-    onEdit(data)
-  }
-
-  const handleDeleteRow = (data: CategoryType) => {
-    onDelete(data)
-  }
 
   const { table, setData } = useTanStackTable<CategoryType>({
     tableData: CategoryList,
@@ -69,10 +51,6 @@ export default function CategoriesTable({
           pageIndex: 0,
           pageSize: pageSize,
         },
-      },
-      meta: {
-        handleDeleteRow,
-        handleEditRow,
       },
       enableColumnResizing: false,
     },

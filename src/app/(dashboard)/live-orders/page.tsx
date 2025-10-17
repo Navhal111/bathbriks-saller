@@ -57,13 +57,18 @@ export default function OrdersPage() {
     const debouncedSearch = KitDebouncedSearchInput(searchQuery, 500);
 
     const queryParams = {
-        page: page,
+        page,
         size: pageSize,
         status: OrderStatus.PLACED,
         ...(debouncedSearch && { search: debouncedSearch }),
-        ...(search.minAmount && { startDate: search.minAmount }),
-        ...(search.maxAmount && { endDate: search.maxAmount }),
-    }
+        ...(search.minAmount && { minAmount: search.minAmount }),
+        ...(search.maxAmount && { maxAmount: search.maxAmount }),
+        ...(search.startDate && search.endDate && {
+            startDate: search.startDate,
+            endDate: search.endDate
+        }),
+        ...(search.status && { status: search.status }),
+    };
 
     const { SellerOrderList, isSellerOrderListLoading, refreshSellerOrderList } = useGetSellerOrderList(queryParams);
     const { deleteRecord, isDeleting } = useDeleteSellerOrder(orderId || '');

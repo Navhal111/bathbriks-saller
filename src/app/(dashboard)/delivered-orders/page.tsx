@@ -137,7 +137,6 @@ export default function DeliveredOrdersPage() {
                     isOpen={isOrderModalOpen}
                     onClose={toggleOrderModal}
                     selectedOrder={selectedOrder}
-                    isStatus={false}
                 />
             </KitShow>
         </>

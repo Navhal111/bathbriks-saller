@@ -27,12 +27,6 @@ export const OrderViewProductsColumn = [
         header: 'SKU',
         cell: ({ row }) => <Text className="text-sm">{row.original.sku}</Text>,
     }),
-    columnHelper.accessor('mrp', {
-        id: 'mrp',
-        size: 200,
-        header: 'Product MRP',
-        cell: ({ row }) => <Text className="text-sm">{row.original.mrp}</Text>,
-    }),
     columnHelper.accessor('price', {
         id: 'price',
         size: 200,
@@ -54,7 +48,7 @@ export const OrderViewProductsColumn = [
             const quantity = row.original.quantity || 0;
             const total = price * quantity;
 
-            return <Text className="text-sm">{total}</Text>;
+            return <Text className="text-sm">{row.original.finaPrice}</Text>;
         }
     }),
 ];

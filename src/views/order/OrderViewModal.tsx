@@ -1,14 +1,12 @@
 "use client";
 
-import { Badge, Modal, Text, Title } from "rizzui";
+import { Modal, Text, Title } from "rizzui";
 import { SellerOrderType } from "@/kit/models/Order";
 import cn from "@/utils/class-names";
 import { PiCheckBold } from "react-icons/pi";
 import { formatDate } from "@/utils/format-date";
 import OrderViewProductsTable from "./OrderViewProductsTable";
 import { OrderStatus } from "@/config/orders";
-import { StatusType } from "@/config/categories";
-import { getStatusColors } from "@/components/table-utils/get-status-color";
 
 const orderStatus = [
     { id: 1, label: 'Order Placed', value: OrderStatus.PLACED },
@@ -16,7 +14,6 @@ const orderStatus = [
     { id: 3, label: 'Order Shipped', value: OrderStatus.SHIPPED },
     { id: 4, label: 'Order Delivered', value: OrderStatus.DELIVERED },
 ];
-
 
 function WidgetCard({
     title,
@@ -53,10 +50,9 @@ interface Props {
     isOpen: boolean
     onClose: () => void
     selectedOrder?: SellerOrderType
-    isStatus?: boolean
 }
 
-export default function OrderViewModal({ isOpen, onClose, selectedOrder, isStatus = true }: Props) {
+export default function OrderViewModal({ isOpen, onClose, selectedOrder }: Props) {
 
     // Get order products based on type
     const getOrderProducts = () => {
@@ -69,23 +65,18 @@ export default function OrderViewModal({ isOpen, onClose, selectedOrder, isStatu
             price: item.price,
             mrp: parseInt(item.product?.mrp || '0'),
             quantity: item.qty,
-            finaPrice: item.price
+            finaPrice: item.price * item.qty
         })) || [];
     };
 
     const orderProducts = getOrderProducts();
 
     const subtotal = orderProducts.reduce(
-        (acc, product) => acc + (product.mrp * product.quantity),
+        (acc, product) => acc + (product.finaPrice),
         0
     );
 
-    const actualTotal = orderProducts.reduce(
-        (acc, product) => acc + (product.price * product.quantity),
-        0
-    );
-
-    const discount = subtotal - actualTotal;
+    const discount = 0;
 
     // Get order details based on type
     const getOrderDetails = () => {
@@ -137,17 +128,6 @@ export default function OrderViewModal({ isOpen, onClose, selectedOrder, isStatu
                         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
                             Total <span className="font-bold">₹{orderDetails.total}</span>
                         </span>
-                        {!isStatus &&
-                            <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
-                                <Badge
-                                    variant="outline"
-                                    color={getStatusColors(orderDetails?.status as StatusType)}
-                                    data-color={getStatusColors(orderDetails?.status as StatusType)}
-                                >
-                                    {orderDetails?.status}
-                                </Badge>
-                            </span>
-                        }
                     </div>
                     <div className="items-start pt-10 @5xl:grid @5xl:grid-cols-12 @5xl:gap-7 @6xl:grid-cols-10 @7xl:gap-10">
                         <div className="space-y-7 @5xl:col-span-8 @5xl:space-y-10 @6xl:col-span-7">
@@ -198,7 +178,7 @@ export default function OrderViewModal({ isOpen, onClose, selectedOrder, isStatu
                             </div>
                         </div>
                         <div className="space-y-7 pt-8 @container @5xl:col-span-4 @5xl:space-y-10 @5xl:pt-0 @6xl:col-span-3">
-                            {isStatus ? orderDetails.status !== OrderStatus.CANCELLED ?
+                            {orderDetails.status !== OrderStatus.CANCELLED ?
                                 <WidgetCard
                                     title="Order Status"
                                     childrenWrapperClass="py-5 @5xl:py-8 flex"
@@ -245,7 +225,6 @@ export default function OrderViewModal({ isOpen, onClose, selectedOrder, isStatu
                                         </div>
                                     </div>
                                 </WidgetCard>
-                                : ''
                             }
 
                             <WidgetCard

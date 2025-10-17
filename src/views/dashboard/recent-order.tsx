@@ -1,41 +1,85 @@
 'use client';
 
-import { useTanStackTable } from '@/components/table/use-TanStack-Table';
-import cn from '@/utils/class-names';
-import WidgetCard from '@/components/cards/widget-card';
 import Table from '@/components/table';
-import { OrderType } from '@/kit/models/Order';
-import { ordersListColumns } from '@/app/(dashboard)/live-orders/list/columns';
-import KitButton from '@/kit/components/KitButton/KitButton';
+import { useTanStackTable } from '@/components/table/use-TanStack-Table';
+import { exportToCSV } from '@/utils/export-to-csv';
+import { SellerOrderType } from '@/kit/models/Order';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ordersListColumns } from '@/app/(dashboard)/live-orders/list/columns';
+import WidgetCard from '@/components/cards/widget-card';
+import cn from '@/utils/class-names';
+import KitButton from '@/kit/components/KitButton/KitButton';
 
-interface RecentOrderProps {
-    OrderList: OrderType[];
-    isLoading: boolean;
-    className?: string
+declare module '@tanstack/react-table' {
+    interface TableMeta<TData extends unknown> {
+        handleDeleteRow?: (data: TData) => void;
+        handleUpdateRow?: (data: TData) => void;
+        handleView?: (data: TData) => void;
+    }
 }
 
 export default function RecentOrder({
     OrderList,
     isLoading,
     className,
-}: RecentOrderProps
-) {
+    onStatusUpdate,
+    onDelete,
+    onView,
+}: {
+    OrderList: SellerOrderType[];
+    isLoading: boolean;
+    className?: string
+    onStatusUpdate: (data: SellerOrderType) => void;
+    onDelete: (data: SellerOrderType) => void;
+    onView: (data: SellerOrderType) => void;
+}) {
+
     const router = useRouter()
 
-    const { table, setData } = useTanStackTable<OrderType>({
+    const handleView = (data: SellerOrderType) => {
+        onView(data)
+    }
+
+    const handleUpdateRow = (data: SellerOrderType) => {
+        onStatusUpdate(data)
+    };
+
+    const handleDeleteRow = (data: SellerOrderType) => {
+        onDelete(data)
+    };
+
+    const { table, setData } = useTanStackTable<SellerOrderType>({
         tableData: OrderList,
         columnConfig: ordersListColumns,
         options: {
-            initialState: {
-                pagination: {
-                    pageIndex: 0,
-                    pageSize: 7,
-                },
+            meta: {
+                handleDeleteRow,
+                handleUpdateRow,
+                handleView
             },
             enableColumnResizing: false,
         },
     });
+
+    const selectedData = table
+        .getSelectedRowModel()
+        .rows.map((row) => row.original);
+
+    function handleExportData() {
+        exportToCSV(
+            selectedData,
+            'ID,Name,Description,Status',
+            `category_data_${selectedData.length}`
+        );
+    }
+
+    useEffect(() => {
+        if (Array.isArray(OrderList)) {
+            setData(OrderList);
+        }
+    }, [OrderList, setData]);
+
     return (
         <WidgetCard
             title="Recent Orders"
@@ -46,7 +90,7 @@ export default function RecentOrder({
                     variant="solid"
                     color="primary"
                     className='!w-32 !h-[36px]'
-                    onClick={() => router.push('/orders')}
+                    onClick={() => router.push('/live-orders')}
                 >
                     Show more
                 </KitButton>

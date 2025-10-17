@@ -10,8 +10,8 @@ import { PiFunnel, PiMagnifyingGlassBold, PiTrashDuotone } from 'react-icons/pi'
 import { Button, Flex, Input, SelectOption } from 'rizzui';
 import { filterParamsProps } from '../page';
 import StatusField from '@/components/controlled-table/status-field';
-import { statusOptions } from '../../shared/invoice/form-utils';
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { LIVE_ORDER_STATUS_OPTIONS } from '@/config/orders';
 
 interface TableToolbarProps<T extends Record<string, any>> {
     table: ReactTableType<T>;
@@ -136,8 +136,8 @@ function FilterElements() {
                 control={control}
                 render={({ field: { onChange, value } }) => (
                     <StatusField
-                        options={statusOptions}
-                        value={statusOptions.find(opt => String(opt.value) === value) || null}
+                        options={LIVE_ORDER_STATUS_OPTIONS}
+                        value={LIVE_ORDER_STATUS_OPTIONS.find(opt => String(opt.value) === value) || null}
                         onChange={(selected: any) => {
                             onChange(selected ?? null);
                         }}

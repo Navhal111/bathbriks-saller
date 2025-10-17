@@ -10,13 +10,6 @@ import ServerPagination from '@/kit/components/Table/ServerPagination';
 import { useEffect } from 'react';
 import { BrandType } from '@/kit/models/Brand';
 
-declare module '@tanstack/react-table' {
-  interface TableMeta<TData extends unknown> {
-    handleEditRow?: (data: TData) => void;
-    handleDeleteRow?: (data: TData) => void;
-  }
-}
-
 export default function BrandTable({
   BrandList,
   isLoading,
@@ -33,8 +26,6 @@ export default function BrandTable({
   pageSize = 5,
   setPage,
   setPageSize,
-  onEdit,
-  onDelete,
 }: {
   BrandList: BrandType[];
   isLoading: boolean;
@@ -48,17 +39,7 @@ export default function BrandTable({
   setPage: (page: number) => void;
   pageSize: number;
   setPageSize: (size: number) => void;
-  onEdit: (data: BrandType) => void;
-  onDelete: (data: BrandType) => void;
 }) {
-
-  const handleEditRow = (data: BrandType) => {
-    onEdit(data)
-  }
-
-  const handleDeleteRow = (data: BrandType) => {
-    onDelete(data)
-  }
 
   const { table, setData } = useTanStackTable<BrandType>({
     tableData: BrandList,
@@ -69,10 +50,6 @@ export default function BrandTable({
           pageIndex: 0,
           pageSize: pageSize,
         },
-      },
-      meta: {
-        handleDeleteRow,
-        handleEditRow,
       },
       enableColumnResizing: false,
     },
