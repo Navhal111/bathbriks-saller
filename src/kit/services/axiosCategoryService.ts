@@ -9,6 +9,8 @@ import authConfig from "@/config/auth";
 import storage from "@/kit/services/storage";
 import type { ApiResponseError } from "@/kit/models/CustomError";
 
+import type { Company } from "@/kit/models/Company";
+
 export type SortType = "asc" | "desc" | undefined | null;
 export type Params = Record<
     string,
@@ -27,6 +29,10 @@ let refreshSubscribers: Array<(token: string) => void> = [];
 axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const accessToken = storage.getItem(authConfig.storageTokenKeyName);
+        const userId = storage.getItem(authConfig.storageUserIDName);
+        const companyDetail = storage.getItem(
+            authConfig.storageCompanyDetailName
+        ) as Partial<Company>;
 
         if (accessToken) {
             config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -34,6 +40,12 @@ axiosInstance.interceptors.request.use(
             config.headers["Access-Control-Allow-Origin"] = `*`;
             config.headers["Access-Control-Allow-Headers"] =
                 `Content-Type, Authorization`;
+
+            // Add x-seller-id header if userId is available
+            if (userId) {
+                config.headers["x-seller-id"] = userId;
+            }
+
             config.params = {
                 ...config.params,
             };
@@ -77,11 +89,18 @@ axiosInstance.interceptors.response.use(
                 // Queue the failed request until the token is refreshed
                 return new Promise((resolve) => {
                     addRefreshSubscriber((token: string) => {
+                        const userId = storage.getItem(authConfig.storageUserIDName);
                         originalRequest.headers.Authorization = `Bearer ${token}`;
                         originalRequest.headers["Content-Type"] = `application/json`;
                         originalRequest.headers["Access-Control-Allow-Origin"] = `*`;
                         originalRequest.headers["Access-Control-Allow-Headers"] =
                             `Content-Type, Authorization`;
+
+                        // Add x-seller-id header if userId is available
+                        if (userId) {
+                            originalRequest.headers["x-seller-id"] = userId;
+                        }
+
                         resolve(axiosInstance(originalRequest));
                     });
                 });
@@ -107,7 +126,13 @@ axiosInstance.interceptors.response.use(
                     isRefreshing = false;
 
                     // Retry the original request with the new token
+                    const userId = storage.getItem(authConfig.storageUserIDName);
                     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+                    // Add x-seller-id header if userId is available
+                    if (userId) {
+                        originalRequest.headers["x-seller-id"] = userId;
+                    }
 
                     return axiosInstance(originalRequest);
                 } else {

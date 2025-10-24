@@ -6,7 +6,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import cn from '@/utils/class-names';
 import FormNav, { formParts } from '@/app/(dashboard)/shared/product/create-edit/form-nav';
 import ProductSummary from '@/app/(dashboard)/shared/product/create-edit/product-summary';
-import { customFields, locationShipping, PriceingType, productQuantity, productVariants } from '@/app/(dashboard)/shared/product/create-edit/form-utils';
+import { customFields, dimensionFields, locationShipping, PriceingType, productQuantity } from '@/app/(dashboard)/shared/product/create-edit/form-utils';
 import ProductMedia from '@/app/(dashboard)/shared/product/create-edit/product-media';
 import PricingInventory from '@/app/(dashboard)/shared/product/create-edit/pricing-inventory';
 import ProductIdentifiers from '@/app/(dashboard)/shared/product/create-edit/product-identifiers';
@@ -20,11 +20,11 @@ import { LAYOUT_OPTIONS } from '@/config/enums';
 import { useGetAllCategoryList } from '@/kit/hooks/data/category';
 import { CustomErrorType } from '@/kit/models/CustomError';
 import { useCreateProduct, useUpdateMedia, useUpdateProduct } from '@/kit/hooks/data/product';
-import { CreateProductType, ProductCustomField, ProductLocationShipping, ProductQuantity, ProductVariant } from '@/kit/models/Product';
+import { CreateProductType, DimensionField, GetProductDetailsType, ProductCustomField, ProductLocationShipping, ProductQuantity } from '@/kit/models/Product';
 import { useAuth } from '@/kit/hooks/useAuth';
 import { useGetAllBrandList } from '@/kit/hooks/data/brand';
 import { useGetAllSubCategoryList } from '@/kit/hooks/data/subCategory';
-import { useGetAllDimensionsList } from '@/kit/hooks/data/dimensions';
+import { useCreateLinkProduct, useGetAllDimensionsList } from '@/kit/hooks/data/dimensions';
 import KitShow from '@/kit/components/KitShow/KitShow';
 import KitLoader from '@/kit/components/KitLoader/KitLoader';
 import { useRouter } from 'next/navigation';
@@ -52,7 +52,7 @@ const MAP_STEP_TO_COMPONENT = {
 
 interface IndexProps {
   className?: string;
-  productDetails?: CreateProductType;
+  productDetails?: GetProductDetailsType;
   productLoading?: boolean
 }
 
@@ -84,6 +84,7 @@ interface FormData {
   shippingPrice?: number;
   locationBasedShipping?: boolean;
   locationShipping?: ProductLocationShipping[];
+  dimensions?: DimensionField[];
   minDeliveryTime?: string
   maxDeliveryTime?: string
   pageTitle?: string;
@@ -94,14 +95,10 @@ interface FormData {
   dateFieldName?: string;
   availableDate?: string;
   endDate?: string;
-  productVariants?: ProductVariant[];
   tags?: string[];
   is_fragile?: boolean
   user_id?: number
   seller_id?: number
-  isVariant?: boolean
-  group_name?: string
-  product_group_id?: number
 }
 
 // type FormData = InferType<typeof productFormSchema>;
@@ -151,72 +148,59 @@ const productFormSchema = yup.object({
   mrp: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
     .typeError(messages.retailPriceIsRequired)
-    .required(messages.retailPriceIsRequired)
-    .min(1, messages.retailPriceIsRequired),
-
-  b2bSalePrice: yup.number()
-    .transform((value, originalValue) => originalValue === '' ? undefined : value)
-    .typeError(messages.costPriceIsRequired)
-    .when('priceingType', {
-      is: PriceingType.SALEBASEPRICEING,
-      then: schema => schema
-        .required(messages.costPriceIsRequired)
-        .min(1, messages.costPriceIsRequired)
-        .test(
-          'b2bSalePrice-less-than-mrp',
-          'B2B Sale Price must be less than mrp',
-          function (b2bSalePrice) {
-            const { mrp } = this.parent;
-            return typeof mrp === 'number' && typeof b2bSalePrice === 'number'
-              ? b2bSalePrice < mrp
-              : true;
-          }
-        ),
-      otherwise: schema => schema.notRequired()
-    }),
-
-  b2cSalePrice: yup.number()
-    .transform((value, originalValue) => originalValue === '' ? undefined : value)
-    .typeError(messages.retailPriceIsRequired)
     .when('priceingType', {
       is: PriceingType.SALEBASEPRICEING,
       then: schema => schema
         .required(messages.retailPriceIsRequired)
-        .min(1, messages.retailPriceIsRequired)
+        .min(1, messages.retailPriceIsRequired),
+      otherwise: schema => schema.notRequired()
+    }),
+
+  b2bSalePrice: yup.number()
+    .transform((value, originalValue) => originalValue === '' ? undefined : value)
+    .typeError(messages.costPriceIsRequired)
+    .required(messages.costPriceIsRequired)
+    .min(1, messages.costPriceIsRequired),
+
+  b2cSalePrice: yup.number()
+    .transform((value, originalValue) => originalValue === '' ? undefined : value)
+    .typeError(messages.retailPriceIsRequired)
+    .required(messages.retailPriceIsRequired)
+    .min(1, messages.retailPriceIsRequired),
+
+
+  quantity: yup.number()
+    .transform((value, originalValue) => originalValue === '' ? undefined : value)
+    .typeError(messages.currentStockIsRequired)
+    .when('priceingType', {
+      is: PriceingType.SALEBASEPRICEING,
+      then: schema => schema
+        .required(messages.currentStockIsRequired)
+        .min(1, messages.currentStockIsRequired),
+      otherwise: schema => schema.notRequired()
+    }),
+
+  lowStock: yup
+    .number()
+    .transform((value, originalValue) => originalValue === '' ? undefined : value)
+    .typeError(messages.lowStockIsRequired)
+    .when('priceingType', {
+      is: PriceingType.SALEBASEPRICEING,
+      then: schema => schema
+        .required(messages.lowStockIsRequired)
+        .min(1, messages.lowStockIsRequired)
         .test(
-          'b2cSalePrice-less-than-mrp',
-          'B2C Sale Price must be less than mrp',
-          function (b2cSalePrice) {
-            const { mrp } = this.parent;
-            return typeof mrp === 'number' && typeof b2cSalePrice === 'number'
-              ? b2cSalePrice < mrp
+          'lowStock-not-greater',
+          'Low stock cannot be greater than quantity',
+          function (lowStock) {
+            const { quantity } = this.parent;
+            return typeof lowStock === 'number' && typeof quantity === 'number'
+              ? lowStock <= quantity
               : true;
           }
         ),
       otherwise: schema => schema.notRequired()
     }),
-
-  quantity: yup.number()
-    .transform((value, originalValue) => originalValue === '' ? undefined : value)
-    .typeError(messages.currentStockIsRequired)
-    .required(messages.currentStockIsRequired)
-    .min(1, messages.currentStockIsRequired),
-  lowStock: yup
-    .number()
-    .transform((value, originalValue) => originalValue === '' ? undefined : value)
-    .typeError(messages.lowStockIsRequired)
-    .required(messages.lowStockIsRequired)
-    .min(1, messages.lowStockIsRequired)
-    .test(
-      'lowStock-not-greater',
-      'Low stock cannot be greater than quantity',
-      function (lowStock) {
-        const { quantity } = this.parent;
-        return typeof lowStock === 'number' && typeof quantity === 'number'
-          ? lowStock <= quantity
-          : true;
-      }
-    ),
 
   minOrder: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
@@ -268,6 +252,12 @@ const productFormSchema = yup.object({
     }),
 
   locationBasedShipping: yup.boolean().optional(),
+  dimensions: yup.array(
+    yup.object({
+      dimension_id: yup.string().nullable(),
+      value: yup.string().nullable(),
+    })
+  ).nullable(),
   locationShipping: yup.array().when('locationBasedShipping', {
     is: true,
     then: (schema) =>
@@ -307,49 +297,6 @@ const productFormSchema = yup.object({
   availableDate: yup.string().optional(),
   endDate: yup.string().optional(),
 
-  productVariants: yup.array(
-    yup.object({
-      dimension: yup.string().nullable(),
-      dimension_id: yup.mixed().nullable(),
-      value: yup.string().nullable(),
-      product_group_name: yup.string().nullable(),
-    })
-  ).nullable()
-    .test('unique-dimensions', 'Each dimension can only be selected once', function (variants) {
-      if (!variants || !Array.isArray(variants)) return true;
-
-      const dimensionIds = variants
-        .map(variant => variant?.dimension_id)
-        .filter(id => id && id !== '');
-
-      const uniqueDimensionIds = new Set(dimensionIds);
-
-      if (dimensionIds.length !== uniqueDimensionIds.size) {
-        // Find duplicate dimension
-        const duplicates = dimensionIds.filter((id, index) =>
-          id && dimensionIds.indexOf(id) !== index
-        );
-
-        if (duplicates.length > 0) {
-          // Create error for each duplicate
-          variants.forEach((variant, index) => {
-            if (variant?.dimension_id && duplicates.includes(variant.dimension_id)) {
-              return this.createError({
-                path: `productVariants[${index}].dimension_id`,
-                message: 'This dimension is already selected. Please choose a different one.'
-              });
-            }
-          });
-        }
-        return false;
-      }
-
-      return true;
-    }),
-
-  isVariant: yup.boolean().optional(),
-  group_name: yup.string().optional(),
-  product_group_id: yup.number().optional(),
   tags: yup.array(yup.string()).optional(),
   is_fragile: yup.boolean().optional(),
   user_id: yup.number().optional(),
@@ -363,7 +310,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
 
   const initialproductUrl = productDetails?.productUrl ?? []
   const [files, setFiles] = useState<any[]>(initialproductUrl);
-  console.log("filessdasd", files)
+  const [linkedProductMap, setLinkedProductMap] = useState<Record<number, string>>({});
 
   const { CategoryList, isCategoryListLoading } = useGetAllCategoryList({ page: 1, size: 10000 });
   const { SubCategoryList, isSubCategoryListLoading } = useGetAllSubCategoryList({ page: 1, size: 10000 });
@@ -372,13 +319,14 @@ export default function CreateEditProduct({ className, productDetails, productLo
   const { createProduct: onCreateProduct, isCreatingProduct } = useCreateProduct()
   const { update: onUpdateProduct, isUpdatingProduct } = useUpdateProduct()
   const { update: onUpdateMedia, isUpdatingMedia } = useUpdateMedia(String(productDetails?.id))
+  const { createLinkProduct: onCreateLinkProduct, isCreatingLinkProduct } = useCreateLinkProduct()
 
   const defaultValues: FormData = {
     name: productDetails?.name || '',
     sku: productDetails?.sku || '',
-    category_id: String(productDetails?.category_id || ''),
-    subcategory_id: String(productDetails?.subcategory_id || ''),
-    brand_id: String(productDetails?.brand_id || ''),
+    category_id: String(productDetails?.category?.id || ''),
+    subcategory_id: String(productDetails?.subcategory?.id || ''),
+    brand_id: String(productDetails?.brand?.id || ''),
     description: productDetails?.description || '',
     productUrl: productDetails?.productUrl || [],
     priceingType: productDetails?.isQuantityPrice ? PriceingType.PRODUCTBASEPRICING : PriceingType.SALEBASEPRICEING,
@@ -393,14 +341,18 @@ export default function CreateEditProduct({ className, productDetails, productLo
     minOrder: productDetails?.minOrder || '',
     maxOrder: productDetails?.maxOrder || '',
     productAvailability: productDetails?.productAvailability || '',
-    tradeNumber: productDetails?.tradeNumber || '',
+    tradeNumber: productDetails?.tradeNumber ? String(productDetails.tradeNumber) : '',
     manufacturerNumber: productDetails?.manufacturerNumber || '',
     upcEan: productDetails?.upcEan || '',
     customFields: productDetails?.customFields ? productDetails?.customFields : customFields,
     freeShipping: productDetails?.freeShipping || false,
+    costPrice: productDetails?.b2cSalePrice || '',
+    inventoryTracking: true,
+    type: 'apparel',
     shippingPrice: productDetails?.shippingPrice ?? undefined,
     locationBasedShipping: productDetails?.locationBasedShipping || false,
     locationShipping: productDetails?.locationShipping ? productDetails?.locationShipping : locationShipping,
+    dimensions: productDetails?.dimensions ? productDetails?.dimensions : dimensionFields,
     minDeliveryTime: productDetails?.minDeliveryTime ? productDetails.minDeliveryTime : "",
     maxDeliveryTime: productDetails?.maxDeliveryTime ? productDetails.maxDeliveryTime : "",
     pageTitle: productDetails?.pageTitle || '',
@@ -411,18 +363,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
     dateFieldName: productDetails?.dateFieldName || '',
     availableDate: productDetails?.availableDate ? productDetails.availableDate : '',
     endDate: productDetails?.endDate ? productDetails.endDate : '',
-    productVariants: Array.isArray(productDetails?.productVariants)
-      ? productDetails.productVariants.map(item => ({
-        dimension: item.dimension || '',
-        dimension_id: item.dimension_id || '',
-        value: item.value || '',
-        product_group_name: item.product_group_name || '',
-      }))
-      : productVariants,
     tags: productDetails?.tags || [],
-    isVariant: productDetails?.isVariant || false,
-    group_name: productDetails?.group_name || productDetails?.productVariantsGroup?.product_group_name || '',
-    product_group_id: productDetails?.productVariantsGroup?.product_group_id,
   } as unknown as FormData;;
 
   const methods = useForm({
@@ -434,64 +375,66 @@ export default function CreateEditProduct({ className, productDetails, productLo
     }
   });
 
-  const isBtnLoading = isCreatingProduct || isUpdatingProduct
+  const isBtnLoading = isCreatingProduct || isCreatingLinkProduct || isUpdatingProduct
+
+  const linked_product_ids = Object.values(linkedProductMap).filter(Boolean).map(id => Number(id));
 
   const handleSubmitWithMedia = async () => {
-    // Filter out only new files (File objects) that need to be processed
-    const newFiles = files.filter(file => file instanceof File);
+    if (!productDetails) {
+      // Filter out only new files (File objects) that need to be processed
+      const newFiles = files.filter(file => file instanceof File);
 
-    // If there are new files to upload, process them
-    if (newFiles.length > 0) {
-      const filePayloads = await Promise.all(
-        newFiles.map((file: File, index: number) => {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
+      // If there are new files to upload, process them
+      if (newFiles.length > 0) {
+        const filePayloads = await Promise.all(
+          newFiles.map((file: File, index: number) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
 
-            reader.onload = () => {
-              const base64 = (reader.result as string).split(',')[1];
+              reader.onload = () => {
+                const base64 = (reader.result as string).split(',')[1];
 
-              const mediaCategory = file.type.startsWith('image/')
-                ? 'image'
-                : file.type.startsWith('video/')
-                  ? 'video'
-                  : 'other';
+                const mediaCategory = file.type.startsWith('image/')
+                  ? 'image'
+                  : file.type.startsWith('video/')
+                    ? 'video'
+                    : 'other';
 
-              resolve({
-                order: index + 1,
-                type: mediaCategory,
-                base64,
-                filename: file.name,
-              });
+                resolve({
+                  order: index + 1,
+                  type: mediaCategory,
+                  base64,
+                  filename: file.name,
+                });
+              };
+
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          })
+        );
+
+        if (productDetails) {
+          try {
+            // Wrap filePayloads in productUrl key for the API
+            const mediaPayload = {
+              productUrl: filePayloads
             };
-
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-        })
-      );
-      console.log("filePayloads", filePayloads)
-
-      if (productDetails) {
-        try {
-          // Wrap filePayloads in productUrl key for the API
-          const mediaPayload = {
-            productUrl: filePayloads
-          };
-          console.log("Media payload being sent:", mediaPayload);
-          await onUpdateMedia(mediaPayload as Partial<MediaType>);
-        } catch (error) {
-          toast.error((error as CustomErrorType)?.message);
-          throw error;
+            await onUpdateMedia(mediaPayload as Partial<MediaType>);
+          } catch (error) {
+            toast.error((error as CustomErrorType)?.message);
+            throw error;
+          }
+        } else {
+          methods.setValue('productUrl', filePayloads);
         }
+      } else if (productDetails) {
+        // In edit mode with no new files, keep existing URLs
+        console.log("No new files to upload, keeping existing media");
       } else {
-        methods.setValue('productUrl', filePayloads);
+        // In create mode, ensure we have productUrl set
+        methods.setValue('productUrl', []);
       }
-    } else if (productDetails) {
-      // In edit mode with no new files, keep existing URLs
-      console.log("No new files to upload, keeping existing media");
-    } else {
-      // In create mode, ensure we have productUrl set
-      methods.setValue('productUrl', []);
     }
 
     methods.handleSubmit(handleValidSubmit)();
@@ -525,19 +468,6 @@ export default function CreateEditProduct({ className, productDetails, productLo
       mrp: data.mrp,
       quantity: data.quantity,
       lowStock: data.lowStock,
-      productVariants:
-        Array.isArray(data.productVariants) &&
-          data.productVariants.some((v: any) => v.dimension && v.value)
-          ? data.productVariants.filter((v: any) => v.dimension && v.value).map((v: any) => ({
-            dimension: v.dimension,
-            dimension_id: v.dimension_id,
-            value: v.value,
-            product_group_name: data.group_name || v.product_group_name,
-          }))
-          : [],
-      isVariant: data?.isVariant || false,
-      group_name: data?.group_name || '',
-      product_group_id: data?.product_group_id,
       productAvailability: data.productAvailability,
       minOrder: data.minOrder,
       maxOrder: data.maxOrder,
@@ -552,6 +482,13 @@ export default function CreateEditProduct({ className, productDetails, productLo
       freeShipping: data?.freeShipping || false,
       shippingPrice: data?.shippingPrice ?? undefined,
       locationBasedShipping: data?.locationBasedShipping || false,
+      dimensions:
+        Array.isArray(data.dimensions) &&
+          data.dimensions.some((f: DimensionField) => f.dimension_id && f.value)
+          ? data.dimensions
+            .filter((f: DimensionField) => f.dimension_id && f.value)
+            .map(({ dimension_name, linked_product_id, ...rest }: DimensionField) => rest)
+          : [],
       locationShipping:
         Array.isArray(data.locationShipping) &&
           data.locationShipping.some((loc: any) => loc.name && loc.shippingCharge)
@@ -569,15 +506,21 @@ export default function CreateEditProduct({ className, productDetails, productLo
       endDate: data?.endDate ? data.endDate : '',
       tags: data?.tags || [],
     };
-    console.log("payload", payload)
 
     try {
       if (productDetails) {
         await onUpdateProduct(payload);
         toast.success('Product updated successfully.');
       } else {
-        await onCreateProduct(payload);
+        const response = await onCreateProduct(payload);
         toast.success('Product created successfully.');
+
+        const linkProductPayload = {
+          product_id: Number(response?.data?.id),
+          linked_product_ids: linked_product_ids,
+          replace: false
+        };
+        await onCreateLinkProduct(linkProductPayload);
       }
       router.push('/products');
     } catch (error) {
@@ -632,6 +575,7 @@ export default function CreateEditProduct({ className, productDetails, productLo
                     isSubCategoryListLoading={isSubCategoryListLoading}
                     isDimensionsListLoading={isDimensionsListLoading}
                     productDetails={productDetails}
+                    setLinkedProductMap={setLinkedProductMap}
                   />}
                 </Element>
               ))}

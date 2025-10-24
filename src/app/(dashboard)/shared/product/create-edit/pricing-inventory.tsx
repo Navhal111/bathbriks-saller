@@ -3,7 +3,7 @@ import cn from '@/utils/class-names';
 import ProductAvailability from '@/app/(dashboard)/shared/product/create-edit/product-availability';
 import InventoryTracing from '@/app/(dashboard)/shared/product/create-edit/inventory-tracking';
 import ProductPricing from '@/app/(dashboard)/shared/product/create-edit/product-pricing';
-import { PriceingType, PriceingTypeOption, productQuantity, productVariants, UOMOption } from './form-utils';
+import { PriceingType, PriceingTypeOption, productQuantity, UOMOption } from './form-utils';
 import { Select, SelectOption } from 'rizzui/select';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Flex } from 'rizzui/flex';
@@ -11,20 +11,23 @@ import KitShow from '@/kit/components/KitShow/KitShow';
 import { useEffect } from 'react';
 import ProductQuantity from './product-quantity';
 import { DimensionType } from '@/kit/hooks/data/dimensions';
+import { Input } from 'rizzui';
 
 interface PricingInventoryProps {
   className?: string;
   DimensionsList?: DimensionType[];
   isDimensionsListLoading?: boolean;
   productDetails?: any;
+  setLinkedProductMap?: any
 }
 
-export default function PricingInventory({ className, DimensionsList, isDimensionsListLoading, productDetails }: PricingInventoryProps) {
+export default function PricingInventory({ className, DimensionsList, isDimensionsListLoading, productDetails, setLinkedProductMap }: PricingInventoryProps) {
 
   const {
     control,
     watch,
     setValue,
+    register,
     formState: { errors },
   } = useFormContext();
 
@@ -34,7 +37,6 @@ export default function PricingInventory({ className, DimensionsList, isDimensio
     if (isPriceingType === PriceingType.SALEBASEPRICEING) {
       setValue('isQuantityPrice', false);
       setValue('quantityPrice', productQuantity);
-      setValue('productVariants', productVariants);
     } else if (isPriceingType === PriceingType.PRODUCTBASEPRICING) {
       setValue('isQuantityPrice', true);
       setValue('b2bSalePrice', null);
@@ -92,15 +94,32 @@ export default function PricingInventory({ className, DimensionsList, isDimensio
         />
 
       </Flex>
-      <KitShow show={isPriceingType === PriceingType.SALEBASEPRICEING}>
-        <FormGroup
-          title="Pricing"
-          description="Add your product pricing here"
-          className={cn(className)}
-        >
+
+      <FormGroup
+        title="Pricing"
+        description="Add your product pricing here"
+        className={cn(className)}
+      >
+        <Input
+          label="B2C Sale Price"
+          placeholder="15"
+          {...register('b2bSalePrice')}
+          error={errors.b2bSalePrice?.message as string}
+          prefix={'₹'}
+          type="number"
+        />
+        <Input
+          label="B2B Sale Price"
+          placeholder="10"
+          {...register('b2cSalePrice')}
+          error={errors.b2cSalePrice?.message as string}
+          prefix={'₹'}
+          type="number"
+        />
+        <KitShow show={isPriceingType === PriceingType.SALEBASEPRICEING}>
           <ProductPricing />
-        </FormGroup>
-      </KitShow>
+        </KitShow>
+      </FormGroup>
       <KitShow show={isPriceingType === PriceingType.PRODUCTBASEPRICING}>
         <FormGroup
           title="Quantity Options"
@@ -118,7 +137,7 @@ export default function PricingInventory({ className, DimensionsList, isDimensio
         <InventoryTracing
           DimensionsList={DimensionsList}
           isDimensionsListLoading={isDimensionsListLoading}
-          productDetails={productDetails}
+          setLinkedProductMap={setLinkedProductMap}
         />
       </FormGroup>
       <FormGroup

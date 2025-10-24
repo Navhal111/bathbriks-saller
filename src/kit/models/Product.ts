@@ -62,6 +62,13 @@ export interface ProductCustomField {
   value: string;
 }
 
+export interface DimensionField {
+  dimension_id: string;
+  value: string;
+  dimension_name?: string;
+  linked_product_id?: string
+}
+
 export interface ProductLocationShipping {
   name: string;
   shippingCharge: number;
@@ -116,6 +123,7 @@ export interface CreateProductType extends BaseModel {
   manufacturerNumber: string
   upcEan: string
   customFields: ProductCustomField[];
+  dimensions: DimensionField[];
   freeShipping: boolean;
   shippingPrice?: number | undefined;
   locationBasedShipping: boolean;
@@ -130,16 +138,71 @@ export interface CreateProductType extends BaseModel {
   dateFieldName: string;
   availableDate: string;
   endDate: string;
-  productVariants: ProductVariant[];
   tags: string[];
   is_fragile?: boolean
   user_id?: number
   seller_id?: number
-  isVariant?: boolean
-  group_name?: string
-  product_group_id?: number
-  productVariantsGroup?: {
-    product_group_id: number;
-    product_group_name: string;
-  }
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface SubCategory {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface GetProductDetailsType extends BaseModel {
+  name: string;
+  sku: string;
+  category: Category;
+  subcategory: SubCategory;
+  brand: Brand;
+  description: string;
+  productUrl: MediaPayload[]
+  priceingType: string
+  uom: string
+  mrp: number | undefined;
+  b2bSalePrice: number | undefined;
+  b2cSalePrice: number | undefined;
+  isQuantityPrice: boolean
+  quantityPrice: ProductQuantity[];
+  quantity: number | undefined;
+  lowStock: number | undefined
+  minOrder: number | undefined
+  maxOrder: number | undefined
+  productAvailability: string;
+  tradeNumber: string
+  manufacturerNumber: string
+  upcEan: string
+  customFields: ProductCustomField[];
+  dimensions: DimensionField[];
+  freeShipping: boolean;
+  shippingPrice?: number | undefined;
+  locationBasedShipping: boolean;
+  locationShipping: ProductLocationShipping[];
+  minDeliveryTime?: string
+  maxDeliveryTime?: string
+  pageTitle: string;
+  metaDescription: string;
+  metaKeywords: string;
+  isPurchaseSpecifyDate: boolean;
+  isLimitDate: boolean;
+  dateFieldName: string;
+  availableDate: string;
+  endDate: string;
+  tags: string[];
+  is_fragile?: boolean
+  user_id?: number
+  seller_id?: number
 }

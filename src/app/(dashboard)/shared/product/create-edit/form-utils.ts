@@ -7,6 +7,13 @@ export const customFields = [
     value: '',
   },
 ];
+export const dimensionFields = [
+  {
+    dimension_id: '',
+    value: '',
+    linked_product_id: [],
+  },
+];
 export const locationShipping = [
   {
     name: '',

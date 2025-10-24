@@ -6,7 +6,7 @@ import { GetAllObjectResponse, GetOneResponse } from '@/kit/models/_generic';
 import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
 import { API_VERSION, customRequest, fetchAll, fetchOne } from './fetchers';
-import { CreateProductType, ProductType } from '@/kit/models/Product';
+import { GetProductDetailsType, ProductType } from '@/kit/models/Product';
 import authConfig from '@/config/auth'
 import storage from '@/kit/services/storage'
 import useSWRMutation from 'swr/mutation';
@@ -43,9 +43,9 @@ const useGetAllProductList = (params?: Params, shouldFetch = true) => {
 }
 
 const useGetOneProduct = (id = '', params?: Params) => {
-    const { data, error, isLoading, isValidating, mutate } = useSWR<GetOneResponse<CreateProductType>, CustomError[]>(
+    const { data, error, isLoading, isValidating, mutate } = useSWR<GetOneResponse<GetProductDetailsType>, CustomError[]>(
         id ? [`${PRODUCT_PATH}/${id}`, params] : null,
-        (): Promise<GetOneResponse<CreateProductType>> => fetchOne(PRODUCT_PATH, id, params, undefined, undefined, true),
+        (): Promise<GetOneResponse<GetProductDetailsType>> => fetchOne(PRODUCT_PATH, id, params, undefined, undefined, true),
         {
             revalidateOnMount: true,
             revalidateIfStale: true,
@@ -93,18 +93,33 @@ const useCreateProduct = (shouldFetch = true, params?: Params) => {
     }
 }
 
-const useUpdateProduct = () => {
-    const { data, error, isMutating, reset, update } = useSWRUpdateOne<CreateProductType>({
-        path: EDIT_PRODUCT_PATH,
-        isCategoryAPI: true,
-    })
+const useUpdateProduct = (shouldFetch = true, params?: Params) => {
+    const sellerId = storage.getItem(authConfig.storageUserIDName)
+
+    const { data, error, isMutating, reset, trigger } = useSWRMutation(
+        shouldFetch ? [`${EDIT_PRODUCT_PATH}`] : null,
+        ([name]: string[], { arg }: { arg: FetcherCreate<any> }) =>
+            customRequest<any, any>({
+                name: name,
+                method: 'POST',
+                payload: arg.body,
+                isCategoryAPI: true,
+                headers: {
+                    'x-seller-id': sellerId,
+                },
+            })
+    )
 
     return {
         data,
         error,
         isUpdatingProduct: isMutating,
         reset,
-        update
+        update: (record: Partial<any>) => {
+            return trigger({
+                body: record
+            })
+        }
     }
 }
 

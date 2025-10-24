@@ -52,7 +52,7 @@ export default function SignInForm() {
       toast.success(loginDetail?.message ?? 'Login Successfully!')
       router.replace('/dashboard')
     } catch (error) {
-      toast.error((error as CustomErrorType)?.message)
+      toast.error((error as CustomErrorType)?.message ?? 'Something went wrong, please try again.');
     }
   };
 
