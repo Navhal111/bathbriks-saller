@@ -29,7 +29,7 @@ const pageHeader = {
     ],
 };
 
-export const filterParams: filterParamsProps = {
+const filterParams: filterParamsProps = {
     minAmount: '',
     maxAmount: '',
     startDate: '',

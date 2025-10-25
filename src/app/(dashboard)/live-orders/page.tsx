@@ -35,7 +35,7 @@ export interface filterParamsProps {
     status: string,
 }
 
-export const filterParams: filterParamsProps = {
+const filterParams: filterParamsProps = {
     minAmount: '',
     maxAmount: '',
     startDate: '',

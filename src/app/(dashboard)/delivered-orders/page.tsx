@@ -32,7 +32,7 @@ export interface filterParamsProps {
     endDate: string,
 }
 
-export const filterParams: filterParamsProps = {
+const filterParams: filterParamsProps = {
     minAmount: '',
     maxAmount: '',
     startDate: '',

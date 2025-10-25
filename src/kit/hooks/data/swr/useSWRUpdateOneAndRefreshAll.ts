@@ -36,7 +36,7 @@ const useSWRUpdateOneAndRefreshAll = <T extends BaseModel>({
   const { data, error, trigger, reset, isMutating } = useSWRMutation(
     key ? [path, key] : [path],
     ([name]: string[], { arg }: { arg: FetcherUpdate<T> }) =>
-      updateOne<T>(name, id, arg.body, arg.params, arg.headers, '')
+      updateOne<T>(name, arg.body, id, arg.params, arg.headers)
   )
 
   const defaultOptimisticData = (currentRecords: GetAllResponse<T>, updatedRecord: Partial<T>): GetAllResponse<T> => {

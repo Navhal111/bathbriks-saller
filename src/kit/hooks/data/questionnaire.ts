@@ -35,26 +35,26 @@ const useGetAllQuestionnaire = (params?: Params) => {
   }
 }
 
-const useGetOneQuestionnaire = (id = '', params?: Params) => {
-  const { mutate, data, error, isLoading, isValidating } = useSWRImmutable<OneQuestionnaireResponse, CustomError[]>(
-    id ? [`${QUESTIONAIRE_PATH}/${id}`, params] : null,
-    (): Promise<OneQuestionnaireResponse> => fetchOne(QUESTIONAIRE_PATH, id, params),
-    {
-      revalidateOnMount: true,
-      revalidateIfStale: true,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  )
+// const useGetOneQuestionnaire = (id = '', params?: Params) => {
+//   const { mutate, data, error, isLoading, isValidating } = useSWRImmutable<OneQuestionnaireResponse, CustomError[]>(
+//     id ? [`${QUESTIONAIRE_PATH}/${id}`, params] : null,
+//     (): Promise<OneQuestionnaireResponse> => fetchOne(QUESTIONAIRE_PATH, id, params),
+//     {
+//       revalidateOnMount: true,
+//       revalidateIfStale: true,
+//       revalidateOnFocus: false,
+//       revalidateOnReconnect: false
+//     }
+//   )
 
-  return {
-    data,
-    isLoading,
-    error,
-    mutate,
-    isValidating
-  }
-}
+//   return {
+//     data,
+//     isLoading,
+//     error,
+//     mutate,
+//     isValidating
+//   }
+// }
 
 const useCreateonQustionnaire = () => {
   const { data, error, isMutating, reset, create } = useSWRCreateOne<SubmitPayloadResponse>({
@@ -152,7 +152,7 @@ const useCreateAnswerOnQuestionnaire = () => {
 export {
   useGetAllQuestionnaire,
   useGetAllQuestionnaireAnswer,
-  useGetOneQuestionnaire,
+  // useGetOneQuestionnaire,
   useCreateonQustionnaire,
   useUpdateQustionnaire,
   useDeleteQuestionnaire,
