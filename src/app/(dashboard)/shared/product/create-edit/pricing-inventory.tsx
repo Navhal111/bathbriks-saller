@@ -39,8 +39,8 @@ export default function PricingInventory({ className, DimensionsList, isDimensio
       setValue('quantityPrice', productQuantity);
     } else if (isPriceingType === PriceingType.PRODUCTBASEPRICING) {
       setValue('isQuantityPrice', true);
-      setValue('b2bSalePrice', null);
-      setValue('b2cSalePrice', null);
+      // setValue('b2bSalePrice', null);
+      // setValue('b2cSalePrice', null);
     }
   }, [isPriceingType, setValue]);
 
@@ -100,25 +100,9 @@ export default function PricingInventory({ className, DimensionsList, isDimensio
         description="Add your product pricing here"
         className={cn(className)}
       >
-        <Input
-          label="B2C Sale Price"
-          placeholder="15"
-          {...register('b2bSalePrice')}
-          error={errors.b2bSalePrice?.message as string}
-          prefix={'₹'}
-          type="number"
-        />
-        <Input
-          label="B2B Sale Price"
-          placeholder="10"
-          {...register('b2cSalePrice')}
-          error={errors.b2cSalePrice?.message as string}
-          prefix={'₹'}
-          type="number"
-        />
-        <KitShow show={isPriceingType === PriceingType.SALEBASEPRICEING}>
+        {/* <KitShow show={isPriceingType === PriceingType.SALEBASEPRICEING}> */}
           <ProductPricing />
-        </KitShow>
+        {/* </KitShow> */}
       </FormGroup>
       <KitShow show={isPriceingType === PriceingType.PRODUCTBASEPRICING}>
         <FormGroup

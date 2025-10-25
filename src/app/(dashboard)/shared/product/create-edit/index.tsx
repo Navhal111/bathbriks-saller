@@ -148,13 +148,8 @@ const productFormSchema = yup.object({
   mrp: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
     .typeError(messages.retailPriceIsRequired)
-    .when('priceingType', {
-      is: PriceingType.SALEBASEPRICEING,
-      then: schema => schema
-        .required(messages.retailPriceIsRequired)
-        .min(1, messages.retailPriceIsRequired),
-      otherwise: schema => schema.notRequired()
-    }),
+    .required(messages.retailPriceIsRequired)
+    .min(1, messages.retailPriceIsRequired),
 
   b2bSalePrice: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
@@ -168,39 +163,28 @@ const productFormSchema = yup.object({
     .required(messages.retailPriceIsRequired)
     .min(1, messages.retailPriceIsRequired),
 
-
   quantity: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
     .typeError(messages.currentStockIsRequired)
-    .when('priceingType', {
-      is: PriceingType.SALEBASEPRICEING,
-      then: schema => schema
-        .required(messages.currentStockIsRequired)
-        .min(1, messages.currentStockIsRequired),
-      otherwise: schema => schema.notRequired()
-    }),
+    .required(messages.currentStockIsRequired)
+    .min(1, messages.currentStockIsRequired),
 
   lowStock: yup
     .number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
     .typeError(messages.lowStockIsRequired)
-    .when('priceingType', {
-      is: PriceingType.SALEBASEPRICEING,
-      then: schema => schema
-        .required(messages.lowStockIsRequired)
-        .min(1, messages.lowStockIsRequired)
-        .test(
-          'lowStock-not-greater',
-          'Low stock cannot be greater than quantity',
-          function (lowStock) {
-            const { quantity } = this.parent;
-            return typeof lowStock === 'number' && typeof quantity === 'number'
-              ? lowStock <= quantity
-              : true;
-          }
-        ),
-      otherwise: schema => schema.notRequired()
-    }),
+    .required(messages.lowStockIsRequired)
+    .min(1, messages.lowStockIsRequired)
+    .test(
+      'lowStock-not-greater',
+      'Low stock cannot be greater than quantity',
+      function (lowStock) {
+        const { quantity } = this.parent;
+        return typeof lowStock === 'number' && typeof quantity === 'number'
+          ? lowStock <= quantity
+          : true;
+      }
+    ),
 
   minOrder: yup.number()
     .transform((value, originalValue) => originalValue === '' ? undefined : value)
@@ -461,10 +445,10 @@ export default function CreateEditProduct({ className, productDetails, productLo
       ...(data.priceingType === PriceingType.PRODUCTBASEPRICING && {
         quantityPrice: data.quantityPrice
       }),
-      ...(data.priceingType === PriceingType.SALEBASEPRICEING && {
+      // ...(data.priceingType === PriceingType.SALEBASEPRICEING && {
         b2bSalePrice: data.b2bSalePrice,
         b2cSalePrice: data.b2cSalePrice,
-      }),
+      // }),
       mrp: data.mrp,
       quantity: data.quantity,
       lowStock: data.lowStock,
@@ -520,7 +504,9 @@ export default function CreateEditProduct({ className, productDetails, productLo
           linked_product_ids: linked_product_ids,
           replace: false
         };
-        await onCreateLinkProduct(linkProductPayload);
+        if (linked_product_ids.length > 0) {
+          await onCreateLinkProduct(linkProductPayload);
+        }
       }
       router.push('/products');
     } catch (error) {

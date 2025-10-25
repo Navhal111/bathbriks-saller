@@ -28,7 +28,7 @@ export const messages = {
   uomIsRequired:"UOM is required",
   priceIsRequired: "Product price is required",
   costPriceIsRequired: "Cost price is required",
-  retailPriceIsRequired: "Retail price is required",
+  retailPriceIsRequired: "MRP is required",
   currentStockIsRequired: "Current stock is required",
   minOrderIsRequired: "Min order is required",
   maxOrderIsRequired: "Max order is required",
