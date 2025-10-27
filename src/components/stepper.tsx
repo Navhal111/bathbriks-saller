@@ -67,7 +67,7 @@ export default function Stepper({ steps, currentStep, className }: StepperProps)
                         {index < steps.length - 1 && (
                             <div
                                 className={cn(
-                                    'mx-4 h-0.5 w-16 transition-colors sm:w-24 md:w-32',
+                                    'mx-4 h-0.5 w-8 transition-colors sm:w-10 md:w-16',
                                     {
                                         'bg-blue': index < currentStep,
                                         'bg-gray-300': index >= currentStep,

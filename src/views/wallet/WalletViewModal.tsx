@@ -3,7 +3,6 @@
 import { Modal, Text, Title } from "rizzui";
 import cn from "@/utils/class-names";
 import { formatDate } from "@/utils/format-date";
-import { useGetAllOrderList } from "@/kit/hooks/data/order";
 import { WalletType } from "@/kit/models/Wallet";
 import { getBadge } from "@/components/table-utils/get-badge";
 
@@ -70,7 +69,7 @@ export default function WalletViewModal({ isOpen, onClose, selectedWallet }: Pro
                             {formatDate(new Date(), 'MMMM D, YYYY')} at{' '}{formatDate(new Date(), 'h:mm A')}
                         </span>
                         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
-                            Amount <span className="font-bold">$20</span>
+                            Amount <span className="font-bold">₹20</span>
                         </span>
                         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
                             {getBadge('pending')}
@@ -101,7 +100,7 @@ export default function WalletViewModal({ isOpen, onClose, selectedWallet }: Pro
                                             </div>
                                         </div>
 
-                                        <div className="w-1/3 text-end">$1575.00</div>
+                                        <div className="w-1/3 text-end">₹1575.00</div>
                                     </div>
                                 </div>
                             </div>

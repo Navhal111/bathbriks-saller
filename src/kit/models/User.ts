@@ -8,24 +8,71 @@ export interface UserResponse extends BaseModel {
   data: User;
 }
 
-export interface User extends BaseModel {
-  name: string;
-  email: string;
-  providers: string[];
-  profilePicUrl: string;
-  isPhoneNumberVerified: boolean;
-  phoneNumber: string;
-  isEmailVerified: boolean;
-  timezone: string;
-  twoFactorAuth?: {
-    isEnabled: true;
-    type: string;
-  };
-  companies: Company[] | [];
-  updatedBy: string;
-  role: Role;
-  countryCode: string;
+// Address type
+export interface SellerAddress extends BaseModel {
+  sellerId: number;
+  type: string; // e.g., "REGISTERED" | "WAREHOUSE"
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isPrimary: boolean;
 }
+
+// Contact type
+export interface SellerContact extends BaseModel {
+  sellerId: number;
+  name: string;
+  phone: string;
+  email: string;
+  designation: string;
+  isPrimary: boolean;
+}
+
+// Bank Account type
+export interface SellerBankAccount extends BaseModel {
+  sellerId: number;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  ifscCode: string;
+  accountType: string; // e.g., "SAVINGS"
+  isVerified: boolean;
+}
+
+export interface User extends BaseModel {
+  companyName: string;
+  email: string;
+  gstNumber: string;
+  panNumber: string;
+  status: string;
+  kycStatus: string;
+  addresses: SellerAddress[];
+  contacts: SellerContact[];
+  bankAccounts: SellerBankAccount[];
+  documents: any[]; 
+}
+
+// export interface User extends BaseModel {
+//   name: string;
+//   email: string;
+//   providers: string[];
+//   profilePicUrl: string;
+//   isPhoneNumberVerified: boolean;
+//   phoneNumber: string;
+//   isEmailVerified: boolean;
+//   timezone: string;
+//   twoFactorAuth?: {
+//     isEnabled: true;
+//     type: string;
+//   };
+//   companies: Company[] | [];
+//   updatedBy: string;
+//   role: Role;
+//   countryCode: string;
+// }
 
 export interface UsersListItem {
   id: number;

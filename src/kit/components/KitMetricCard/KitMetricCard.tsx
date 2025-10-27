@@ -4,7 +4,7 @@ import cn from '@/utils/class-names';
 import { Text } from 'rizzui';
 
 const metricCardClasses = {
-  base: 'border border-muted bg-gray-0 p-2 dark:bg-gray-50 lg:p-2',
+  base: 'border border-muted bg-gray-0 p-5 dark:bg-gray-50 lg:p-6',
   rounded: {
     sm: 'rounded-sm',
     DEFAULT: 'rounded-lg',
@@ -64,16 +64,13 @@ export default function KitMetricCard({
             </div>
           ) : null}
 
-          <div className={cn(icon && 'ps-3 text-center', contentClassName)}>
-            {chart ? (
-              <div className={cn('h-12 w-20', chartClassName)}>{chart}</div>
-            ) : null}
+          <div className={cn(icon && 'ps-3', contentClassName)}>
             <Text className={cn('mb-0.5 text-gray-500', titleClassName)}>
               {title}
             </Text>
             <Text
               className={cn(
-                'font-lexend text-3xl text-start font-semibold text-gray-900 2xl:xl:text-xl dark:text-gray-700',
+                'font-lexend text-lg font-semibold text-gray-900 2xl:xl:text-xl dark:text-gray-700',
                 metricClassName
               )}
             >
@@ -82,6 +79,10 @@ export default function KitMetricCard({
             {info ? info : null}
           </div>
         </div>
+
+        {chart ? (
+          <div className={cn('h-12 w-20', chartClassName)}>{chart}</div>
+        ) : null}
       </div>
 
       {children}

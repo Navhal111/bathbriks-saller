@@ -1,39 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useEffect } from "react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { Fragment } from "react";
+import { usePathname } from "next/navigation";
 import { Title, Collapse } from "rizzui";
 import Image from "next/image";
 import { cn } from "@/utils/class-names";
 import { PiCaretDownBold } from "react-icons/pi";
 import SimpleBar from "@/components/ui/simplebar";
 import { menuItems } from "@/layouts/hydrogen/menu-items";
-import { LocalStorageService, UserData } from "@/services/localStorageService";
-import { useUserDetailsRedux } from "@/store/hooks/useUserDetailsRedux";
 
 export default function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const username = searchParams.get("username");
-  // // Redux hook for user details
-  // const { userDetails, isLoading, error, fetchUserDetails, updateUser } =
-  //   useUserDetailsRedux();
-
-  useEffect(() => {
-    // Check if token exists in localStorage
-    const storedToken = LocalStorageService.getToken();
-    if (!storedToken) {
-      // No token found, redirect to login
-      // const loginUrl =
-      //   process.env.NEXT_PUBLIC_LOGIN_URL || "http://localhost:8081/";
-      // console.log("No token found, redirecting to login:", loginUrl);
-      window.location.href = "/auth/sign-in";
-      return;
-    }
-  }, [token, username]);
 
   return (
     <aside
@@ -44,7 +22,7 @@ export default function Sidebar({ className }: { className?: string }) {
     >
       <div className="sticky top-0 z-40 bg-gray-0/10 px-6 pb-5 pt-5 2xl:px-8 2xl:pt-6 dark:bg-gray-100/5">
         <Link
-          href={"/"}
+          href={"/dashboard"}
           aria-label="Site Logo"
           className="text-gray-800 hover:text-gray-900"
         >

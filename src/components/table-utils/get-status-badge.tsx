@@ -4,11 +4,18 @@ import cn from "@/utils/class-names";
 import { Badge, Flex, Text } from "rizzui";
 import { replaceUnderscoreDash } from "@/utils/replace-underscore-dash";
 
+// const statusColors = {
+//   success: ["text-green-dark", "bg-green-dark"],
+//   warning: ["text-orange-dark", "bg-orange-dark"],
+//   danger: ["text-red-dark", "bg-red-dark"],
+//   default: ["text-gray-600", "bg-gray-600"],
+// };
+
 const statusColors = {
-  success: ["text-green-dark", "bg-green-dark"],
-  warning: ["text-orange-dark", "bg-orange-dark"],
-  danger: ["text-red-dark", "bg-red-dark"],
-  default: ["text-gray-600", "bg-gray-600"],
+  success: ["text-green-dark", "bg-green-200", "border-green-dark"],
+  warning: ["text-orange-dark", "bg-orange-200", "border-orange-dark"],
+  danger: ["text-red-dark", "bg-red-200", "border-red-dark"],
+  default: ["text-gray-900", "bg-gray-200", "border-gray-900"],
 };
 
 export const allStatus = {
@@ -33,6 +40,11 @@ export const allStatus = {
   dispatched: statusColors.success,
   cancel: statusColors.danger,
   return: statusColors.warning,
+  delivered: statusColors.success,
+  // New order statuses from API
+  placed: statusColors.warning,
+  confirmed: statusColors.success,
+  shipped: statusColors.success,
 };
 
 export type StatusTypes = keyof typeof allStatus;

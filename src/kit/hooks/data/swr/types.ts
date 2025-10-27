@@ -13,16 +13,18 @@ export type SWRUpdateAndRefreshAllOptimisticDataFunction<T extends BaseModel> = 
 
 export interface UseSWRUpdateOne {
   path: string
-  id: string
+  id?: string
   apiVersion?: string
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }
 
 export interface useSWRUpdateOneAndRefresh {
   path: string
   id: string
   key?: Params
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }
 
 export interface useSWRDeleteOneAndRefresh {
@@ -30,13 +32,15 @@ export interface useSWRDeleteOneAndRefresh {
   id?: string
   key?: Params
   apiVersion?: string
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }
 
 export interface useCustomSWRDeleteOneAndRefreshAll {
   path: string
   key?: Params
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
+  isOrderAPI?: boolean
   options: {
     path: string
     payload?: object
@@ -49,5 +53,6 @@ export interface UseSWRCreateOne {
   path: string
   key?: Params
   apiVersion?: string
-  isGalleryAPI?: boolean
+  isCategoryAPI?: boolean
+  isOrderAPI?: boolean
 }

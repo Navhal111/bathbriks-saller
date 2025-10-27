@@ -18,10 +18,6 @@ export type Params = Record<
 >;
 export type Headers = Record<string, string>;
 
-console.log(
-  `Axios Service initialized with base URL: ${process.env.NEXT_PUBLIC_BASE_API}`
-);
-
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BASE_API}`,
 });
@@ -33,6 +29,7 @@ let refreshSubscribers: Array<(token: string) => void> = [];
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = storage.getItem(authConfig.storageTokenKeyName);
+    const userId = storage.getItem(authConfig.storageUserIDName);
     const companyDetail = storage.getItem(
       authConfig.storageCompanyDetailName
     ) as Partial<Company>;
@@ -43,6 +40,12 @@ axiosInstance.interceptors.request.use(
       config.headers["Access-Control-Allow-Origin"] = `*`;
       config.headers["Access-Control-Allow-Headers"] =
         `Content-Type, Authorization`;
+
+      // Add x-seller-id header if userId is available
+      if (userId) {
+        config.headers["x-seller-id"] = userId;
+      }
+
       config.params = {
         ...config.params,
       };
@@ -86,11 +89,18 @@ axiosInstance.interceptors.response.use(
         // Queue the failed request until the token is refreshed
         return new Promise((resolve) => {
           addRefreshSubscriber((token: string) => {
+            const userId = storage.getItem(authConfig.storageUserIDName);
             originalRequest.headers.Authorization = `Bearer ${token}`;
             originalRequest.headers["Content-Type"] = `application/json`;
             originalRequest.headers["Access-Control-Allow-Origin"] = `*`;
             originalRequest.headers["Access-Control-Allow-Headers"] =
               `Content-Type, Authorization`;
+
+            // Add x-seller-id header if userId is available
+            if (userId) {
+              originalRequest.headers["x-seller-id"] = userId;
+            }
+
             resolve(axiosInstance(originalRequest));
           });
         });
@@ -116,7 +126,13 @@ axiosInstance.interceptors.response.use(
           isRefreshing = false;
 
           // Retry the original request with the new token
+          const userId = storage.getItem(authConfig.storageUserIDName);
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+          // Add x-seller-id header if userId is available
+          if (userId) {
+            originalRequest.headers["x-seller-id"] = userId;
+          }
 
           return axiosInstance(originalRequest);
         } else {
@@ -266,7 +282,7 @@ function handleLogout() {
   storage.removeItem(authConfig.storageTokenKeyName);
   storage.removeItem(authConfig.storageRefreshKeyName);
 
-  window.location.href = "/login"; // Example: Redirect to login page
+  window.location.href = "/sign-in"; // Example: Redirect to login page
 }
 
 export default { get, post, patch, remove, request };

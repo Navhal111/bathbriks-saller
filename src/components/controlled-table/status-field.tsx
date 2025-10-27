@@ -10,7 +10,7 @@ export default function StatusField({
 }: SelectProps<SelectOption>) {
   return (
     <Select
-      inPortal={false}
+      // inPortal={false}
       placeholder={placeholder}
       selectClassName="h-9 min-w-[150px]"
       dropdownClassName={cn("p-1.5 !z-0", dropdownClassName)}

@@ -1,9 +1,5 @@
-import { Title } from "rizzui/typography";
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  return (
-    <>
-      <Title>Dashboard</Title>
-    </>
-  );
+    return redirect('/dashboard')
 }

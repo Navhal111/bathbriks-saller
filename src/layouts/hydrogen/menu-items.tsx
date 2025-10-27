@@ -4,6 +4,8 @@ import {
   PiFolder,
   PiAcorn,
   PiWallet,
+  PiGlobe,
+  PiSupersetOf,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -24,7 +26,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     name: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     icon: <PiFolder />,
   },
   {
@@ -58,17 +60,30 @@ export const menuItems: MenuItem[] = [
     ],
   },
   {
+    name: "Brand",
+    href: "/brand",
+    icon: <PiGlobe />,
+  },
+  {
     name: "Orders modules",
     href: "#",
     icon: <PiAcorn />,
     dropdownItems: [
       {
-        name: "Orders List",
-        href: "/orders",
+        name: "Live Orders",
+        href: "/live-orders",
       },
       {
-        name: "Return Orders",
-        href: "/return-orders",
+        name: "Cancelled Orders",
+        href: "/cancelled-orders",
+      },
+      {
+        name: "Delivered Orders",
+        href: "/delivered-orders",
+      },
+      {
+        name: "Order Reports",
+        href: "/order-reports",
       },
     ],
   },
@@ -86,6 +101,11 @@ export const menuItems: MenuItem[] = [
         href: "/wallet",
       },
     ],
+  },
+  {
+    name: "Support",
+    href: "/support",
+    icon: <PiSupersetOf />,
   },
   // {
   //   name: "Reports",
