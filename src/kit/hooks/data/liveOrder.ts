@@ -2,8 +2,7 @@ import { API_VERSION, customRequest, fetchAll, fetchOne } from '@/kit/hooks/data
 import useSWR from 'swr'
 import type { CustomError } from '@/kit/models/CustomError'
 import type { Params } from '@/kit/services/axiosService'
-import { GetAllObjectResponse, GetAllResponse, GetOneResponse } from '@/kit/models/_generic';
-import { useSWRUpdateOne } from './swr/useSWRUpdateOne';
+import { GetAllResponse, GetOneResponse } from '@/kit/models/_generic';
 import useSWRDeleteOneAndRefreshAll from './swr/useSWRDeleteOneAndRefreshAll';
 import { SellerOrderType } from '@/kit/models/Order';
 import useSWRMutation from 'swr/mutation';

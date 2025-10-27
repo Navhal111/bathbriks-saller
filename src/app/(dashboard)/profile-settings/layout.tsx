@@ -1,4 +1,3 @@
-import { routes } from "@/config/routes";
 import PageHeader from "@/app/(dashboard)/shared/page-header";
 import ProfileSettingsNav from "@/app/(dashboard)/shared/account-settings/navigation";
 
@@ -7,11 +6,7 @@ const pageHeader = {
   breadcrumb: [
     {
       href: "/dashboard",
-      name: "Home",
-    },
-    {
-      href: routes.profileSettings.dashboard,
-      name: "Form",
+      name: "Dashboard",
     },
     {
       name: "Account Settings",

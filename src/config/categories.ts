@@ -18,4 +18,6 @@ export const STATUS_OPTIONS: DropdownOptions[] = [
 export type StatusType =
     | 'draft'
     | 'published'
-    | 'pending';
+    | 'pending'
+    | 'approved'
+    | 'rejected';

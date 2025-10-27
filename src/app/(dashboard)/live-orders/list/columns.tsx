@@ -10,16 +10,17 @@ import EyeIcon from '@/components/icons/eye';
 import { LIVE_ORDER_STATUS_OPTIONS } from '@/config/orders';
 import cn from '@/utils/class-names';
 import dayjs from 'dayjs';
+import { formatDate } from '@/utils/format-date';
 
 const columnHelper = createColumnHelper<SellerOrderType>();
 
 export const ordersListColumns = [
     columnHelper.accessor('order_date', {
         id: 'order_date',
-        size: 150,
+        size: 250,
         header: 'Date',
         cell: ({ row }) => (
-            <Text className="font-medium text-gray-700">{dayjs(row.original.order_date).format('DD-MMM-YYYY')}</Text>
+            <Text className="font-semibold text-gray-700">{dayjs(row.original.order_date).format('DD-MMM-YYYY')} at {formatDate(new Date(row.original.order_date), 'h:mm A')}</Text>
         ),
     }),
     columnHelper.accessor('id', {

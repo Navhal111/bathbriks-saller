@@ -14,6 +14,7 @@ import { useAuth } from "@/kit/hooks/useAuth";
 import { useUpdateUser } from "@/kit/hooks/data/user";
 import storage from "@/kit/services/storage";
 import authConfig from '@/config/auth'
+import { CustomErrorType } from "@/kit/models/CustomError";
 
 interface FormData {
     companyName: string,
@@ -28,17 +29,19 @@ const formSchema = yup.object().shape({
     gstNumber: yup
         .string()
         .required('GST number is required')
-        .length(15, 'GST number must be exactly 15 characters'),
+        .length(15, 'GST number must be exactly 15 characters')
+        .matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, 'Invalid GST number format'),
     panNumber: yup
         .string()
         .required('PAN number is required')
-        .length(15, 'GST number must be exactly 10 characters'),
+        .length(10, 'PAN number must be exactly 10 characters')
+        .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, 'Invalid PAN number format'),
 })
 
 export default function CompanyDetailsPage() {
     const { user, loading } = useAuth()
 
-    const { update: onUpdateUser, isUpdatingUser: isUserUpdateLoading } = useUpdateUser()
+    const { update: onUpdateUser, isUpdatingUser: isUserUpdateLoading } = useUpdateUser(String(user?.id) || '')
 
     const defaultValues: FormData = {
         companyName: user?.companyName || '',
@@ -101,9 +104,9 @@ export default function CompanyDetailsPage() {
             const updateUser = await onUpdateUser(payload)
             await Promise.all([storage.setItem(authConfig.storageUserDetailName, updateUser.data)])
             toast.success(updateUser?.message ?? 'Profile updated successfully!')
-
+            window.location.reload();
         } catch (error) {
-            toast.error(<Text as="b">Failed to update profile</Text>);
+            toast.error((error as CustomErrorType)?.message ?? 'Something went wrong, please try again.')
         }
     };
 
@@ -169,10 +172,6 @@ export default function CompanyDetailsPage() {
                                             onChange={onChange}
                                             error={errors.gstNumber && errors.gstNumber.message}
                                             placeholder="Enter GST number (15 characters)"
-                                            type="number"
-                                            onKeyDown={(e) => {
-                                                if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
-                                            }}
                                         />
                                     )}
                                 />

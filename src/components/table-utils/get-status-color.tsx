@@ -2,6 +2,8 @@ export const shippingStatuses = {
   Draft: "draft",
   Published: "published",
   Pending: "pending",
+  Approved: "approved",
+  Rejected: "rejected",
   Delivered: "Delivered",
   DeliveryFailed: "Delivery Failed",
   Started: "started",
@@ -10,7 +12,7 @@ export const shippingStatuses = {
 };
 
 export function getStatusColors(status: string) {
-  if (shippingStatuses.Draft === status) {
+  if (shippingStatuses.Approved === status) {
     return "success";
   }
   if (shippingStatuses.Resolved === status) {
@@ -25,13 +27,13 @@ export function getStatusColors(status: string) {
   if (shippingStatuses.Cancelled === status) {
     return "secondary";
   }
-  if (shippingStatuses.Pending === status) {
+  if (shippingStatuses.Pending === status || shippingStatuses.Draft === status) {
     return "info";
   }
   if (shippingStatuses.Delivered === status) {
     return "success";
   }
-  if (shippingStatuses.DeliveryFailed === status) {
+  if (shippingStatuses.DeliveryFailed === status || shippingStatuses.Rejected === status) {
     return "danger";
   }
 }

@@ -14,6 +14,7 @@ import { useAuth } from "@/kit/hooks/useAuth";
 import { useUpdateUser } from "@/kit/hooks/data/user";
 import storage from "@/kit/services/storage";
 import authConfig from '@/config/auth'
+import { CustomErrorType } from "@/kit/models/CustomError";
 
 const accountTypeOptions = [
     { label: 'Savings Account', value: 'SAVINGS' },
@@ -49,7 +50,7 @@ const formSchema = yup.object().shape({
 export default function BankDetailsPage() {
     const { user, loading } = useAuth()
 
-    const { update: onUpdateUser, isUpdatingUser: isUserUpdateLoading } = useUpdateUser()
+    const { update: onUpdateUser, isUpdatingUser: isUserUpdateLoading } = useUpdateUser(String(user?.id) || '')
 
     const defaultValues: FormData = {
         bankName: user?.bankAccounts[0]?.bankName || '',
@@ -115,9 +116,9 @@ export default function BankDetailsPage() {
             const updateUser = await onUpdateUser(payload)
             await Promise.all([storage.setItem(authConfig.storageUserDetailName, updateUser.data)])
             toast.success(updateUser?.message ?? 'Profile updated successfully!')
-
+            window.location.reload();
         } catch (error) {
-            toast.error(<Text as="b">Failed to update profile</Text>);
+            toast.error((error as CustomErrorType)?.message ?? 'Something went wrong, please try again.')
         }
     };
 

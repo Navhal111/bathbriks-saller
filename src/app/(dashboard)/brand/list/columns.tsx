@@ -1,8 +1,10 @@
 'use client';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { Text } from 'rizzui';
+import { Badge, Text } from 'rizzui';
 import { BrandType } from '@/kit/models/Brand';
+import { StatusType } from '@/config/categories';
+import { getStatusColors } from '@/components/table-utils/get-status-color';
 
 const columnHelper = createColumnHelper<BrandType>();
 
@@ -18,6 +20,24 @@ export const brandListColumns = [
         size: 200,
         header: 'Slug',
         cell: ({ row }) => <Text className="text-sm">{row.original.slug}</Text>,
+    }),
+    columnHelper.accessor('status', {
+        id: 'status',
+        size: 170,
+        header: 'Status',
+        enableSorting: false,
+        cell: ({ row }) => {
+            return (
+                <Badge
+                    variant="outline"
+                    className="w-32 font-medium"
+                    color={getStatusColors(row.original.status.toLowerCase() as StatusType)}
+                    data-color={getStatusColors(row.original.status.toLowerCase() as StatusType)}
+                >
+                    {row.original.status}
+                </Badge>
+            );
+        },
     }),
     // columnHelper.accessor('status', {
     //     id: 'status',

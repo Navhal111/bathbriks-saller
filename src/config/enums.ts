@@ -43,3 +43,11 @@ export enum ProductStatus {
   REMOVED_BY_ADMIN = "REMOVED_BY_ADMIN",
   DEACTIVATED = "DEACTIVATED",
 }
+
+export enum SellerStatus {
+  REJECTED = "REJECTED",
+  APPROVED = "APPROVED",
+  PENDING = "PENDING",
+  DRAFT = "DRAFT",
+  LIVE = "LIVE"
+}

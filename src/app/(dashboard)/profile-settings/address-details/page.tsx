@@ -15,6 +15,7 @@ import storage from "@/kit/services/storage";
 import authConfig from '@/config/auth'
 import { useUpdateUser } from "@/kit/hooks/data/user";
 import { Country, locationData, State } from "@/dummyData/country";
+import { CustomErrorType } from "@/kit/models/CustomError";
 
 interface FormData {
     registeredAddress: {
@@ -53,7 +54,7 @@ const formSchema = yup.object().shape({
 export default function AddressDetailsPage() {
     const { user, loading } = useAuth()
 
-    const { update: onUpdateUser, isUpdatingUser: isUserUpdateLoading } = useUpdateUser()
+    const { update: onUpdateUser, isUpdatingUser: isUserUpdateLoading } = useUpdateUser(String(user?.id) || '')
 
     const defaultValues: FormData = {
         registeredAddress: {
@@ -181,9 +182,9 @@ export default function AddressDetailsPage() {
             const updateUser = await onUpdateUser(payload)
             await Promise.all([storage.setItem(authConfig.storageUserDetailName, updateUser.data)])
             toast.success(updateUser?.message ?? 'Profile updated successfully!')
-
+            window.location.reload();
         } catch (error) {
-            toast.error(<Text as="b">Failed to update profile</Text>);
+            toast.error((error as CustomErrorType)?.message ?? 'Something went wrong, please try again.')
         }
     };
 

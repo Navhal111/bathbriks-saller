@@ -10,7 +10,8 @@ import authConfig from '@/config/auth'
 import storage from '@/kit/services/storage'
 
 const USER_DETAIL_PATH_NAME = 'seller/fetch-profile'
-const USER_UPDATE_PATH_NAME = 'user'
+const USER_PATH = 'user'
+const USER_UPDATE_PATH_NAME = 'seller/sellers'
 
 const useSWRUserDetail = (shouldFetch = true) => {
     const sellerId = storage.getItem(authConfig.storageUserIDName)
@@ -60,7 +61,7 @@ const useUpdateUser = (id = '') => {
 
 const useDeleteUser = () => {
     const { data, error, isDeleting, reset, deleteRecord } = useSWRDeleteOneAndRefreshAll<User>({
-        path: USER_UPDATE_PATH_NAME
+        path: USER_PATH
     })
 
     return {
@@ -74,8 +75,8 @@ const useDeleteUser = () => {
 
 const useGetAllUser = (params?: Params, shouldFetch = true) => {
     const { data, error, isValidating, isLoading, mutate } = useSWR<GetAllResponse<User>, CustomError[]>(
-        shouldFetch ? [USER_UPDATE_PATH_NAME, params] : null,
-        (): Promise<GetAllResponse<User>> => fetchAll(USER_UPDATE_PATH_NAME, params),
+        shouldFetch ? [USER_PATH, params] : null,
+        (): Promise<GetAllResponse<User>> => fetchAll(USER_PATH, params),
         {
             revalidateOnMount: true,
             revalidateIfStale: true,
@@ -96,8 +97,8 @@ const useGetAllUser = (params?: Params, shouldFetch = true) => {
 
 const useGetOneUser = (id = '', params?: Params, shouldFetch = true) => {
     const { data, error, isValidating, isLoading, mutate } = useSWR<GetOneResponse<User>, CustomError[]>(
-        shouldFetch ? [USER_UPDATE_PATH_NAME, params] : null,
-        (): Promise<GetOneResponse<User>> => fetchOne(USER_UPDATE_PATH_NAME, id, params),
+        shouldFetch ? [USER_PATH, params] : null,
+        (): Promise<GetOneResponse<User>> => fetchOne(USER_PATH, id, params),
         {
             revalidateOnMount: true,
             revalidateIfStale: true,

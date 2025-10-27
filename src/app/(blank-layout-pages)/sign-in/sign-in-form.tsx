@@ -15,6 +15,7 @@ import storage from '@/kit/services/storage';
 import authConfig from '@/config/auth'
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/kit/hooks/useAuth';
+import { SellerStatus } from '@/config/enums';
 
 const initialValues: LoginSchema = {
   email: '',
@@ -43,13 +44,21 @@ export default function SignInForm() {
       const loginDetail = await onLoginAccount(payload as Partial<Login>, undefined, headers);
       auth.setLoading(false)
 
+      if (loginDetail.data.seller.status === SellerStatus.REJECTED) {
+        toast.error('Your account has been rejected. Please contact support for more information.');
+        router.replace('/sign-in');
+        return;
+      }
+
+
       storage.setItem(authConfig.storageTokenKeyName, loginDetail.data.accessToken)
       storage.setItem(authConfig.storageRefreshKeyName, loginDetail.data.refreshToken)
       storage.setItem(authConfig.storageUserDetailName, loginDetail.data.seller)
       storage.setItem('userId', loginDetail.data.seller.id)
 
       setReset({ email: "", password: "", isRememberMe: false });
-      toast.success(loginDetail?.message ?? 'Login Successfully!')
+      loginDetail.data.seller.status === SellerStatus.PENDING && toast.success('Login Successfully! Your account is pending approval.');
+      loginDetail.data.seller.status === SellerStatus.APPROVED && toast.success(loginDetail?.message ?? 'Login Successfully!')
       router.replace('/dashboard')
     } catch (error) {
       toast.error((error as CustomErrorType)?.message ?? 'Something went wrong, please try again.');

@@ -5,5 +5,5 @@ export interface BrandType extends BaseModel {
     slug: string
     image:string
     description?: string;
-    status?: string;
+    status: string;
 }
